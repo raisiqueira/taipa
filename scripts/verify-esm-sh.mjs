@@ -12,7 +12,10 @@
 //   1. vp run -r build                       # fresh dist
 //   2. pnpm --filter @taipa/ui publish       # publishes 0.0.0-cdn-probe.* (pnpm rewrites catalog:)
 //   3. pnpm verify:cdn                       # this script (network)
-//   4. npm deprecate @taipa/ui@0.0.0-cdn-probe.0 "U1 CDN probe canary; superseded by supported alphas."
+//   4. (cd "$(mktemp -d)" && npm deprecate @taipa/ui@<version> "U1 CDN probe canary; superseded by supported alphas.")
+//      ^ run from a neutral directory: the repo root's devEngines pin makes
+//        npm refuse ANY command (EBADDEVENGINES) there, and pnpm deprecate
+//        can lag registry propagation right after publish.
 //
 // Usage: pnpm verify:cdn [-- <version>]   (defaults to packages/ui version)
 import { readFileSync } from "node:fs";
@@ -22,7 +25,21 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pkg = JSON.parse(readFileSync(path.join(root, "packages/ui/package.json"), "utf8"));
 const version = process.argv[2] ?? pkg.version;
-const alienVersion = pkg.dependencies["alien-signals"]?.replace(/^[^\d]*/, "") ?? "3.2.1";
+
+// packages/ui declares alien-signals via the `catalog:` protocol, so resolve
+// the exact version from the workspace catalog (the single source of truth)
+// when the manifest carries no literal version.
+let alienVersion = pkg.dependencies?.["alien-signals"]?.match(/\d+\.\d+\.\d+/)?.[0];
+if (!alienVersion) {
+  const workspaceYaml = readFileSync(path.join(root, "pnpm-workspace.yaml"), "utf8");
+  alienVersion = workspaceYaml.match(/^\s*alien-signals:\s*(\d+\.\d+\.\d+)\s*$/m)?.[1];
+}
+if (!alienVersion) {
+  console.error(
+    "Could not resolve the alien-signals version from packages/ui or the pnpm catalog.",
+  );
+  process.exit(1);
+}
 
 const entries = [
   { name: "root", specifier: `@taipa/ui@${version}` },
@@ -124,6 +141,5 @@ if (failures > 0) {
   );
   process.exit(1);
 }
-console.log(
-  'CDN topology verified. Deprecate the probe on npm when done: npm deprecate @taipa/ui@<probe-version> "U1 CDN probe canary; superseded by supported alphas."',
-);
+console.log(`CDN topology verified. Deprecate the probe on npm when done (from a neutral directory — the repo root's devEngines pin makes npm refuse commands there):
+(cd "$(mktemp -d)" && npm deprecate @taipa/ui@${version} "U1 CDN probe canary; superseded by supported alphas.")`);
