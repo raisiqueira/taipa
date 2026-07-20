@@ -1,0 +1,90 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      # setup-vp resolves the vite-plus version from the pnpm catalog and the
+      # Node version from .node-version; `cache: true` caches the pnpm store
+      # (package-manager cache), which is distinct from the Vite Task cache
+      # used by `vp run`.
+      - uses: voidzero-dev/setup-vp@250f29ce396baf5e8f24498e17c0dfdebabc26eb # v1 (v1.15.0)
+        with:
+          node-version-file: ".node-version"
+          cache: true
+          run-install: false
+
+      - run: vp install --frozen-lockfile
+
+      - run: vp check
+
+      - run: vp run -r build
+
+      - name: Provision Playwright Chromium and Linux system dependencies
+        run: pnpm --filter @taipa/ui exec playwright install --with-deps chromium
+
+      - run: vp run -r test
+
+      - name: Toolchain deliberate-failure smoke checks
+        run: node scripts/smoke-toolchain.mjs
+
+  consumer:
+    # Clean-consumer import checks on the Node floor (22.12) and current LTS.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["22.12.0", "24.18.0"]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - uses: voidzero-dev/setup-vp@250f29ce396baf5e8f24498e17c0dfdebabc26eb # v1 (v1.15.0)
+        with:
+          node-version-file: ".node-version"
+          cache: true
+          run-install: false
+
+      - run: vp install --frozen-lockfile
+
+      - run: vp run -r build
+
+      # Placed after setup-vp so PATH resolves `node`/`npm` to the matrix
+      # version for the clean-consumer steps (consumers never run vp).
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Verify clean consumer imports every subpath
+        run: node scripts/verify-consumer.mjs
+
+  django:
+    # Python lane: independent of pnpm; uv.lock is the freeze mechanism.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: integrations/django
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+        with:
+          enable-cache: true
+          python-version: "3.12"
+
+      - run: uv sync --frozen
+
+      - run: uv run --frozen ruff check
+
+      - run: uv run --frozen ruff format --check
+
+      - run: uv run --frozen pytest

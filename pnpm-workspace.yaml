@@ -1,0 +1,23 @@
+packages:
+  - packages/*
+
+catalogMode: prefer
+
+catalog:
+  "@types/node": 24.13.3
+  typescript: 7.0.2
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.5
+  vite-plus: 0.2.5
+  # alien-signals is the shared reactivity contract across every Taipa package
+  # and the CDN import map. Keep this exact (KTD4/KTD8); bump deliberately.
+  alien-signals: 3.2.1
+  # Bundled Vitest version in vite-plus@0.2.5; the browser provider peer must match exactly.
+  "@vitest/browser-playwright": 4.1.10
+  playwright: 1.61.1
+overrides:
+  vite: "catalog:"
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: "*"

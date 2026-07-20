@@ -1,0 +1,15 @@
+{
+  "name": "@taipa/conformance",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "vp check"
+  },
+  "devDependencies": {
+    "@taipa/ui": "workspace:*",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
