@@ -21,14 +21,14 @@ export default defineConfig({
       {
         test: {
           name: "node",
-          include: ["tests/**/*.node.test.ts"],
+          include: ["tests/node/**/*.test.ts"],
           environment: "node",
         },
       },
       {
         test: {
           name: "browser",
-          include: ["tests/**/*.browser.test.ts"],
+          include: ["tests/browser/**/*.test.ts"],
           browser: {
             enabled: true,
             provider: playwright(),

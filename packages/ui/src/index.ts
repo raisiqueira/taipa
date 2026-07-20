@@ -1,15 +1,34 @@
-import { signal } from "alien-signals";
-
-export const probeTarget = "@taipa/ui:root";
-
 /**
- * U1 CDN-probe canary: proves the root subpath ships ESM and keeps
- * alien-signals as an external import. Replaced by the real runtime in U2+.
+ * `@taipa/ui` — the universal entry point (R1, R3–R4, R15; design 3.2).
+ *
+ * Universal component definitions, the safe `html` template, branded safe
+ * values, and the alien-signals reactivity surface. This module is DOM-free
+ * and performs no work at import time (AE9): no `window`/`document` access,
+ * no Node imports, no auto-bootstrap.
  */
-export function createProbeCount(initial: number) {
-  const count = signal(initial);
-  return {
-    get: () => count(),
-    set: (value: number) => count(value),
-  };
-}
+export type {
+  Cleanup,
+  ClientContext,
+  Component,
+  DerivedSignals,
+  JsonObject,
+  JsonPrimitive,
+  JsonValue,
+  MaybePromise,
+  ReactiveContext,
+  ReadSignal,
+  RefMap,
+  SafeHtml,
+  SafeUrl,
+  Signal,
+  StateSignals,
+} from "./types.ts";
+
+export { component } from "./component.ts";
+export type { ComponentOptions } from "./component.ts";
+
+export { html, raw } from "./template/html.ts";
+export { safeUrl } from "./template/safe-url.ts";
+export type { SafeUrlOptions } from "./template/safe-url.ts";
+
+export { batch, computed, effect, effectScope, signal } from "./reactivity.ts";

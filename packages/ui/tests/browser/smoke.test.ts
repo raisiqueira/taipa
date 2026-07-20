@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { mountProbe, probeTarget } from "../src/client.ts";
+import { mountProbe, probeTarget } from "../../src/client.ts";
 
 test("runs in a real browser", () => {
   expect(typeof window).toBe("object");

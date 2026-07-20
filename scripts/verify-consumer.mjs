@@ -75,10 +75,16 @@ const checks = [
   {
     subpath: "@taipa/ui",
     assert: `const m = await import("@taipa/ui");
-if (m.probeTarget !== "@taipa/ui:root") throw new Error("bad root marker");
-const c = m.createProbeCount(1);
-c.set(41);
-if (c.get() !== 41) throw new Error("alien-signals reactivity broken");`,
+for (const key of ["component","html","raw","safeUrl","signal","computed","effect","effectScope","batch"]) {
+  if (typeof m[key] !== "function") throw new Error("missing root export: " + key);
+}
+const c = m.component("probe", { contractVersion: "1" }).state("n", 0).render(() => m.html\`<p>x</p>\`);
+if (c.name !== "probe" || c.contractVersion !== "1") throw new Error("component metadata broken");
+if (m.html\`<p>\${"<e>"}</p>\`.value !== "<p>&lt;e&gt;</p>") throw new Error("html escaping broken");
+const s = m.signal(1);
+m.batch(() => { s(41); });
+if (s() !== 41) throw new Error("alien-signals reactivity broken");
+if (m.safeUrl("/x").value !== "/x") throw new Error("safeUrl broken");`,
   },
   {
     subpath: "@taipa/ui/server",
