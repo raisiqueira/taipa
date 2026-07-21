@@ -67,7 +67,8 @@ export interface ConnectedRegistration<P, S, D> {
  * public surface exposes only `Component` (name, contractVersion,
  * requiredRefs).
  */
-export interface ComponentDefinition<P, S, D> extends Component<P, S, D> {
+// oxlint-disable-next-line no-explicit-any -- bare ComponentDefinition reads as an opaque handle
+export interface ComponentDefinition<P = any, S = any, D = any> extends Component<P, S, D> {
   readonly view: (context: ReactiveContext<P, S, D>) => MaybePromise<SafeHtml>;
   readonly stateRegistrations: readonly StateRegistration[];
   readonly derivedRegistrations: readonly DerivedRegistration<P, S, D>[];

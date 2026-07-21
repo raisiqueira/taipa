@@ -7,7 +7,7 @@ export default defineConfig({
   pack: {
     entry: {
       index: "src/index.ts",
-      client: "src/client.ts",
+      client: "src/client/index.ts",
       server: "src/server/index.ts",
       forms: "src/forms.ts",
     },
@@ -22,6 +22,13 @@ export default defineConfig({
         test: {
           name: "node",
           include: ["tests/node/**/*.test.ts"],
+          environment: "node",
+        },
+      },
+      {
+        test: {
+          name: "package",
+          include: ["tests/package/**/*.test.ts"],
           environment: "node",
         },
       },

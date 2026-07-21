@@ -112,8 +112,9 @@ if (m.probeFieldName("email") !== "taipa:email") throw new Error("probeFieldName
   {
     subpath: "@taipa/ui/client",
     assert: `const m = await import("@taipa/ui/client");
-if (m.probeTarget !== "@taipa/ui:client") throw new Error("bad client marker");
-if (typeof m.mountProbe !== "function") throw new Error("mountProbe missing");`,
+if (typeof m.hydrate !== "function" || typeof m.mount !== "function" || typeof m.unmount !== "function") throw new Error("client surface incomplete");
+if ("window" in globalThis || "document" in globalThis || "customElements" in globalThis) throw new Error("DOM global leaked");
+if (globalThis[Symbol.for("taipa/ui/runtime")] !== undefined) throw new Error("runtime registry created at import");`,
   },
 ];
 

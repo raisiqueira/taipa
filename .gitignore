@@ -43,3 +43,4 @@ __pycache__/
 .claude/worktrees/
 .opencode/worktrees/
 .vitest-attachments/
+__screenshots__/

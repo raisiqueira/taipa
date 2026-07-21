@@ -66,9 +66,27 @@ export interface ClientContext<P, S, D> extends ReactiveContext<P, S, D> {
   readonly signal: AbortSignal;
 }
 
-// oxlint-disable-next-line no-unused-vars -- phantom params carry P/S/D identity for renderer and hydration signatures
-export interface Component<P, S, D> {
+// oxlint-disable-next-line no-unused-vars, no-explicit-any -- phantom params carry P/S/D identity; bare Component reads as an opaque handle
+export interface Component<P = any, S = any, D = any> {
   readonly name: string;
   readonly contractVersion: string;
   readonly requiredRefs: readonly string[];
+}
+
+export interface HydrateOptions<P, S> {
+  readonly props?: P;
+  readonly state?: Partial<S>;
+}
+
+export interface MountOptions<P, S> extends HydrateOptions<P, S> {
+  readonly replace?: boolean;
+}
+
+// oxlint-disable-next-line no-explicit-any -- bare ComponentInstance reads as an opaque handle
+export interface ComponentInstance<P = any, S = any, D = any> {
+  readonly host: HTMLElement;
+  readonly props: Readonly<P>;
+  readonly state: StateSignals<S>;
+  readonly derived: DerivedSignals<D>;
+  destroy(): void;
 }
