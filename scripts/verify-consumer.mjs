@@ -89,8 +89,19 @@ if (m.safeUrl("/x").value !== "/x") throw new Error("safeUrl broken");`,
   {
     subpath: "@taipa/ui/server",
     assert: `const m = await import("@taipa/ui/server");
-if (m.probeTarget !== "@taipa/ui:server") throw new Error("bad server marker");
-if (!m.renderProbe("ok").includes("data-taipa-probe")) throw new Error("renderProbe broken");`,
+const ui = await import("@taipa/ui");
+for (const key of ["renderToString","renderIsland"]) {
+  if (typeof m[key] !== "function") throw new Error("missing server export: " + key);
+}
+const c = ui.component("Probe", { contractVersion: "1" })
+  .state("n", ({ props }) => props.start)
+  .render(({ state }) => ui.html\`<output>\${state.n()}</output>\`);
+const inner = await m.renderToString(c, { start: 2 });
+if (inner !== "<output>2</output>") throw new Error("renderToString broken: " + inner);
+const island = await m.renderIsland(c, { start: 2 }, { hydrate: "load", state: { n: 5 } });
+const expected = '<taipa-island data-taipa-component="Probe" data-taipa-hydrate="load" data-taipa-version="1"><output>5</output><script type="application/json" data-taipa-props>{"start":2}</script><script type="application/json" data-taipa-state>{"n":5}</script></taipa-island>';
+if (island !== expected) throw new Error("renderIsland broken: " + island);
+if ("window" in globalThis || "document" in globalThis) throw new Error("DOM global leaked");`,
   },
   {
     subpath: "@taipa/ui/forms",

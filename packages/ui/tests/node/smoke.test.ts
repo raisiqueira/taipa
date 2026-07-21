@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
 import { probeFieldName } from "../../src/forms.ts";
 import { component, html, signal } from "../../src/index.ts";
-import { probeTarget as serverTarget, renderProbe } from "../../src/server.ts";
+import { renderIsland, renderToString } from "../../src/server/index.ts";
 
 test("runs in the node environment", () => {
   expect(typeof process.versions.node).toBe("string");
@@ -19,8 +19,11 @@ test("the root universal surface works in node", () => {
   expect(count()).toBe(2);
 });
 
-test("server-safe subpaths are importable in node", () => {
-  expect(serverTarget).toBe("@taipa/ui:server");
-  expect(renderProbe("ok")).toContain('data-taipa-probe="server"');
+test("server-safe subpaths are importable in node", async () => {
+  const badge = component("badge", { contractVersion: "1" }).render(() => html`<b>ok</b>`);
+  expect(await renderToString(badge, {})).toBe("<b>ok</b>");
+  expect(await renderIsland(badge, {})).toBe(
+    '<taipa-island data-taipa-component="badge"><b>ok</b></taipa-island>',
+  );
   expect(probeFieldName("email")).toBe("taipa:email");
 });

@@ -1,0 +1,8 @@
+{
+  "description": "Static island: no hydration policy means no version attribute and no JSON scripts at all.",
+  "component": "Badge",
+  "props": { "label": "Beta" },
+  "state": null,
+  "options": {},
+  "expect": "<taipa-island data-taipa-component=\"Badge\"><span>Beta</span></taipa-island>"
+}

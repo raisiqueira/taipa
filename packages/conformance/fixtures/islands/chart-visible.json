@@ -1,0 +1,8 @@
+{
+  "description": "Visible-hydrated chart: id, root margin, and props script; no state script without explicit overrides.",
+  "component": "PriceChart",
+  "props": { "symbol": "TAIPA" },
+  "state": null,
+  "options": { "id": "price-history", "hydrate": "visible", "visibleRootMargin": "300px 0px" },
+  "expect": "<taipa-island id=\"price-history\" data-taipa-component=\"PriceChart\" data-taipa-hydrate=\"visible\" data-taipa-visible-root-margin=\"300px 0px\" data-taipa-version=\"2\"><p data-taipa-ref=\"status\">TAIPA</p><script type=\"application/json\" data-taipa-props>{\"symbol\":\"TAIPA\"}</script></taipa-island>"
+}
