@@ -42,3 +42,4 @@ __pycache__/
 # AI agent worktrees
 .claude/worktrees/
 .opencode/worktrees/
+.vitest-attachments/
