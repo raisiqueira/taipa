@@ -116,6 +116,31 @@ export interface BootstrapHandle {
 export type FormErrors = Readonly<Record<string, readonly string[]>>;
 export type ValidationMode = "submit" | "blur" | "input";
 
+export type StandardSchemaPathSegment = PropertyKey | { readonly key: PropertyKey };
+
+export interface StandardSchemaIssue {
+  readonly message: string;
+  readonly path?: readonly StandardSchemaPathSegment[];
+}
+
+export type StandardSchemaResult<Output> =
+  | { readonly value: Output; readonly issues?: undefined }
+  | { readonly issues: readonly StandardSchemaIssue[] };
+
+export interface StandardSchemaV1<Input = unknown, Output = Input> {
+  readonly "~standard": {
+    readonly version: 1;
+    readonly vendor: string;
+    validate(value: Input): MaybePromise<StandardSchemaResult<Output>>;
+  };
+}
+
+export interface StandardSchemaAdapterOptions {
+  readonly formErrorName?: string;
+  readonly pathToName?: (path: readonly PropertyKey[]) => string;
+  readonly errorMessage?: string | ((error: unknown) => string);
+}
+
 export interface FormReadContext {
   readonly form: HTMLFormElement;
   readonly formData: FormData;

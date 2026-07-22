@@ -37,3 +37,12 @@ test("importing /server in Node is side-effect free", async () => {
   expect("customElements" in globalThis).toBe(false);
   expect(runtimeRegistry()).toBeUndefined();
 });
+
+test("importing /forms in Node is side-effect free", async () => {
+  const forms = await import("../../src/forms/index.ts");
+  expect(typeof forms.createForm).toBe("function");
+  expect(typeof forms.standardSchema).toBe("function");
+  expect(typeof forms.issuesToFormErrors).toBe("function");
+  expect("customElements" in globalThis).toBe(false);
+  expect(runtimeRegistry()).toBeUndefined();
+});

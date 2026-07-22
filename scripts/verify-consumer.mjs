@@ -107,7 +107,26 @@ if ("window" in globalThis || "document" in globalThis) throw new Error("DOM glo
     subpath: "@taipa/ui/forms",
     assert: `const m = await import("@taipa/ui/forms");
 if (typeof m.createForm !== "function") throw new Error("missing forms export: createForm");
+if (typeof m.standardSchema !== "function") throw new Error("missing forms export: standardSchema");
+if (typeof m.issuesToFormErrors !== "function") throw new Error("missing forms export: issuesToFormErrors");
+const errors = m.issuesToFormErrors([{ message: "Required", path: ["user", "email"] }]);
+if (errors["user.email"]?.[0] !== "Required") throw new Error("standard schema issue mapping broken");
 if ("window" in globalThis || "document" in globalThis || "customElements" in globalThis) throw new Error("DOM global leaked");`,
+    afterInstall: () => {
+      const declarations = readFileSync(
+        path.join(consumerDir, "node_modules/@taipa/ui/dist/forms.d.mts"),
+        "utf8",
+      );
+      for (const typeName of [
+        "StandardSchemaAdapterOptions",
+        "StandardSchemaIssue",
+        "StandardSchemaV1",
+      ]) {
+        if (!declarations.includes(typeName)) {
+          throw new Error(`missing forms declaration export: ${typeName}`);
+        }
+      }
+    },
   },
   {
     subpath: "@taipa/ui/client",
@@ -118,7 +137,8 @@ if (globalThis[Symbol.for("taipa.ui/runtime")] !== undefined) throw new Error("r
   },
 ];
 
-for (const { subpath, assert } of checks) {
+for (const { subpath, assert, afterInstall } of checks) {
+  afterInstall?.();
   const result = spawnSync("node", ["--input-type=module", "-e", assert], {
     cwd: consumerDir,
     encoding: "utf8",
