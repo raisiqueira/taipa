@@ -112,9 +112,9 @@ if (m.probeFieldName("email") !== "taipa:email") throw new Error("probeFieldName
   {
     subpath: "@taipa/ui/client",
     assert: `const m = await import("@taipa/ui/client");
-if (typeof m.hydrate !== "function" || typeof m.mount !== "function" || typeof m.unmount !== "function") throw new Error("client surface incomplete");
+if (typeof m.bootstrap !== "function" || typeof m.hydrate !== "function" || typeof m.mount !== "function" || typeof m.unmount !== "function") throw new Error("client surface incomplete");
 if ("window" in globalThis || "document" in globalThis || "customElements" in globalThis) throw new Error("DOM global leaked");
-if (globalThis[Symbol.for("taipa/ui/runtime")] !== undefined) throw new Error("runtime registry created at import");`,
+if (globalThis[Symbol.for("taipa.ui/runtime")] !== undefined) throw new Error("runtime registry created at import");`,
   },
 ];
 

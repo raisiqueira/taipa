@@ -83,11 +83,7 @@ export function attachComponent<P, S, D>(
         );
       }
     }
-    const payloadProps = readPayload(host, definition, ATTR_PROPS_SCRIPT, "props");
-    const payloadState = readPayload(host, definition, ATTR_STATE_SCRIPT, "state");
-    if (payloadState !== undefined) {
-      assertKnownStateKeys(definition, payloadState);
-    }
+    const { props: payloadProps, state: payloadState } = readHostPayloads(host, definition);
     if (options?.props !== undefined) {
       validateProps(definition, options.props);
     }
@@ -213,6 +209,21 @@ function findPayloadScripts(host: HTMLElement, attribute: string): Element[] {
     scripts.push(walker.currentNode as Element);
   }
   return scripts;
+}
+
+export function readHostPayloads(
+  host: HTMLElement,
+  definition: ComponentDefinition,
+): { readonly props?: Record<string, unknown>; readonly state?: Record<string, unknown> } {
+  const props = readPayload(host, definition, ATTR_PROPS_SCRIPT, "props");
+  const state = readPayload(host, definition, ATTR_STATE_SCRIPT, "state");
+  if (state !== undefined) {
+    assertKnownStateKeys(definition, state);
+  }
+  return {
+    ...(props !== undefined ? { props } : {}),
+    ...(state !== undefined ? { state } : {}),
+  };
 }
 
 function readPayload(

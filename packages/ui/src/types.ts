@@ -90,3 +90,25 @@ export interface ComponentInstance<P = any, S = any, D = any> {
   readonly derived: DerivedSignals<D>;
   destroy(): void;
 }
+
+export type ComponentLoader = () => Promise<Record<string, unknown>>;
+
+export interface RegistryEntry {
+  readonly load: ComponentLoader;
+  readonly exportName?: string;
+}
+
+export type ComponentRegistry = Readonly<Record<string, ComponentLoader | RegistryEntry>>;
+
+export interface BootstrapOptions {
+  readonly root?: ParentNode;
+  readonly registry?: ComponentRegistry;
+  readonly observe?: boolean;
+  readonly resolveDomModule?: (specifier: string, host: HTMLElement) => ComponentLoader | null;
+  readonly onError?: (error: unknown, host: HTMLElement) => void;
+}
+
+export interface BootstrapHandle {
+  scan(root?: ParentNode): void;
+  destroy(): void;
+}

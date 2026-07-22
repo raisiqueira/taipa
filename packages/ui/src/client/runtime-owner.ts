@@ -9,7 +9,8 @@
  * disconnections. Cleanup is deferred one microtask so native DOM moves —
  * which pass through a disconnected state — reconnect without teardown.
  */
-import type { ComponentInstance } from "../types.ts";
+import type { ComponentInstance, ComponentLoader } from "../types.ts";
+import type { ScheduledTask } from "./scheduler.ts";
 
 export const RUNTIME_PROTOCOL = 1;
 const OWNER_KEY = "taipa.ui/runtime";
@@ -24,12 +25,28 @@ export interface RuntimeRegistry {
   readonly instances: WeakMap<HTMLElement, ComponentInstance>;
   readonly live: Set<ComponentInstance>;
   readonly watched: Map<Document, WatchedDocument>;
+  readonly loaders: Map<unknown, Promise<Record<string, unknown>>>;
+  readonly hosts: Map<HTMLElement, RuntimeHostRecord>;
+}
+
+export type RuntimeHostStatus = "idle" | "scheduled" | "loading" | "active" | "errored";
+
+export interface RuntimeHostRecord {
+  readonly claims: Set<unknown>;
+  status: RuntimeHostStatus;
+  generation: number;
+  task?: ScheduledTask;
+  scheduledBy?: unknown;
 }
 
 export interface RuntimeOwner {
   liveInstanceFor(host: HTMLElement): ComponentInstance | undefined;
   register(instance: ComponentInstance): void;
   unregister(instance: ComponentInstance): void;
+  loadModule(cacheKey: unknown, load: ComponentLoader): Promise<Record<string, unknown>>;
+  hostRecordFor(host: HTMLElement): RuntimeHostRecord;
+  existingHostRecordFor(host: HTMLElement): RuntimeHostRecord | undefined;
+  deleteHostRecord(host: HTMLElement): void;
 }
 
 function createRegistry(): RuntimeRegistry {
@@ -38,10 +55,18 @@ function createRegistry(): RuntimeRegistry {
     instances: new WeakMap(),
     live: new Set(),
     watched: new Map(),
+    loaders: new Map(),
+    hosts: new Map(),
   };
 }
 
-function isCompatibleRegistry(value: unknown): value is RuntimeRegistry {
+function isBaseCompatibleRegistry(value: unknown): value is Omit<
+  RuntimeRegistry,
+  "loaders" | "hosts"
+> & {
+  loaders?: unknown;
+  hosts?: unknown;
+} {
   if (typeof value !== "object" || value === null) {
     return false;
   }
@@ -52,6 +77,28 @@ function isCompatibleRegistry(value: unknown): value is RuntimeRegistry {
     candidate.live instanceof Set &&
     candidate.watched instanceof Map
   );
+}
+
+function ensureRegistryFields(
+  registry: Omit<RuntimeRegistry, "loaders" | "hosts"> & { loaders?: unknown; hosts?: unknown },
+): RuntimeRegistry {
+  if (!(registry.loaders instanceof Map)) {
+    Object.defineProperty(registry, "loaders", {
+      configurable: true,
+      enumerable: true,
+      value: new Map(),
+      writable: false,
+    });
+  }
+  if (!(registry.hosts instanceof Map)) {
+    Object.defineProperty(registry, "hosts", {
+      configurable: true,
+      enumerable: true,
+      value: new Map(),
+      writable: false,
+    });
+  }
+  return registry as RuntimeRegistry;
 }
 
 function sweepDisconnected(registry: RuntimeRegistry): void {
@@ -109,6 +156,32 @@ function wrap(registry: RuntimeRegistry): RuntimeOwner {
       registry.live.delete(instance);
       unwatchDocument(registry, instance.host.ownerDocument);
     },
+    loadModule(cacheKey, load) {
+      const cached = registry.loaders.get(cacheKey);
+      if (cached !== undefined) {
+        return cached;
+      }
+      const promise = load().catch((error: unknown) => {
+        registry.loaders.delete(cacheKey);
+        throw error;
+      });
+      registry.loaders.set(cacheKey, promise);
+      return promise;
+    },
+    hostRecordFor(host) {
+      let record = registry.hosts.get(host);
+      if (record === undefined) {
+        record = { claims: new Set(), status: "idle", generation: 0 };
+        registry.hosts.set(host, record);
+      }
+      return record;
+    },
+    existingHostRecordFor(host) {
+      return registry.hosts.get(host);
+    },
+    deleteHostRecord(host) {
+      registry.hosts.delete(host);
+    },
   };
 }
 
@@ -116,12 +189,12 @@ export function claimRuntimeOwner(): RuntimeOwner {
   const globalRecord = globalThis as Record<PropertyKey, unknown>;
   const existing: unknown = globalRecord[Symbol.for(OWNER_KEY)];
   if (existing !== undefined) {
-    if (!isCompatibleRegistry(existing)) {
+    if (!isBaseCompatibleRegistry(existing)) {
       throw new Error(
         "an incompatible taipa runtime already owns this page; refusing to take over",
       );
     }
-    return wrap(existing);
+    return wrap(ensureRegistryFields(existing));
   }
   const registry = createRegistry();
   globalRecord[Symbol.for(OWNER_KEY)] = registry;

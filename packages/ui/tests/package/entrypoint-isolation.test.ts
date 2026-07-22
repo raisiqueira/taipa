@@ -14,6 +14,7 @@ function runtimeRegistry(): unknown {
 
 test("importing /client in Node is side-effect free", async () => {
   const client = await import("../../src/client/index.ts");
+  expect(typeof client.bootstrap).toBe("function");
   expect(typeof client.hydrate).toBe("function");
   expect(typeof client.mount).toBe("function");
   expect(typeof client.unmount).toBe("function");
