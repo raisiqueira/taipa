@@ -14,11 +14,12 @@ execution: code
 
 ## Goal Capsule
 
-- **Objective:** Deliver a publishable alpha of `@taipa/ui` that renders on JavaScript servers, hydrates JavaScript- or foreign-server HTML without DOM diffing, updates retained DOM nodes through `alien-signals`, progressively enhances native forms, and works from npm or exact-version esm.sh URLs.
+- **Objective:** Deliver a publishable alpha of `@taipa/ui` that renders on JavaScript servers, hydrates JavaScript- or foreign-server HTML without DOM diffing, updates retained DOM nodes through `alien-signals`, progressively enhances native forms, supports Standard Schema validation adapters, and works from npm or exact-version esm.sh URLs.
 - **Authority:** `outputs/taipa-ui-framework-design-plan.md` defines product behavior and public API; this plan defines implementation boundaries and sequencing; verified browser and cross-runtime behavior overrides implementation convenience.
 - **Execution profile:** Greenfield, prototype-gated, test-first at contract boundaries, with real-browser proof for DOM behavior and packed-artifact proof for distribution.
 - **Stop conditions:** Stop and revisit the design if hydration requires rendering or reconciling a client tree, if foreign-server HTML cannot preserve node identity, or if esm.sh creates incompatible reactive/runtime copies that the documented no-build path cannot prevent.
-- **Tail ownership:** The work includes CI, package validation, Django conformance, documentation, an npm prerelease, and exact-version esm.sh verification.
+- **Delivered baseline:** U1-U6 have established the workspace, universal core, server renderer, direct-DOM client runtime, bootstrap policies, and progressive forms. Remaining work starts from those public entrypoints and test patterns rather than probe scaffolding.
+- **Tail ownership:** The remaining work includes Standard Schema validation support, package validation, late-phase Django conformance, documentation, an npm prerelease, and exact-version esm.sh verification.
 
 ---
 
@@ -27,7 +28,7 @@ execution: code
 ### Summary
 
 Build Taipa as a small ESM-first islands framework whose server HTML remains authoritative after hydration.
-The alpha covers the universal component API, JavaScript SSR, direct-DOM client hydration, runtime hydration policies, progressive forms, a maintained Django adapter, and npm/esm.sh distribution.
+The alpha covers the universal component API, JavaScript SSR, direct-DOM client hydration, runtime hydration policies, progressive forms, Standard Schema validation support, a maintained Django adapter, and npm/esm.sh distribution.
 
 ### Problem Frame
 
@@ -74,6 +75,7 @@ The first phase must establish a reproducible multi-language development environ
 
 - R12. `createForm()` must enhance a real form while preserving native controls, constraint validation, CSRF fields, submitter semantics, autofill, reset behavior, accessibility relationships, file-input ownership, and no-JavaScript submission.
 - R13. Async validation and enhanced submission must abort stale work, prevent replay loops, expose pending state, render error text safely, and never silently replay a failed non-idempotent request.
+- R19. Standard Schema support must compose with `createForm()` without adding schema-library-specific dependencies, while mapping schema issues into Taipa's safe `FormErrors` and preserving native form semantics.
 
 **Packaging and contributor workflow**
 
@@ -120,6 +122,13 @@ The first phase must establish a reproducible multi-language development environ
   - **Outcome:** A browser-native ESM page runs without a local build.
   - **Covered by:** R15-R16.
 
+- F6. **Standard Schema form validation**
+  - **Trigger:** A component or page author wants a Standard Schema-compatible validator to validate a Taipa-enhanced form.
+  - **Actors:** A1, A2, A4.
+  - **Steps:** The form reads current native `FormData`; Taipa validates the read value through the schema; schema issues map to form field errors; successful validation continues the existing native replay or enhanced submit path.
+  - **Outcome:** Schema-backed validation works without replacing controls, coupling Taipa to a specific validation library, or bypassing the existing async race protections.
+  - **Covered by:** R12-R13, R19.
+
 ### Acceptance Examples
 
 - AE1. **Retained identity:** Given server HTML containing an output node, when its counter island hydrates and increments, then the original output node remains connected and only its `textContent` changes.
@@ -131,10 +140,12 @@ The first phase must establish a reproducible multi-language development environ
 - AE7. **Safe validation output:** Given a validator error containing HTML-like text, when errors render, then the text is visible but no new element or executable attribute is created.
 - AE8. **No-build import:** Given a published prerelease and its exact-version import map, when the no-build fixture loads in a clean browser, then root and client imports share compatible reactivity/runtime ownership and the counter works.
 - AE9. **Entrypoint isolation:** Given a clean Node ESM process, when it imports `@taipa/ui` or `@taipa/ui/server`, then no DOM global is accessed; importing `@taipa/ui/client` performs no mutation, and DOM or runtime mutation begins only when an explicit client operation such as `hydrate()`, `mount()`, or `bootstrap()` is called.
+- AE10. **Schema-backed form errors:** Given a Standard Schema-compatible validator that returns nested field issues and hostile message text, when Taipa validates the form, then issues map to the documented form field names, messages render as text only, stale results cannot overwrite newer validation, and a valid form continues through the same submitter-preserving path as non-schema validation.
 
 ### Success Criteria
 
 - Every public API proposed in the design document is exported, typed, documented, and covered by a positive and failure-path test.
+- The delivered U1-U6 entrypoints remain stable while Standard Schema support is added as a forms-layer adapter, not as a dependency on any specific schema implementation.
 - Node SSR and Django pass the same contract fixtures.
 - Browser conformance proves node identity, scoped direct writes, scheduling, cancellation, lifecycle cleanup, and form behavior.
 - The packed tarball passes export/type validation and clean-consumer imports.
@@ -147,7 +158,7 @@ The first phase must establish a reproducible multi-language development environ
 
 - One npm package with four public subpath exports.
 - One maintained Django adapter and a Django example application.
-- Light DOM, runtime island policies, progressive forms, conformance fixtures, benchmarks, and alpha release documentation.
+- Light DOM, runtime island policies, progressive forms, Standard Schema validation support, conformance fixtures, benchmarks, and alpha release documentation.
 - Node and real-browser validation, plus Python tests for the Django adapter.
 
 **Deferred to Follow-Up Work**
@@ -156,7 +167,6 @@ The first phase must establish a reproducible multi-language development environ
 - Shadow DOM or Declarative Shadow DOM adapters.
 - A generic keyed collection primitive.
 - Rails, Laravel, Go, CMS, and static-generator adapters.
-- Standard Schema validation adapters.
 - Independent PyPI publication of the Django adapter; the first npm alpha keeps it installable and tested from the monorepo until the markup contract survives external feedback.
 - Organization-specific component generators.
 
@@ -192,6 +202,7 @@ The first phase must establish a reproducible multi-language development environ
 - KTD18. **Parsed page data is untrusted input.** Parse props, state, and inert registries into null-prototype records; read own properties only; reject `__proto__`, `prototype`, and `constructor` keys at every depth; cap each island payload at 64 KiB and the page registry at 256 KiB. Registry sources may be bare/import-map specifiers, same-origin relative URLs, or `https:` URLs; other schemes require an explicit application resolver and never execute by default.
 - KTD19. **Template interpolation is allowlist-based.** Permit HTML text, a documented set of inert quoted attributes, and separately validated single-URL attributes. Reject event handlers, `style`, `srcdoc`, `srcset`, meta-refresh content, raw-text elements, unquoted attributes, dynamic names, and other compound or executable grammars until a dedicated branded type and parser exist.
 - KTD20. **Releases use short-lived identity, not stored registry tokens.** npm publication uses GitHub OIDC trusted publishing, provenance attestations, a protected release environment, minimal job permissions, tag-to-package-version verification, and third-party Actions pinned to reviewed commit SHAs.
+- KTD21. **Standard Schema support is a forms adapter, not a schema dependency.** Keep `@taipa/ui/forms` structurally compatible with Standard Schema V1 by validating the app's existing `read()` output and mapping issues into `FormErrors`. Do not depend on a specific schema library or make transformed schema output replace the live DOM-derived `values()` signal unless a later API revision explicitly adds that contract.
 
 ### Output Structure
 
@@ -311,15 +322,20 @@ flowchart TB
   U1["U1 Toolchain and workspace"] --> U2["U2 Universal core"]
   U2 --> U3["U3 Server rendering"]
   U2 --> U4["U4 Hydration engine"]
-  U3 --> U7["U7 Django protocol spike"]
-  U4 --> U7
   U3 --> U5["U5 Runtime policies"]
   U4 --> U5
   U2 --> U6["U6 Forms"]
+  U6 --> U11["U11 Standard Schema forms"]
   U3 --> U8["U8 Packaging and examples"]
   U5 --> U8
-  U6 --> U8
+  U11 --> U8
+  U3 --> U7["U7 Django protocol integration"]
+  U4 --> U7
+  U5 --> U7
+  U6 --> U7
+  U11 --> U7
   U7 --> U10["U10 Django hardening"]
+  U8 --> U10
   U5 --> U10
   U6 --> U10
   U8 --> U9["U9 Hardening and alpha release"]
@@ -339,27 +355,29 @@ flowchart TB
 
 ### Phased Delivery
 
-1. **Foundation:** U1-U2 establish the reproducible workspace and safe universal primitives.
-2. **Rendering protocol and foreign-server spike:** U3-U4 establish SSR and hydration, then U7 immediately runs one contract fixture through JavaScript SSR, Django output, and browser hydration.
-3. **Runtime and distribution:** U5-U6 complete policies and forms; U8 proves the packed npm and esm.sh topology while U10 hardens the Django adapter and example against the now-tested protocol.
-4. **Alpha:** U9 records performance baselines, documents the framework, publishes the npm prerelease, and verifies esm.sh. The Django adapter remains a tested monorepo artifact for this cycle.
+1. **Delivered foundation:** U1-U6 establish the reproducible workspace, safe universal primitives, SSR, direct-DOM hydration, runtime policies, and progressive forms.
+2. **Forms ecosystem compatibility:** U11 adds Standard Schema validation support on top of the delivered forms API without changing Taipa's native form ownership model.
+3. **Distribution proof:** U8 proves the packed npm and esm.sh topology against the delivered public subpaths and the schema-aware forms surface.
+4. **Late foreign-server protocol:** U7 and U10 move Django protocol work to the latest integration phase, after the JavaScript runtime and forms contracts have stabilized.
+5. **Alpha:** U9 records performance baselines, documents the framework, publishes the npm prerelease, and verifies esm.sh. The Django adapter remains a tested monorepo artifact for this cycle.
 
 ---
 
 ## Implementation Units
 
-| Unit | Outcome                                         | Depends on |
-| ---- | ----------------------------------------------- | ---------- |
-| U1   | Reproducible Vite+/pnpm development environment | —          |
-| U2   | Universal component and signal core             | U1         |
-| U3   | Safe native-template SSR                        | U2         |
-| U4   | Direct-DOM hydration engine                     | U2         |
-| U5   | Bootstrap, registries, and runtime policies     | U3, U4     |
-| U6   | Progressive forms                               | U2, U4     |
-| U7   | Early Django protocol spike                     | U3, U4     |
-| U8   | Packed npm and no-build distribution proof      | U3, U5, U6 |
-| U10  | Hardened Django adapter and example             | U5, U6, U7 |
-| U9   | Documentation, benchmarks, and npm alpha        | U8, U10    |
+| Unit | Outcome                                         | Depends on      |
+| ---- | ----------------------------------------------- | --------------- |
+| U1   | Reproducible Vite+/pnpm development environment | —               |
+| U2   | Universal component and signal core             | U1              |
+| U3   | Safe native-template SSR                        | U2              |
+| U4   | Direct-DOM hydration engine                     | U2              |
+| U5   | Bootstrap, registries, and runtime policies     | U3, U4          |
+| U6   | Progressive forms                               | U2, U4          |
+| U11  | Standard Schema support for forms               | U6              |
+| U8   | Packed npm and no-build distribution proof      | U3, U5, U6, U11 |
+| U7   | Late Django protocol integration                | U3-U6, U11      |
+| U10  | Hardened Django adapter and example             | U7, U8, U11     |
+| U9   | Documentation, benchmarks, and npm alpha        | U8, U10         |
 
 ### U1. Establish the Vite+ and pnpm development environment
 
@@ -581,7 +599,6 @@ flowchart TB
   - `packages/ui/tests/browser/forms-values.test.ts`
   - `packages/ui/tests/browser/forms-validation.test.ts`
   - `packages/ui/tests/browser/forms-submission.test.ts`
-  - `packages/ui/tests/browser/forms-accessibility.test.ts`
   - `packages/ui/tests/browser/forms-destroy.test.ts`
 - **Approach:**
   - Use delegated form events and fresh `FormData` reads; signals mirror current state but do not control input values.
@@ -616,38 +633,50 @@ flowchart TB
   15. Reset, autofill-related changes, controller destroy, and re-enhancement restore only Taipa-owned mutations without duplicate listeners.
 - **Verification:** Tests pass in a real browser with JavaScript-enabled behavior, and the example form still posts successfully when client enhancement is omitted.
 
-### U7. Prove the portable markup contract with an early Django spike
+### U11. Add Standard Schema support for progressive forms
 
-- **Goal:** Fail fast on Taipa's central claim by running one language-neutral island fixture through JavaScript SSR, minimal Django output, and real-browser hydration.
-- **Requirements:** R10-R11, R17; F2; AE5; KTD5, KTD7, KTD17.
-- **Dependencies:** U3, U4.
+- **Goal:** Let form authors validate Taipa form values with Standard Schema-compatible validators while preserving the delivered `createForm()` lifecycle, native submitter semantics, and safe `FormErrors` rendering.
+- **Requirements:** R12-R13, R19; F4, F6; AE6-AE7, AE10; KTD16, KTD21.
+- **Dependencies:** U6.
 - **Files:**
-  - `packages/conformance/src/index.ts`
-  - `packages/conformance/src/normalize.ts`
-  - `packages/conformance/fixtures/islands/counter.json`
-  - `packages/conformance/tests/contract.test.ts`
-  - `integrations/django/pyproject.toml`
-  - `integrations/django/uv.lock`
-  - `integrations/django/src/taipa_django/templatetags/taipa.py`
-  - `integrations/django/tests/test_protocol_spike.py`
+  - `packages/ui/src/forms/index.ts`
+  - `packages/ui/src/forms/controller.ts`
+  - `packages/ui/src/forms/errors.ts`
+  - `packages/ui/src/forms/standard-schema.ts`
+  - `packages/ui/src/types.ts`
+  - `packages/ui/tests/browser/forms-standard-schema.test.ts`
+  - `packages/ui/tests/package/entrypoint-isolation.test.ts`
+  - `scripts/verify-consumer.mjs`
 - **Approach:**
-  - Define fixtures as language-neutral inputs plus normalized contract expectations, not JavaScript-rendered golden strings.
-  - Implement only enough of a block Django tag to emit one counter island with safe inert JSON and the exact contract version.
-  - Normalize JavaScript and Django HTML to the same semantic record, then hydrate the Django output in Browser Mode and update the retained node.
-  - Record any protocol change as a design-plan amendment before U5, U6, or U10 builds on it.
-- **Execution note:** Time-box convenience features, not correctness. This unit is complete only when the cross-language browser path works or the protocol is explicitly redesigned.
-- **Patterns to follow:** Django's native template and JSON escaping primitives; no JavaScript implementation details may leak into the fixture schema.
+  - Add a small forms-layer adapter around the delivered `validate` hook rather than replacing the controller or requiring a schema library dependency.
+  - Define Taipa's local structural Standard Schema V1 type surface in public types or forms-specific types so consumers can pass compatible schemas without importing `@standard-schema/spec` through Taipa declarations.
+  - Validate the app's existing `read()` output. This keeps form value shaping under the application author, avoids inventing a lossy `FormData` object convention, and preserves the current `values()` signal as DOM-derived form state.
+  - Map `issues` into Taipa `FormErrors` using a documented default path-to-name policy: string and number path keys join with dots, `{ key }` path segments behave like their key, and missing paths map to a documented form-level key. Expose a narrow mapper option if the implementation needs bracket-style field names.
+  - Treat schema validation as application validation: `formnovalidate` bypasses it for that submit attempt, stale generations cannot apply its issues, and successful validation continues the same native replay or enhanced submit path already proven by U6.
+  - Preserve schema issue order per field, route all messages through existing text-only error rendering, and reuse existing dangerous-key and oversized-error hardening.
+  - Treat thrown or rejected schema validation as a retryable validation failure that clears pending state, prevents submission, and surfaces a form-level error rather than replaying a native POST.
+- **Execution note:** Start with schema issue mapping, transform, and async-race browser tests so the adapter cannot bypass the delivered form safety guarantees.
+- **Patterns to follow:** Delivered `packages/ui/src/forms/controller.ts`, `packages/ui/src/forms/errors.ts`, `packages/ui/src/forms/values.ts`, and the Standard Schema V1 interface from `https://standardschema.dev`.
 - **Test scenarios:**
-  1. Covers the core of AE5. JavaScript and Django counter output normalize to the same component, policy, contract version, ref, props, and state contract.
-  2. The Django fixture safely serializes a hostile nested value without closing the inert script.
-  3. Browser hydration of Django output updates the original counter text node without replacing it.
-- **Verification:** The same fixture passes in Node, Python, and a real browser before runtime-policy or forms work is accepted.
+  1. Covers AE10. A schema returning `{ value }` for valid `read()` output clears previous schema errors and allows the existing native replay path to submit exactly once with the original submitter.
+  2. A schema returning issues for `title` maps them to `errors().title`, marks matching controls invalid, and populates the matching `data-taipa-error-for="title"` container with text only.
+  3. Multiple issues for one path preserve Standard Schema issue order in the resulting `FormErrors` array.
+  4. Nested paths such as `user.email`, array paths such as `items.0.name`, and `{ key }` path segments map to the documented field-name format.
+  5. Pathless issues map to the documented form-level key and render in the matching form-level error container without attaching to an arbitrary control.
+  6. A schema that transforms `{ age: "42" }` into `{ age: 42 }` does not replace the live `values()` signal unless the adapter exposes the transformed value through its documented helper contract.
+  7. Two async schema validations racing on input or submit apply only the newest result; the older result cannot reintroduce errors or flip `valid()`.
+  8. A submitter with `formnovalidate` skips Standard Schema validation but still follows the selected native or enhanced submission path.
+  9. Files, checkbox groups, radio groups, multi-selects, and repeated fields reach the schema through the app's `read()` output rather than a hidden Taipa object convention.
+  10. A schema issue path containing `__proto__`, `prototype`, or `constructor` cannot pollute objects or redirect error rendering.
+  11. A schema `validate()` throw or rejected promise prevents submission, clears pending state, renders a form-level retryable error, and allows a later valid submission to proceed.
+  12. Destroying the form controller while schema validation is pending aborts or ignores the late schema result and leaves no Taipa-owned ARIA or listener state behind.
+- **Verification:** Browser tests prove schema-backed validation composes with native replay, enhanced submit, formnovalidate, race cancellation, and text-only error rendering; the `/forms` packed entry remains side-effect free and does not import schema libraries.
 
 ### U8. Package the library and create consumer examples
 
 - **Goal:** Prove that the actual packed artifact satisfies the four-entrypoint npm contract and is ready for one final alpha publication.
-- **Requirements:** R15-R16; F5; AE9; KTD1, KTD8, KTD11.
-- **Dependencies:** U3, U5-U6.
+- **Requirements:** R15-R16, R19; F5-F6; AE9-AE10; KTD1, KTD8, KTD11, KTD21.
+- **Dependencies:** U3, U5-U6, U11.
 - **Files:**
   - `packages/ui/package.json`
   - `packages/ui/vite.config.ts`
@@ -676,61 +705,49 @@ flowchart TB
   2. Clean Node ESM imports of root and server succeed; root, server, forms, and client declarations resolve without private source paths.
   3. A clean Vite consumer imports root, client, and forms; tree-shaking excludes unused entrypoints.
   4. Root and server evaluation contain no DOM access; client import has no bootstrap side effect; forms does not pull in the island scheduler.
-  5. All public subpaths observe one compatible `alien-signals` graph in packed consumers, and the local ESM proxy retains the external bare import required by the final import map.
-  6. The no-build counter hydrates and updates in a clean browser using the packed package through a local ESM proxy that preserves the final exact-version import-map shape.
-  7. A Deno smoke import succeeds for universal and server-safe surfaces or records a release-blocking compatibility defect.
-  8. Invalid or missing exports, accidental CJS output, duplicate reactivity, and unexpected Node built-ins fail package verification.
+  5. The packed `/forms` entry exposes the Standard Schema helper types or adapter functions without importing a concrete schema implementation.
+  6. All public subpaths observe one compatible `alien-signals` graph in packed consumers, and the local ESM proxy retains the external bare import required by the final import map.
+  7. The no-build counter hydrates and updates in a clean browser using the packed package through a local ESM proxy that preserves the final exact-version import-map shape.
+  8. A Deno smoke import succeeds for universal and server-safe surfaces or records a release-blocking compatibility defect.
+  9. Invalid or missing exports, accidental CJS output, duplicate reactivity, and unexpected Node built-ins fail package verification.
 - **Verification:** `vp pack` produces a validated tarball and clean consumers pass without publishing an incomplete alpha.
 
-### U9. Harden, document, benchmark, and release the alpha
+### U7. Prove the portable markup contract with Django in the final integration phase
 
-- **Goal:** Turn the feature-complete implementation into a supportable alpha with evidence for its safety, performance, and compatibility claims.
-- **Requirements:** R1-R18; all acceptance examples; KTD12, KTD20.
-- **Dependencies:** U8, U10.
+- **Goal:** Validate Taipa's foreign-server claim after the JavaScript runtime, forms, and Standard Schema contracts have stabilized by running shared island and form fixtures through JavaScript SSR, Django output, and real-browser hydration.
+- **Requirements:** R10-R11, R17, R19; F2, F6; AE5, AE10; KTD5, KTD7, KTD17, KTD21.
+- **Dependencies:** U3-U6, U11.
 - **Files:**
-  - `README.md`
-  - `LICENSE`
-  - `CONTRIBUTING.md`
-  - `SECURITY.md`
-  - `docs/guide/getting-started.md`
-  - `docs/guide/django.md`
-  - `docs/guide/forms.md`
-  - `docs/guide/hydration-policies.md`
-  - `docs/guide/no-build.md`
-  - `docs/reference/public-api.md`
-  - `docs/reference/markup-contract.md`
-  - `docs/reference/security.md`
-  - `benchmarks/ssr.bench.ts`
-  - `benchmarks/hydration.browser.test.ts`
-  - `benchmarks/memory.browser.test.ts`
-  - `.github/workflows/release.yml`
-  - `CHANGELOG.md`
+  - `packages/conformance/src/index.ts`
+  - `packages/conformance/src/normalize.ts`
+  - `packages/conformance/fixtures/islands/*.json`
+  - `packages/conformance/fixtures/forms/*.json`
+  - `packages/conformance/tests/contract.test.ts`
+  - `integrations/django/pyproject.toml`
+  - `integrations/django/uv.lock`
+  - `integrations/django/src/taipa_django/templatetags/taipa.py`
+  - `integrations/django/tests/test_protocol_integration.py`
 - **Approach:**
-  - Convert every design prototype gate into a CI or release-check outcome.
-  - Add hostile-input, CSP/CORS guidance, version-skew, runtime-owner, and lifecycle-race coverage.
-  - Record bundle size, SSR throughput, hydration time, per-island overhead, and memory after unmount on a documented baseline environment.
-  - Document the exact limits lost relative to Astro build-time directives and the explicit import-map/module-registry responsibilities.
-  - Publish an npm prerelease, run CDN verification, and publish the alpha notes with known limitations. Build and install-check the Django adapter from the monorepo but do not publish it independently in this cycle.
-  - Release from a protected environment with GitHub OIDC npm trusted publishing, provenance, least-privilege permissions, immutable Action pins, and a check that the signed tag version equals the packed package version.
-- **Execution note:** Keep benchmarks informational until stable baselines exist; correctness, cleanup, and package-contract failures block the alpha.
-- **Patterns to follow:** Prototype gates and risk list in the origin design.
+  - Define fixtures as language-neutral inputs plus normalized contract expectations, not JavaScript-rendered golden strings.
+  - Implement only enough Django output to emit contract-compatible islands, inert JSON payloads, registry metadata, and form markup needed by the shared fixtures.
+  - Normalize JavaScript and Django HTML to the same semantic record, then hydrate the Django output in Browser Mode and update retained nodes.
+  - Include at least one progressively enhanced form fixture that can be validated by the Standard Schema adapter after hydration without giving Django a JavaScript-only path.
+  - Record any protocol change as a design-plan amendment before U10 or U9 builds on it.
+- **Execution note:** Treat protocol compatibility as the work, not Django convenience. This unit is complete only when the cross-language browser path works or the protocol is explicitly redesigned.
+- **Patterns to follow:** Django's native template and JSON escaping primitives; no JavaScript implementation details may leak into the fixture schema.
 - **Test scenarios:**
-  1. Every worked example is executed in CI or a release smoke workflow rather than copied only into documentation.
-  2. Hostile props, state, URLs, templates, registry data, validation messages, and manifest values remain inert.
-  3. All policy/lifecycle races pass under repeated browser runs, including disconnect during import and bfcache-style reconnect.
-  4. Package size reports attribute universal, client, server, forms, and external `alien-signals` costs separately.
-  5. Memory tests show instances, hosts, listeners, and effects become collectible after unmount within the test harness's supported observation model.
-  6. The upgrade rehearsal for Vite+ or `alien-signals` runs the full verification matrix and detects an intentionally introduced compatibility break.
-  7. Release workflows refuse to publish with a dirty generated surface, failing conformance, missing changelog, invalid package, or unverified esm.sh prerelease.
-  8. Covers AE8. The final published alpha's exact-version esm.sh import map hydrates and updates the no-build counter, and fetched modules retain the external singleton contract proven by the U1 probe.
-  9. A dry-run release proves no long-lived npm token is present, all third-party Actions are SHA-pinned, provenance is attached, and tag/package versions match.
-- **Verification:** The full Verification Contract passes, benchmark results are recorded, documentation examples execute, known alpha limitations are explicit, and prerelease artifacts are reachable from their supported registries.
+  1. Covers the core of AE5. JavaScript and Django counter output normalize to the same component, policy, contract version, ref, props, and state contract.
+  2. The Django fixture safely serializes a hostile nested value without closing the inert script.
+  3. Browser hydration of Django output updates the original counter text node without replacing it.
+  4. A Django-rendered form keeps native submission useful with JavaScript omitted and receives the same Standard Schema-backed field errors after Taipa enhancement is loaded.
+  5. Invalid fixture data for props, state, registry source, form error names, or schema issue mapping fails in the normalizer before browser hydration.
+- **Verification:** The same fixture corpus passes in Node, Python, and a real browser after U11, proving the late Django protocol path consumes the stabilized JavaScript and forms contracts.
 
 ### U10. Harden the Django adapter and example
 
-- **Goal:** Turn the successful protocol spike into a maintained golden-path adapter without adding an independent registry release to the first alpha.
-- **Requirements:** R10-R11, R17; F2; AE5; KTD5, KTD7, KTD17.
-- **Dependencies:** U5-U7.
+- **Goal:** Turn the successful late-phase protocol integration into a maintained golden-path adapter without adding an independent registry release to the first alpha.
+- **Requirements:** R10-R11, R17, R19; F2, F6; AE5, AE10; KTD5, KTD7, KTD17, KTD21.
+- **Dependencies:** U7, U8, U11.
 - **Files:**
   - `packages/conformance/fixtures/islands/*.json`
   - `integrations/django/src/taipa_django/apps.py`
@@ -747,24 +764,73 @@ flowchart TB
   - State the safety boundary explicitly: Taipa protects adapter-generated host attributes and inert JSON, while Django owns inner-template safety. Require autoescaping and prohibit untrusted values in URL, `style`, `srcdoc`, or other executable and compound contexts.
   - Make unknown components, policies, exports, versions, and unsafe module data fail during server rendering with template-context diagnostics.
   - Run the complete shared fixture corpus through JavaScript SSR, Django output, and browser hydration.
+  - Include the documented progressive form and Standard Schema example in the Django golden path without making the Python adapter validate with JavaScript schemas on the server.
   - Keep the Python project buildable and installable from its wheel, but defer PyPI publication and a long-term cross-version compatibility promise.
 - **Execution note:** Adapter behavior extends the language-neutral protocol; it cannot create a Django-only hydration path.
-- **Patterns to follow:** The U7 spike, the Django tag example and manifest contract in the origin design, and Django's native template and JSON escaping primitives.
+- **Patterns to follow:** The U7 protocol integration, the Django tag example and manifest contract in the origin design, and Django's native template and JSON escaping primitives.
 - **Test scenarios:**
   1. Covers AE5 fully. JavaScript and Django output normalize to the same component, policy, contract version, refs, props, state, export, and fallback contract across the corpus.
   2. Unknown component names, invalid policies, manifest schema errors, version omissions, and unsafe source values fail with useful diagnostics.
   3. Registry emission deduplicates components and preserves exact approved module specifiers.
   4. Django-generated load, visible, idle, and only islands hydrate in the real-browser conformance suite.
   5. The Django example submits and validates its plain form with JavaScript disabled, then gains Taipa behavior when enabled.
-  6. A wheel built from the monorepo installs into a clean Python environment and passes an import plus template-render smoke test.
-  7. Django fixtures keep autoescaping enabled and prove hostile URL, `style`, and `srcdoc` values are rejected or rendered only in inert text contexts.
+  6. The Django example demonstrates schema-backed client validation after enhancement while server-side Django validation remains authoritative on postback.
+  7. A wheel built from the monorepo installs into a clean Python environment and passes an import plus template-render smoke test.
+  8. Django fixtures keep autoescaping enabled and prove hostile URL, `style`, and `srcdoc` values are rejected or rendered only in inert text contexts.
 - **Verification:** Both runtimes consume the full fixture corpus, the wheel install test passes, and the example proves end-to-end hydration and progressive forms.
+
+### U9. Harden, document, benchmark, and release the alpha
+
+- **Goal:** Turn the feature-complete implementation into a supportable alpha with evidence for its safety, performance, and compatibility claims.
+- **Requirements:** R1-R19; all acceptance examples; KTD12, KTD20-KTD21.
+- **Dependencies:** U8, U10.
+- **Files:**
+  - `README.md`
+  - `LICENSE`
+  - `CONTRIBUTING.md`
+  - `SECURITY.md`
+  - `docs/guide/getting-started.md`
+  - `docs/guide/django.md`
+  - `docs/guide/forms.md`
+  - `docs/guide/standard-schema.md`
+  - `docs/guide/hydration-policies.md`
+  - `docs/guide/no-build.md`
+  - `docs/reference/public-api.md`
+  - `docs/reference/markup-contract.md`
+  - `docs/reference/security.md`
+  - `benchmarks/ssr.bench.ts`
+  - `benchmarks/hydration.browser.test.ts`
+  - `benchmarks/memory.browser.test.ts`
+  - `.github/workflows/release.yml`
+  - `CHANGELOG.md`
+- **Approach:**
+  - Convert every design prototype gate into a CI or release-check outcome.
+  - Add hostile-input, CSP/CORS guidance, version-skew, runtime-owner, and lifecycle-race coverage.
+  - Document Standard Schema support as a forms-layer adapter, including the default path-to-name mapping, form-level issue key, transform boundary, and lack of concrete schema-library dependency.
+  - Record bundle size, SSR throughput, hydration time, per-island overhead, and memory after unmount on a documented baseline environment.
+  - Document the exact limits lost relative to Astro build-time directives and the explicit import-map/module-registry responsibilities.
+  - Publish an npm prerelease, run CDN verification, and publish the alpha notes with known limitations. Build and install-check the Django adapter from the monorepo but do not publish it independently in this cycle.
+  - Release from a protected environment with GitHub OIDC npm trusted publishing, provenance, least-privilege permissions, immutable Action pins, and a check that the signed tag version equals the packed package version.
+- **Execution note:** Keep benchmarks informational until stable baselines exist; correctness, cleanup, and package-contract failures block the alpha.
+- **Patterns to follow:** Prototype gates and risk list in the origin design.
+- **Test scenarios:**
+  1. Every worked example is executed in CI or a release smoke workflow rather than copied only into documentation.
+  2. Hostile props, state, URLs, templates, registry data, validation messages, and manifest values remain inert.
+  3. Standard Schema issue messages and paths remain text-only, prototype-safe, and race-safe in release examples.
+  4. All policy/lifecycle races pass under repeated browser runs, including disconnect during import and bfcache-style reconnect.
+  5. Package size reports attribute universal, client, server, forms, Standard Schema adapter, and external `alien-signals` costs separately.
+  6. Memory tests show instances, hosts, listeners, and effects become collectible after unmount within the test harness's supported observation model.
+  7. The upgrade rehearsal for Vite+ or `alien-signals` runs the full verification matrix and detects an intentionally introduced compatibility break.
+  8. Release workflows refuse to publish with a dirty generated surface, failing conformance, missing changelog, invalid package, or unverified esm.sh prerelease.
+  9. Covers AE8. The final published alpha's exact-version esm.sh import map hydrates and updates the no-build counter, and fetched modules retain the external singleton contract proven by the U1 probe.
+  10. A dry-run release proves no long-lived npm token is present, all third-party Actions are SHA-pinned, provenance is attached, and tag/package versions match.
+- **Verification:** The full Verification Contract passes, benchmark results are recorded, documentation examples execute, known alpha limitations are explicit, and prerelease artifacts are reachable from their supported registries.
 
 ---
 
 ## System-Wide Impact
 
-- **Public compatibility:** The component builder, four package entrypoints, markup attributes, lifecycle events, error behavior, and Django manifest become versioned public contracts.
+- **Public compatibility:** The component builder, four package entrypoints, markup attributes, lifecycle events, form validation adapter behavior, error behavior, and Django manifest become versioned public contracts.
 - **Security:** HTML context handling, JSON escaping, URL approval, registry resolution, and text-only error rendering are security boundaries and require hostile-input tests.
 - **Performance:** Direct DOM writes reduce update work, but bootstrap discovery, ref scans, observers, module loading, and per-island scopes still need measurement.
 - **Accessibility:** Taipa preserves native HTML but cannot repair inaccessible server markup; forms own error association, pending state, and focus behavior.
@@ -781,6 +847,7 @@ flowchart TB
 - **Foreign markup drift:** Ref/version checks catch protocol drift, not semantic or accessibility drift. Shared normalized fixtures and end-to-end Django examples reduce but cannot eliminate it.
 - **Custom Element lifecycle variance:** DOM moves, history restoration, fragment swaps, and browser differences can expose cleanup races. Real-browser tests must cover Chromium first and add Firefox/WebKit before stable release.
 - **Async form races:** Validation, submitter preservation, and stale responses can duplicate or misroute submissions. Generation and abort tests are required before release.
+- **Schema path ambiguity:** Standard Schema issue paths do not inherently know HTML field naming conventions. The adapter must document its default path-to-name mapping and keep escape hatches narrow enough that error rendering remains exact-name and prototype-safe.
 - **Network-dependent release proof:** esm.sh cannot validate unpublished local artifacts. Prerelease publication and CDN checks belong in the release lane, not the fast local suite.
 - **Multi-language maintenance:** pnpm/Vite+ does not cover Python. The Django adapter needs its own dependency lock, tests, linting, packaging, and release documentation.
 - **No-build security:** esm.sh offers convenience but cannot substitute for an application CSP, exact version pinning, or self-hosting where supply-chain controls require it.
@@ -789,20 +856,20 @@ flowchart TB
 
 ## Verification Contract
 
-| Gate               | Command or environment                                    | Proves                                                                     | Applies to        |
-| ------------------ | --------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------- |
-| Environment        | `vp env doctor`                                           | Node and pnpm declarations agree with Vite+ resolution                     | U1                |
-| Install            | `vp install --frozen-lockfile`                            | Workspace can be reproduced from committed metadata                        | All units         |
-| Static checks      | `vp check`                                                | Oxfmt, Oxlint, and type-aware checks pass from shared config               | All units         |
-| Node tests         | `vp test --project node`                                  | Universal, template, SSR, serialization, and package helpers               | U2-U3, U7-U8, U10 |
-| Browser tests      | `vp test --project browser`                               | Real DOM hydration, policies, lifecycle, and forms                         | U4-U7, U9-U10     |
-| Workspace build    | `vp run -r build`                                         | Dependency-ordered workspace outputs build                                 | U3-U10            |
-| Library package    | `vp pack` in `packages/ui`                                | ESM entries, declarations, and source maps are generated                   | U8-U9             |
-| Package consumers  | `vp run package:verify`                                   | Tarball contents, exports, types, clean installs, and singleton behavior   | U8-U9             |
-| Node compatibility | clean consumers on Node 22.12 and Node 24                 | Every server-safe packed subpath honors `engines.node`                     | U1, U8-U9         |
-| Django             | `uv sync --frozen`, Ruff, pytest, and wheel install smoke | Template tag, manifest, serialization, conformance, and clean installation | U1, U7, U9-U10    |
-| Benchmarks         | `vp run benchmark`                                        | Bundle, SSR, hydration, and retention baselines are recorded               | U9                |
-| CDN smoke          | `vp run esm-sh:verify -- <exact-version>`                 | Disposable topology probe and final published browser imports work         | U1, U9            |
+| Gate               | Command or environment                                    | Proves                                                                     | Applies to            |
+| ------------------ | --------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------- |
+| Environment        | `vp env doctor`                                           | Node and pnpm declarations agree with Vite+ resolution                     | U1                    |
+| Install            | `vp install --frozen-lockfile`                            | Workspace can be reproduced from committed metadata                        | All units             |
+| Static checks      | `vp check`                                                | Oxfmt, Oxlint, and type-aware checks pass from shared config               | All units             |
+| Node tests         | `vp test --project node`                                  | Universal, template, SSR, serialization, and package helpers               | U2-U3, U7-U8, U10-U11 |
+| Browser tests      | `vp test --project browser`                               | Real DOM hydration, policies, lifecycle, forms, and schema validation      | U4-U7, U9-U11         |
+| Workspace build    | `vp run -r build`                                         | Dependency-ordered workspace outputs build                                 | U3-U11                |
+| Library package    | `vp pack` in `packages/ui`                                | ESM entries, declarations, and source maps are generated                   | U8-U9                 |
+| Package consumers  | `vp run package:verify`                                   | Tarball contents, exports, types, clean installs, and singleton behavior   | U8-U9                 |
+| Node compatibility | clean consumers on Node 22.12 and Node 24                 | Every server-safe packed subpath honors `engines.node`                     | U1, U8-U9             |
+| Django             | `uv sync --frozen`, Ruff, pytest, and wheel install smoke | Template tag, manifest, serialization, conformance, and clean installation | U1, U7, U9-U10        |
+| Benchmarks         | `vp run benchmark`                                        | Bundle, SSR, hydration, and retention baselines are recorded               | U9                    |
+| CDN smoke          | `vp run esm-sh:verify -- <exact-version>`                 | Disposable topology probe and final published browser imports work         | U1, U9                |
 
 CI must run all non-network gates for every pull request.
 The CDN smoke runs only after an npm prerelease exists and must block promotion of that prerelease to the documented alpha tag.
@@ -811,13 +878,14 @@ The CDN smoke runs only after an npm prerelease exists and must block promotion 
 
 ## Definition of Done
 
-- R1-R18 are implemented and traceable to passing unit, integration, browser, conformance, package, or release tests.
-- AE1-AE9 pass against actual server HTML, real browser APIs, Django output, and packed/published artifacts as applicable.
+- R1-R19 are implemented and traceable to passing unit, integration, browser, conformance, package, or release tests.
+- AE1-AE10 pass against actual server HTML, real browser APIs, Django output, schema-backed form validation, and packed/published artifacts as applicable.
 - The public TypeScript declarations and package exports match the design document without undocumented top-level exports.
 - Hydration contains no render call, client tree, DOM comparison, reconciliation, or fallback subtree replacement outside the explicit `mount()` and successful `only` paths.
 - `alien-signals` is externally declared, compatibility-pinned, and single-resolved in supported npm and esm.sh examples.
 - The Django adapter and JavaScript renderer pass the same portable conformance corpus.
 - JavaScript-disabled forms and server HTML remain useful before and after the enhancement code ships.
+- Standard Schema support is documented as a structural adapter, keeps `values()` tied to native form reads, maps issues safely into `FormErrors`, and adds no concrete schema-library runtime dependency.
 - CI uses Vite+ for the JavaScript toolchain and runs the separate Python lane for Django.
 - The npm prerelease is published, exact-version esm.sh verification passes, the Django wheel passes a clean install smoke test, and known alpha limitations—including deferred PyPI publication—are documented.
 - Performance and size baselines are recorded without unsupported production-performance claims.
@@ -845,3 +913,4 @@ The CDN smoke runs only after an npm prerelease exists and must block promotion 
 - [alien-signals](https://github.com/stackblitz/alien-signals)
 - [alien-signals on npm](https://www.npmjs.com/package/alien-signals)
 - [esm.sh](https://esm.sh/)
+- [Standard Schema](https://standardschema.dev)
