@@ -9,7 +9,7 @@ export default defineConfig({
       index: "src/index.ts",
       client: "src/client/index.ts",
       server: "src/server/index.ts",
-      forms: "src/forms.ts",
+      forms: "src/forms/index.ts",
     },
     dts: {
       tsgo: true,

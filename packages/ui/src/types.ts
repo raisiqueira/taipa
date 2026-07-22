@@ -112,3 +112,44 @@ export interface BootstrapHandle {
   scan(root?: ParentNode): void;
   destroy(): void;
 }
+
+export type FormErrors = Readonly<Record<string, readonly string[]>>;
+export type ValidationMode = "submit" | "blur" | "input";
+
+export interface FormReadContext {
+  readonly form: HTMLFormElement;
+  readonly formData: FormData;
+}
+
+export interface FormValidationContext<T> {
+  readonly form: HTMLFormElement;
+  readonly values: Readonly<T>;
+  readonly formData: FormData;
+  readonly signal: AbortSignal;
+}
+
+export interface FormSubmitContext<T> extends FormValidationContext<T> {
+  setErrors(errors: FormErrors): void;
+}
+
+export interface CreateFormOptions<T> {
+  readonly read: (context: FormReadContext) => T;
+  readonly validate?: (context: FormValidationContext<T>) => MaybePromise<FormErrors | void>;
+  readonly mode?: ValidationMode;
+  readonly submit?: (context: FormSubmitContext<T>) => MaybePromise<void>;
+}
+
+export interface FormController<T> {
+  readonly values: ReadSignal<Readonly<T>>;
+  readonly errors: ReadSignal<FormErrors>;
+  readonly dirty: ReadSignal<boolean>;
+  readonly touched: ReadSignal<ReadonlySet<string>>;
+  readonly validating: ReadSignal<boolean>;
+  readonly submitting: ReadSignal<boolean>;
+  readonly valid: ReadSignal<boolean>;
+  validate(fieldNames?: readonly string[]): Promise<boolean>;
+  setErrors(errors: FormErrors): void;
+  setValue(name: string, value: string | File | readonly string[]): void;
+  reset(): void;
+  destroy(): void;
+}

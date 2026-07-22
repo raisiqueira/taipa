@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { probeFieldName } from "../../src/forms.ts";
+import { createForm } from "../../src/forms/index.ts";
 import { component, html, signal } from "../../src/index.ts";
 import { renderIsland, renderToString } from "../../src/server/index.ts";
 
@@ -25,5 +25,5 @@ test("server-safe subpaths are importable in node", async () => {
   expect(await renderIsland(badge, {})).toBe(
     '<taipa-island data-taipa-component="badge"><b>ok</b></taipa-island>',
   );
-  expect(probeFieldName("email")).toBe("taipa:email");
+  expect(typeof createForm).toBe("function");
 });

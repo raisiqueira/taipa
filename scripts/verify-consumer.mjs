@@ -106,8 +106,8 @@ if ("window" in globalThis || "document" in globalThis) throw new Error("DOM glo
   {
     subpath: "@taipa/ui/forms",
     assert: `const m = await import("@taipa/ui/forms");
-if (m.probeTarget !== "@taipa/ui:forms") throw new Error("bad forms marker");
-if (m.probeFieldName("email") !== "taipa:email") throw new Error("probeFieldName broken");`,
+if (typeof m.createForm !== "function") throw new Error("missing forms export: createForm");
+if ("window" in globalThis || "document" in globalThis || "customElements" in globalThis) throw new Error("DOM global leaked");`,
   },
   {
     subpath: "@taipa/ui/client",
