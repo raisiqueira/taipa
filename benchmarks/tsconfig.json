@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "useDefineForClassFields": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strict": true,
+    "paths": {
+      "@taipa/ui": ["../packages/ui/src/index.ts"],
+      "@taipa/ui/client": ["../packages/ui/src/client/index.ts"],
+      "@taipa/ui/forms": ["../packages/ui/src/forms/index.ts"],
+      "@taipa/ui/server": ["../packages/ui/src/server/index.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}

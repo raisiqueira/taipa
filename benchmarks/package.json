@@ -1,0 +1,33 @@
+{
+  "name": "@taipa/benchmarks",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local js-framework-benchmark-style comparisons for Taipa UI.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "bench": "node scripts/run-benchmarks.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@taipa/ui": "workspace:*",
+    "alien-signals": "catalog:",
+    "ilha": "catalog:",
+    "lit-html": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "playwright": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-cli": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

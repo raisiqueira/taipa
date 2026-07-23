@@ -1,4 +1,5 @@
 packages:
+  - benchmarks
   - playground
   - packages/*
 
@@ -16,6 +17,14 @@ catalog:
   "@vitest/browser-playwright": 4.1.10
   playwright: 1.61.1
   vite-cli: npm:vite@^8.1.5
+  lit-html: ^3.3.3
+  react: ^19.2.8
+  react-dom: ^19.2.8
+  vue: ^3.5.40
+  ilha: ^0.9.5
+  "@types/react": ^19.2.17
+  "@types/react-dom": ^19.2.3
+  "@vitejs/plugin-vue": ^6.0.8
 overrides:
   vite: "catalog:"
 peerDependencyRules:
