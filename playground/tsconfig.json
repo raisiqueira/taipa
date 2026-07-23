@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "allowImportingTsExtensions": true,
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@taipa/ui": ["../packages/ui/src/index.ts"],
+      "@taipa/ui/client": ["../packages/ui/src/client/index.ts"],
+      "@taipa/ui/forms": ["../packages/ui/src/forms/index.ts"],
+      "@taipa/ui/server": ["../packages/ui/src/server/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "vite.config.ts"]
+}

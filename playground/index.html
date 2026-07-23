@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Taipa UI Playground</title>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">Local development</p>
+        <h1 id="page-title">Taipa UI playground</h1>
+        <p>
+          Exercise direct-DOM hydration, runtime bootstrap, progressive forms, and Standard Schema
+          validation from the local source tree.
+        </p>
+      </section>
+
+      <section class="card" aria-labelledby="counter-title">
+        <div>
+          <p class="eyebrow">Island hydration</p>
+          <h2 id="counter-title">Counter island</h2>
+        </div>
+
+        <taipa-island
+          data-taipa-component="Counter"
+          data-taipa-hydrate="load"
+          data-taipa-version="1"
+        >
+          <div class="counter">
+            <button type="button" data-taipa-ref="decrement" aria-label="Decrease count">-</button>
+            <output data-taipa-ref="count">3</output>
+            <button type="button" data-taipa-ref="increment" aria-label="Increase count">+</button>
+          </div>
+          <script type="application/json" data-taipa-state>
+            { "count": 3 }
+          </script>
+        </taipa-island>
+      </section>
+
+      <section class="card" aria-labelledby="client-counter-title">
+        <div>
+          <p class="eyebrow">Client-side mount</p>
+          <h2 id="client-counter-title">Mounted counter</h2>
+          <p class="muted">
+            This counter is rendered once in the browser with <code>mount()</code>.
+          </p>
+        </div>
+
+        <div id="client-counter"></div>
+      </section>
+
+      <section class="card" aria-labelledby="form-title">
+        <div>
+          <p class="eyebrow">Progressive forms</p>
+          <h2 id="form-title">Schema-backed signup</h2>
+          <p class="muted">Try submitting with a short title or an invalid email.</p>
+        </div>
+
+        <form class="form" action="/playground-submit" method="post" novalidate>
+          <label>
+            Project title
+            <input name="title" value="Taipa" autocomplete="organization" />
+          </label>
+          <p class="field-error" data-taipa-error-for="title"></p>
+
+          <label>
+            Contact email
+            <input name="email" value="hello@example.com" autocomplete="email" />
+          </label>
+          <p class="field-error" data-taipa-error-for="email"></p>
+
+          <p class="field-error" data-taipa-error-for="$form"></p>
+          <p class="status" data-taipa-form-status aria-live="polite"></p>
+
+          <div class="actions">
+            <button type="submit" data-taipa-disable-while-submitting>Validate locally</button>
+            <button type="submit" formnovalidate name="intent" value="draft">Save draft</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
