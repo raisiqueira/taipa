@@ -1,1 +1,1 @@
-export { normalizeErrors } from "./errors.ts";
+export { normalizeErrors } from "./errors";

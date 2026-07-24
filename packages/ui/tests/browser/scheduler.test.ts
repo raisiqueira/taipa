@@ -6,7 +6,7 @@
  * validated data (KTD9) — invalid values fail before any scheduling.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { resolvePolicy, schedulePolicy } from "../../src/client/scheduler.ts";
+import { resolvePolicy, schedulePolicy } from "../../src/client/scheduler";
 
 const hosts: HTMLElement[] = [];
 

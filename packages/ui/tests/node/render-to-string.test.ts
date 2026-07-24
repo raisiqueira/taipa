@@ -1,9 +1,9 @@
 import { expect, test } from "vite-plus/test";
-import { component } from "../../src/component.ts";
-import { effect } from "../../src/reactivity.ts";
-import { renderToString } from "../../src/server/render.ts";
-import { html } from "../../src/template/html.ts";
-import type { SafeHtml } from "../../src/types.ts";
+import { component } from "../../src/component";
+import { effect } from "../../src/reactivity";
+import { renderToString } from "../../src/server/render";
+import { html } from "../../src/template/html";
+import type { SafeHtml } from "../../src/types";
 
 const Counter = component<{ initial: number }>("Counter", { contractVersion: "1" })
   .state("count", ({ props }) => props.initial)

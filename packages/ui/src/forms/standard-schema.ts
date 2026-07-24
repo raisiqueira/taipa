@@ -5,8 +5,8 @@ import type {
   StandardSchemaIssue,
   StandardSchemaPathSegment,
   StandardSchemaV1,
-} from "../types.ts";
-import { normalizeErrors } from "./errors.ts";
+} from "../types";
+import { normalizeErrors } from "./errors";
 
 const DEFAULT_FORM_ERROR_NAME = "$form";
 const DEFAULT_ERROR_MESSAGE = "Validation failed. Please try again.";

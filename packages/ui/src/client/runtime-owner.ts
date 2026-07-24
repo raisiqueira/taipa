@@ -9,8 +9,8 @@
  * disconnections. Cleanup is deferred one microtask so native DOM moves —
  * which pass through a disconnected state — reconnect without teardown.
  */
-import type { ComponentInstance, ComponentLoader } from "../types.ts";
-import type { ScheduledTask } from "./scheduler.ts";
+import type { ComponentInstance, ComponentLoader } from "../types";
+import type { ScheduledTask } from "./scheduler";
 
 export const RUNTIME_PROTOCOL = 1;
 const OWNER_KEY = "taipa.ui/runtime";

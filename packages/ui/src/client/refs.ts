@@ -12,8 +12,8 @@
  * validation runs here, once, as part of the atomic preflight — before any
  * listener is attached or binding applied (KTD7/AE2).
  */
-import type { RefMap } from "../types.ts";
-import { ISLAND_TAG } from "../server/attributes.ts";
+import type { RefMap } from "../types";
+import { ISLAND_TAG } from "../server/attributes";
 
 const REF_ATTRIBUTE = "data-taipa-ref";
 

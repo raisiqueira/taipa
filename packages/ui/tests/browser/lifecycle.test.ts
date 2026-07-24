@@ -4,10 +4,10 @@
  * microtask; one compatible runtime owns the document.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { component, html } from "../../src/index.ts";
-import { hydrate } from "../../src/client/hydrate.ts";
-import { unmount } from "../../src/client/instance.ts";
-import { RUNTIME_PROTOCOL } from "../../src/client/runtime-owner.ts";
+import { component, html } from "../../src/index";
+import { hydrate } from "../../src/client/hydrate";
+import { unmount } from "../../src/client/instance";
+import { RUNTIME_PROTOCOL } from "../../src/client/runtime-owner";
 
 const created: HTMLElement[] = [];
 

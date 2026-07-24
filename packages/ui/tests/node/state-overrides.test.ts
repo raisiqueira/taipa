@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
-import { component } from "../../src/component.ts";
-import { renderToString } from "../../src/server/render.ts";
-import { html } from "../../src/template/html.ts";
+import { component } from "../../src/component";
+import { renderToString } from "../../src/server/render";
+import { html } from "../../src/template/html";
 
 // ---------------------------------------------------------------------------
 // Plan U3 scenario 7: explicit overrides win, omitted keys use initializers,

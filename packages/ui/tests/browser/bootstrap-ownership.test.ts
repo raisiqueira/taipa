@@ -3,10 +3,10 @@
  * promises, while each bootstrap handle owns only its claims/schedules.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { component, html } from "../../src/index.ts";
-import { bootstrap } from "../../src/client/bootstrap.ts";
-import { unmount } from "../../src/client/instance.ts";
-import { RUNTIME_PROTOCOL } from "../../src/client/runtime-owner.ts";
+import { component, html } from "../../src/index";
+import { bootstrap } from "../../src/client/bootstrap";
+import { unmount } from "../../src/client/instance";
+import { RUNTIME_PROTOCOL } from "../../src/client/runtime-owner";
 
 const elements: Element[] = [];
 const handles: { destroy(): void }[] = [];

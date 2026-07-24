@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { html, raw } from "../../src/template/html.ts";
-import { safeUrl } from "../../src/template/safe-url.ts";
+import { html, raw } from "../../src/template/html";
+import { safeUrl } from "../../src/template/safe-url";
 
 // ---------------------------------------------------------------------------
 // Scenario 1: supported contexts escape, flatten, and drop nullish values

@@ -6,7 +6,7 @@
  * Django adapter can compare markup byte-for-byte. The order is a fixture
  * convention, not a public byte-stability promise.
  */
-import { escapeAttribute } from "../template/escape.ts";
+import { escapeAttribute } from "../template/escape";
 
 export const ISLAND_TAG = "taipa-island";
 export const ATTR_COMPONENT = "data-taipa-component";

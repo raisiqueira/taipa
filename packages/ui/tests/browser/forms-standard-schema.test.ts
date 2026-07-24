@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { createForm, standardSchema } from "../../src/forms/index.ts";
-import { issuesToFormErrors } from "../../src/forms/standard-schema.ts";
-import type { StandardSchemaIssue, StandardSchemaV1 } from "../../src/types.ts";
+import { createForm, standardSchema } from "../../src/forms/index";
+import { issuesToFormErrors } from "../../src/forms/standard-schema";
+import type { StandardSchemaIssue, StandardSchemaV1 } from "../../src/types";
 
 const mounted: HTMLFormElement[] = [];
 

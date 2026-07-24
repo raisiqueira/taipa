@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import type { FormErrors } from "../../src/types.ts";
-import { createForm } from "../../src/forms/controller.ts";
+import type { FormErrors } from "../../src/types";
+import { createForm } from "../../src/forms/controller";
 
 const mounted: HTMLFormElement[] = [];
 

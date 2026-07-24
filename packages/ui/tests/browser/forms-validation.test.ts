@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vite-plus/test";
-import { createForm } from "../../src/forms/controller.ts";
-import type { FormErrors } from "../../src/types.ts";
+import { createForm } from "../../src/forms/controller";
+import type { FormErrors } from "../../src/types";
 
 function formFrom(html: string): HTMLFormElement {
   const template = document.createElement("template");

@@ -5,10 +5,10 @@
  * that first render the view is never invoked again.
  */
 import { afterEach, expect, test, vi } from "vite-plus/test";
-import { component, html } from "../../src/index.ts";
-import { hydrate } from "../../src/client/hydrate.ts";
-import { mount } from "../../src/client/mount.ts";
-import { unmount } from "../../src/client/instance.ts";
+import { component, html } from "../../src/index";
+import { hydrate } from "../../src/client/hydrate";
+import { mount } from "../../src/client/mount";
+import { unmount } from "../../src/client/instance";
 
 const created: HTMLElement[] = [];
 

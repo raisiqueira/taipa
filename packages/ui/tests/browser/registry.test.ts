@@ -8,13 +8,13 @@
  * approves the exact specifier through resolveDomModule.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import type { ComponentLoader } from "../../src/types.ts";
-import { claimRuntimeOwner } from "../../src/client/runtime-owner.ts";
+import type { ComponentLoader } from "../../src/types";
+import { claimRuntimeOwner } from "../../src/client/runtime-owner";
 import {
   assertApprovedSpecifier,
   loadCachedModule,
   resolveRegistryEntry,
-} from "../../src/client/registry.ts";
+} from "../../src/client/registry";
 
 const elements: Element[] = [];
 

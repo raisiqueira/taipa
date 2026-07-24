@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
-import { createForm } from "../../src/forms/index.ts";
-import { component, html, signal } from "../../src/index.ts";
-import { renderIsland, renderToString } from "../../src/server/index.ts";
+import { createForm } from "../../src/forms/index";
+import { component, html, signal } from "../../src/index";
+import { renderIsland, renderToString } from "../../src/server/index";
 
 test("runs in the node environment", () => {
   expect(typeof process.versions.node).toBe("string");

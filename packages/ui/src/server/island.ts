@@ -8,8 +8,8 @@
  * server render entirely and carry the optional fallback element as inert
  * content; the bootstrapper replaces it after an off-DOM render succeeds.
  */
-import { isSafeHtml } from "../template/html.ts";
-import type { Component, JsonObject, SafeHtml } from "../types.ts";
+import { isSafeHtml } from "../template/html";
+import type { Component, JsonObject, SafeHtml } from "../types";
 import {
   ATTR_COMPONENT,
   ATTR_EXPORT,
@@ -25,8 +25,8 @@ import {
   jsonScript,
   serializeAttributes,
   type Attribute,
-} from "./attributes.ts";
-import { toInertJson } from "./json.ts";
+} from "./attributes";
+import { toInertJson } from "./json";
 import {
   asComponentDefinition,
   prepareContext,
@@ -34,7 +34,7 @@ import {
   validateProps,
   validateStateOverrides,
   type RenderOptions,
-} from "./render.ts";
+} from "./render";
 
 export type HydrationPolicy = false | "load" | "idle" | "visible" | "only";
 

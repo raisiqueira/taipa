@@ -1,4 +1,4 @@
-import { ISLAND_TAG } from "../server/attributes.ts";
+import { ISLAND_TAG } from "../server/attributes";
 
 export function defineIslandElement(): void {
   if (customElements.get(ISLAND_TAG) !== undefined) {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vite-plus/test";
-import { formDataFor, setValue } from "../../src/forms/values.ts";
+import { formDataFor, setValue } from "../../src/forms/values";
 
 function formFrom(html: string): HTMLFormElement {
   const template = document.createElement("template");

@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { assertJsonSafe, toInertJson } from "../../src/server/json.ts";
+import { assertJsonSafe, toInertJson } from "../../src/server/json";
 
 // ---------------------------------------------------------------------------
 // toInertJson: markup-significant characters can never break out of the

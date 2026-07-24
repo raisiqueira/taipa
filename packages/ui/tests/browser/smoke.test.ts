@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { component, html } from "../../src/index.ts";
-import { mount, unmount } from "../../src/client/index.ts";
+import { component, html } from "../../src/index";
+import { mount, unmount } from "../../src/client/index";
 
 test("runs in a real browser", () => {
   expect(typeof window).toBe("object");

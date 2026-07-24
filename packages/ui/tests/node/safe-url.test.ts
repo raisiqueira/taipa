@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { safeUrl } from "../../src/template/safe-url.ts";
+import { safeUrl } from "../../src/template/safe-url";
 
 // Scenario 3: approved relative and protocol URLs pass; hostile schemes fail.
 

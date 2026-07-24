@@ -1,8 +1,8 @@
 import { component, html } from "@taipa/ui";
 import { mount } from "@taipa/ui/client";
-import { buildData, updateEveryTenth } from "../data.ts";
-import { replaceRows } from "../dom.ts";
-import type { BenchmarkApp, RowData } from "../types.ts";
+import { buildData, updateEveryTenth } from "../data";
+import { replaceRows } from "../dom";
+import type { BenchmarkApp, RowData } from "../types";
 
 const TaipaBenchmark = component("TaipaBenchmark", { contractVersion: "1" })
   .state("rows", [] as RowData[])

@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { component, type ComponentDefinition } from "../../src/component.ts";
-import { html } from "../../src/template/html.ts";
+import { component, type ComponentDefinition } from "../../src/component";
+import { html } from "../../src/template/html";
 
 type CounterDefinition = ComponentDefinition<
   { readonly label: string },
@@ -146,7 +146,7 @@ test("the root entry neither accesses DOM globals at import nor at first use", a
   }
 
   try {
-    const root = await import("../../src/index.ts");
+    const root = await import("../../src/index");
     const counter = root
       .component("isolated", { contractVersion: "1" })
       .state("count", 0)

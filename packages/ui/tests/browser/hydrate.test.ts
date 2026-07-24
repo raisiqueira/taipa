@@ -7,9 +7,9 @@
  * partial attachment, and exactly one `taipa:error` event describes it.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { component, html } from "../../src/index.ts";
-import type { Component } from "../../src/index.ts";
-import { hydrate } from "../../src/client/hydrate.ts";
+import { component, html } from "../../src/index";
+import type { Component } from "../../src/index";
+import { hydrate } from "../../src/client/hydrate";
 
 const created: HTMLElement[] = [];
 

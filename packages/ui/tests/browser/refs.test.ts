@@ -5,7 +5,7 @@
  * parent must not see them (and vice versa).
  */
 import { describe, expect, test } from "vite-plus/test";
-import { assertRequiredRefs, collectRefs, createRefMap } from "../../src/client/refs.ts";
+import { assertRequiredRefs, collectRefs, createRefMap } from "../../src/client/refs";
 
 function hostFrom(markup: string): HTMLElement {
   const template = document.createElement("template");

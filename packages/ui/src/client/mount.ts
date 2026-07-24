@@ -8,10 +8,10 @@
  * Every validation that can fail runs before any DOM mutation: a rejected
  * mount leaves the target exactly as it was found.
  */
-import type { Component, ComponentInstance, JsonObject, MountOptions } from "../types.ts";
-import { asComponentDefinition, renderToString } from "../server/render.ts";
-import { attachComponent } from "./hydrate.ts";
-import { claimRuntimeOwner } from "./runtime-owner.ts";
+import type { Component, ComponentInstance, JsonObject, MountOptions } from "../types";
+import { asComponentDefinition, renderToString } from "../server/render";
+import { attachComponent } from "./hydrate";
+import { claimRuntimeOwner } from "./runtime-owner";
 
 export async function mount<P extends JsonObject, S, D>(
   host: HTMLElement,

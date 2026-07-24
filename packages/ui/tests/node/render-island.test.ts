@@ -1,9 +1,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test } from "vite-plus/test";
-import { component } from "../../src/component.ts";
-import { renderIsland, type IslandRenderOptions } from "../../src/server/island.ts";
-import { html, raw } from "../../src/template/html.ts";
-import type { Component, JsonObject } from "../../src/types.ts";
+import { component } from "../../src/component";
+import { renderIsland, type IslandRenderOptions } from "../../src/server/island";
+import { html, raw } from "../../src/template/html";
+import type { Component, JsonObject } from "../../src/types";
 
 const Counter = component<{ initial: number }>("Counter", { contractVersion: "1" })
   .state("count", ({ props }) => props.initial)

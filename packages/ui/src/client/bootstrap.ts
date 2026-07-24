@@ -1,16 +1,16 @@
-import { renderToString, asComponentDefinition } from "../server/render.ts";
-import { ATTR_COMPONENT } from "../server/attributes.ts";
-import type { ComponentDefinition } from "../component.ts";
-import type { BootstrapHandle, BootstrapOptions, Component } from "../types.ts";
-import { defineIslandElement } from "./custom-element.ts";
-import { discoverIslands } from "./discovery.ts";
-import { attachComponent, readHostPayloads } from "./hydrate.ts";
-import { dispatchIslandEvent, unmount } from "./instance.ts";
-import { assertRequiredRefs, collectRefs } from "./refs.ts";
-import { loadCachedModule, resolveRegistryEntry } from "./registry.ts";
-import type { RuntimeHostRecord } from "./runtime-owner.ts";
-import { claimRuntimeOwner } from "./runtime-owner.ts";
-import { resolvePolicy, schedulePolicy } from "./scheduler.ts";
+import { renderToString, asComponentDefinition } from "../server/render";
+import { ATTR_COMPONENT } from "../server/attributes";
+import type { ComponentDefinition } from "../component";
+import type { BootstrapHandle, BootstrapOptions, Component } from "../types";
+import { defineIslandElement } from "./custom-element";
+import { discoverIslands } from "./discovery";
+import { attachComponent, readHostPayloads } from "./hydrate";
+import { dispatchIslandEvent, unmount } from "./instance";
+import { assertRequiredRefs, collectRefs } from "./refs";
+import { loadCachedModule, resolveRegistryEntry } from "./registry";
+import type { RuntimeHostRecord } from "./runtime-owner";
+import { claimRuntimeOwner } from "./runtime-owner";
+import { resolvePolicy, schedulePolicy } from "./scheduler";
 
 interface BootstrapRecord {
   readonly options: BootstrapOptions;

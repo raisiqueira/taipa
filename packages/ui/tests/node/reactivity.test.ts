@@ -5,7 +5,7 @@ import {
   effectScope as alienEffectScope,
   signal as alienSignal,
 } from "alien-signals";
-import { batch, computed, effect, effectScope, signal } from "../../src/reactivity.ts";
+import { batch, computed, effect, effectScope, signal } from "../../src/reactivity";
 
 test("reactive primitives are direct alien-signals re-exports", () => {
   // KTD8 / design 2.9: Taipa does not wrap the reactive graph. batch() is the

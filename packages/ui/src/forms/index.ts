@@ -1,5 +1,5 @@
-export { createForm } from "./controller.ts";
-export { issuesToFormErrors, standardSchema } from "./standard-schema.ts";
+export { createForm } from "./controller";
+export { issuesToFormErrors, standardSchema } from "./standard-schema";
 
 export type {
   CreateFormOptions,
@@ -14,4 +14,4 @@ export type {
   StandardSchemaResult,
   StandardSchemaV1,
   ValidationMode,
-} from "../types.ts";
+} from "../types";

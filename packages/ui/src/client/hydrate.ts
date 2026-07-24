@@ -12,14 +12,14 @@
  * are not reversible and are left alone.
  */
 import { effect, effectScope } from "alien-signals";
-import type { ComponentDefinition } from "../component.ts";
-import { ATTR_PROPS_SCRIPT, ATTR_STATE_SCRIPT, ATTR_VERSION } from "../server/attributes.ts";
+import type { ComponentDefinition } from "../component";
+import { ATTR_PROPS_SCRIPT, ATTR_STATE_SCRIPT, ATTR_VERSION } from "../server/attributes";
 import {
   asComponentDefinition,
   prepareContext,
   validateProps,
   validateStateOverrides,
-} from "../server/render.ts";
+} from "../server/render";
 import type {
   ClientContext,
   Component,
@@ -27,17 +27,17 @@ import type {
   HydrateOptions,
   JsonObject,
   ReactiveContext,
-} from "../types.ts";
-import { attachEventListeners } from "./events.ts";
-import { createComponentInstance, dispatchIslandEvent } from "./instance.ts";
+} from "../types";
+import { attachEventListeners } from "./events";
+import { createComponentInstance, dispatchIslandEvent } from "./instance";
 import {
   assertRequiredRefs,
   collectRefs,
   createRefMap,
   elementForRef,
   type CollectedRefs,
-} from "./refs.ts";
-import { claimRuntimeOwner } from "./runtime-owner.ts";
+} from "./refs";
+import { claimRuntimeOwner } from "./runtime-owner";
 
 const MAX_PAYLOAD_BYTES = 64 * 1024;
 const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);

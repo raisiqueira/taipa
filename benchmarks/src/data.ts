@@ -1,4 +1,4 @@
-import type { RowData } from "./types.ts";
+import type { RowData } from "./types";
 
 const adjectives = [
   "pretty",

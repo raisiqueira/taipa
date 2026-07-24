@@ -1,4 +1,4 @@
-import { ISLAND_TAG } from "../server/attributes.ts";
+import { ISLAND_TAG } from "../server/attributes";
 
 export function discoverIslands(root: ParentNode): HTMLElement[] {
   const hosts: HTMLElement[] = [];

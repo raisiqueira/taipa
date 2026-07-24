@@ -10,8 +10,8 @@
  * a later unit's concern.
  */
 import { computed, effectScope, signal } from "alien-signals";
-import type { ComponentDefinition, StateRegistration } from "../component.ts";
-import { isSafeHtml } from "../template/html.ts";
+import type { ComponentDefinition, StateRegistration } from "../component";
+import { isSafeHtml } from "../template/html";
 import type {
   Component,
   JsonObject,
@@ -19,8 +19,8 @@ import type {
   ReactiveContext,
   SafeHtml,
   Signal,
-} from "../types.ts";
-import { assertJsonSafe } from "./json.ts";
+} from "../types";
+import { assertJsonSafe } from "./json";
 
 export interface RenderOptions<S> {
   readonly state?: Partial<S>;

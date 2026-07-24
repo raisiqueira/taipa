@@ -1,8 +1,8 @@
 import { computed, signal } from "alien-signals";
-import type { CreateFormOptions, FormController, FormErrors } from "../types.ts";
-import { createErrorRenderer, normalizeErrors } from "./errors.ts";
-import { disableSubmittingControls } from "./submission.ts";
-import { formDataFor, setValue as setControlValue } from "./values.ts";
+import type { CreateFormOptions, FormController, FormErrors } from "../types";
+import { createErrorRenderer, normalizeErrors } from "./errors";
+import { disableSubmittingControls } from "./submission";
+import { formDataFor, setValue as setControlValue } from "./values";
 
 export function createForm<T>(
   form: HTMLFormElement,

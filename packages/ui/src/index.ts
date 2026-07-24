@@ -22,13 +22,13 @@ export type {
   SafeUrl,
   Signal,
   StateSignals,
-} from "./types.ts";
+} from "./types";
 
-export { component } from "./component.ts";
-export type { ComponentOptions } from "./component.ts";
+export { component } from "./component";
+export type { ComponentOptions } from "./component";
 
-export { html, raw } from "./template/html.ts";
-export { safeUrl } from "./template/safe-url.ts";
-export type { SafeUrlOptions } from "./template/safe-url.ts";
+export { html, raw } from "./template/html";
+export { safeUrl } from "./template/safe-url";
+export type { SafeUrlOptions } from "./template/safe-url";
 
-export { batch, computed, effect, effectScope, signal } from "./reactivity.ts";
+export { batch, computed, effect, effectScope, signal } from "./reactivity";

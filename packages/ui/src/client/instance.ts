@@ -4,8 +4,8 @@
  * reverse attach order — connected cleanups, the effect scope (bindings and
  * effects), then the abort signal that removes every listener.
  */
-import type { ClientContext, ComponentInstance } from "../types.ts";
-import { claimRuntimeOwner } from "./runtime-owner.ts";
+import type { ClientContext, ComponentInstance } from "../types";
+import { claimRuntimeOwner } from "./runtime-owner";
 
 export function dispatchIslandEvent(
   host: HTMLElement,

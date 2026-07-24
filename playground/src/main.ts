@@ -1,7 +1,7 @@
 import { bootstrap, mount } from "@taipa/ui/client";
 import { createForm, standardSchema } from "@taipa/ui/forms";
 import type { StandardSchemaV1 } from "@taipa/ui/forms";
-import { Counter } from "./counter.ts";
+import { Counter } from "./counter";
 import "./style.css";
 
 interface SignupValues {

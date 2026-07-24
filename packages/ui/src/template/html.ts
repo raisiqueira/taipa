@@ -9,10 +9,10 @@
  * `raw()` marks already-sanitized or fully trusted markup as safe. It is
  * intentionally alarming; never pass user-controlled input.
  */
-import type { SafeHtml } from "../types.ts";
-import { classifyAttribute, createTemplateScanner, type InterpolationContext } from "./context.ts";
-import { escapeAttribute, escapeText } from "./escape.ts";
-import { isSafeUrl } from "./safe-url.ts";
+import type { SafeHtml } from "../types";
+import { classifyAttribute, createTemplateScanner, type InterpolationContext } from "./context";
+import { escapeAttribute, escapeText } from "./escape";
+import { isSafeUrl } from "./safe-url";
 
 /**
  * Runtime brand key. See `./safe-url.ts` for why `Symbol.for` is used; plain

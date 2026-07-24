@@ -3,9 +3,9 @@
  * the component module loads, renders off-DOM, and passes hydration preflight.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { component, html } from "../../src/index.ts";
-import { bootstrap } from "../../src/client/bootstrap.ts";
-import { unmount } from "../../src/client/instance.ts";
+import { component, html } from "../../src/index";
+import { bootstrap } from "../../src/client/bootstrap";
+import { unmount } from "../../src/client/instance";
 
 const elements: Element[] = [];
 const handles: { destroy(): void }[] = [];

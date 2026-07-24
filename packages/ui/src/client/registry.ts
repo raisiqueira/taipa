@@ -6,14 +6,9 @@
  * `data-taipa-src` remains inert unless the application approves that exact
  * specifier through resolveDomModule.
  */
-import { ATTR_COMPONENT, ATTR_EXPORT, ATTR_SRC } from "../server/attributes.ts";
-import type {
-  BootstrapOptions,
-  ComponentLoader,
-  ComponentRegistry,
-  RegistryEntry,
-} from "../types.ts";
-import type { RuntimeOwner } from "./runtime-owner.ts";
+import { ATTR_COMPONENT, ATTR_EXPORT, ATTR_SRC } from "../server/attributes";
+import type { BootstrapOptions, ComponentLoader, ComponentRegistry, RegistryEntry } from "../types";
+import type { RuntimeOwner } from "./runtime-owner";
 
 const REGISTRY_ID = "taipa-registry";
 const MAX_REGISTRY_CHARS = 256 * 1024;

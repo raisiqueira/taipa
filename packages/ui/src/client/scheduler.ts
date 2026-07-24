@@ -8,7 +8,7 @@
  * macrotask when the document is already loaded); without
  * IntersectionObserver, visible degrades to load.
  */
-import { ATTR_HYDRATE, ATTR_IDLE_TIMEOUT, ATTR_VISIBLE_ROOT_MARGIN } from "../server/attributes.ts";
+import { ATTR_HYDRATE, ATTR_IDLE_TIMEOUT, ATTR_VISIBLE_ROOT_MARGIN } from "../server/attributes";
 
 export type ActivePolicy = "load" | "idle" | "visible" | "only";
 

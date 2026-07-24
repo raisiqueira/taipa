@@ -13,7 +13,7 @@
  *   instances, cycles) with an error naming the exact path, so a hostile or
  *   buggy payload fails at render time instead of silently degrading.
  */
-import type { JsonValue } from "../types.ts";
+import type { JsonValue } from "../types";
 
 const INERT_ESCAPES: Record<string, string> = {
   "<": "\\u003c",

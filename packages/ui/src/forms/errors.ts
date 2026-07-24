@@ -1,5 +1,5 @@
-import type { FormErrors } from "../types.ts";
-import { controlsForName } from "./values.ts";
+import type { FormErrors } from "../types";
+import { controlsForName } from "./values";
 
 const ERROR_ATTR = "data-taipa-error-for";
 const STATUS_ATTR = "data-taipa-form-status";

@@ -4,10 +4,10 @@
  * listener without bookkeeping. Throwing or rejecting handlers surface as
  * `taipa:error` on the host instead of becoming unhandled failures.
  */
-import type { EventRegistration } from "../component.ts";
-import type { ClientContext } from "../types.ts";
-import { dispatchIslandEvent } from "./instance.ts";
-import { elementForRef, type CollectedRefs } from "./refs.ts";
+import type { EventRegistration } from "../component";
+import type { ClientContext } from "../types";
+import { dispatchIslandEvent } from "./instance";
+import { elementForRef, type CollectedRefs } from "./refs";
 
 export function attachEventListeners<P, S, D>(
   context: ClientContext<P, S, D>,

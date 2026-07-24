@@ -15,7 +15,7 @@ import type {
   MaybePromise,
   ReactiveContext,
   SafeHtml,
-} from "./types.ts";
+} from "./types";
 
 export interface ComponentOptions {
   readonly contractVersion: string;

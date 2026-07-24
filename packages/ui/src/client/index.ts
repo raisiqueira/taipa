@@ -4,10 +4,10 @@
  * side-effect free — no custom elements are defined and no globals are
  * touched until an API is called (AE9).
  */
-export { bootstrap } from "./bootstrap.ts";
-export { hydrate } from "./hydrate.ts";
-export { mount } from "./mount.ts";
-export { unmount } from "./instance.ts";
+export { bootstrap } from "./bootstrap";
+export { hydrate } from "./hydrate";
+export { mount } from "./mount";
+export { unmount } from "./instance";
 export type {
   BootstrapHandle,
   BootstrapOptions,
@@ -17,4 +17,4 @@ export type {
   HydrateOptions,
   MountOptions,
   RegistryEntry,
-} from "../types.ts";
+} from "../types";

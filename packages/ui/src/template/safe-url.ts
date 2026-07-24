@@ -7,7 +7,7 @@
  * containing ASCII whitespace or control characters (which smuggle schemes
  * past naive prefix checks), is rejected.
  */
-import type { SafeUrl } from "../types.ts";
+import type { SafeUrl } from "../types";
 
 export interface SafeUrlOptions {
   readonly protocols?: readonly string[];

@@ -6,9 +6,9 @@
  * taipa:error. User DOM writes are never claimed to be reversible.
  */
 import { afterEach, expect, test, vi } from "vite-plus/test";
-import { component, html } from "../../src/index.ts";
-import { hydrate } from "../../src/client/hydrate.ts";
-import { unmount } from "../../src/client/instance.ts";
+import { component, html } from "../../src/index";
+import { hydrate } from "../../src/client/hydrate";
+import { unmount } from "../../src/client/instance";
 
 const created: HTMLElement[] = [];
 

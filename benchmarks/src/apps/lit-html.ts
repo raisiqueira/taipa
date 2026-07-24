@@ -1,7 +1,7 @@
 import { html, render } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
-import { buildData, updateEveryTenth } from "../data.ts";
-import type { BenchmarkApp, RowData } from "../types.ts";
+import { buildData, updateEveryTenth } from "../data";
+import type { BenchmarkApp, RowData } from "../types";
 
 const app: BenchmarkApp = {
   name: "lit-html",

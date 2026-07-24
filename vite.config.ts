@@ -8,12 +8,21 @@ export default defineConfig({
     "*": "vp check --fix",
   },
   fmt: {
-    ignorePatterns: ["**/dist/**", "integrations/**"],
+    ignorePatterns: ["**/dist/**", "integrations/**", "tests/consumers/**"],
   },
   lint: {
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
-    ignorePatterns: ["**/dist/**", "integrations/**"],
+    plugins: ["import"],
+    ignorePatterns: ["**/dist/**", "integrations/**", "tests/consumers/**"],
     rules: {
+      "import/extensions": [
+        "error",
+        "ignorePackages",
+        {
+          checkTypeImports: true,
+          pattern: { cts: "never", mts: "never", ts: "never", tsx: "never" },
+        },
+      ],
       "vite-plus/prefer-vite-plus-imports": "error",
       "no-console": ["error", { allow: ["warn", "error"] }],
     },

@@ -1,13 +1,13 @@
 import "./style.css";
-import type { BenchmarkApp } from "./types.ts";
+import type { BenchmarkApp } from "./types";
 
 const apps = {
-  ilha: () => import("./apps/ilha.ts"),
-  "lit-html": () => import("./apps/lit-html.ts"),
-  react: () => import("./apps/react.ts"),
-  taipa: () => import("./apps/taipa.ts"),
-  vanillajs: () => import("./apps/vanillajs.ts"),
-  vue: () => import("./apps/vue.ts"),
+  ilha: () => import("./apps/ilha"),
+  "lit-html": () => import("./apps/lit-html"),
+  react: () => import("./apps/react"),
+  taipa: () => import("./apps/taipa"),
+  vanillajs: () => import("./apps/vanillajs"),
+  vue: () => import("./apps/vue"),
 } satisfies Record<string, () => Promise<{ default: BenchmarkApp }>>;
 
 export type FrameworkId = keyof typeof apps;

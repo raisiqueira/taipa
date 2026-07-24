@@ -1,6 +1,6 @@
-import { buildData, updateEveryTenth } from "../data.ts";
-import { benchmarkShell, replaceRows } from "../dom.ts";
-import type { BenchmarkApp, RowData } from "../types.ts";
+import { buildData, updateEveryTenth } from "../data";
+import { benchmarkShell, replaceRows } from "../dom";
+import type { BenchmarkApp, RowData } from "../types";
 
 const app: BenchmarkApp = {
   name: "vanillajs",
