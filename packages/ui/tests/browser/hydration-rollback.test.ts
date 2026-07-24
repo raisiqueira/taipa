@@ -1,5 +1,5 @@
 /**
- * Commit-phase rollback (KTD14, plan scenario 9). Preflight failures preserve
+ * Commit-phase rollback. Preflight failures preserve
  * the island byte-for-byte and stay unmarked; a fault while attaching
  * listeners, bindings, effects, or connected hooks disposes every runtime
  * resource in reverse order, marks the host errored, and emits exactly one
@@ -107,7 +107,7 @@ test("an effect fault stops the bindings that were already attached", () => {
   expect(errors).toHaveLength(1);
   expect(errors[0]?.detail).toMatchObject({ phase: "commit" });
   expect(order).toEqual(["binding-cleanup"]);
-  // KTD14: the binding's DOM write is a user write and is not reversed.
+  // The binding's DOM write is a user write and is not reversed.
   expect(host.querySelector("output")?.textContent).toBe("0");
 });
 
@@ -175,7 +175,7 @@ test("a connected fault runs the cleanups of the hooks that already ran", () => 
   expect(errors).toHaveLength(1);
   expect(errors[0]?.detail).toMatchObject({ component: "probe", phase: "commit" });
   expect(order).toEqual(["connected1", "connected1-cleanup", "binding-cleanup"]);
-  // KTD14: the binding's DOM write is a user write and is not reversed.
+  // The binding's DOM write is a user write and is not reversed.
   expect(host.querySelector("output")?.textContent).toBe("bound");
   expect(host.getAttribute("data-taipa-error")).toBe("probe");
 });

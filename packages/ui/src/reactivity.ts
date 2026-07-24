@@ -1,5 +1,5 @@
 /**
- * Reactivity surface (design 2.9 / KTD8).
+ * Reactivity surface (design 2.9).
  *
  * `signal`, `computed`, `effect`, and `effectScope` are direct re-exports of
  * the pinned alien-signals release — Taipa never wraps scheduling or

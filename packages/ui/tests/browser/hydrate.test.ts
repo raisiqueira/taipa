@@ -1,5 +1,5 @@
 /**
- * hydrate() — direct-DOM hydration (design 2.3/2.4, KTD13/14/18, AE1/AE2).
+ * hydrate() — direct-DOM hydration (design 2.3/2.4).
  *
  * The runtime attaches behavior to the exact server-rendered nodes: it never
  * renders, replaces, or re-parents anything. Preflight (version, payload,
@@ -180,7 +180,7 @@ describe("atomic preflight", () => {
   });
 });
 
-describe("payload resolution (KTD13)", () => {
+describe("payload resolution", () => {
   test("payload scripts feed props and state when no explicit options exist", () => {
     const host = island(
       `<button data-taipa-ref="increment">+</button><output data-taipa-ref="label"></output>${propsScript('{"start": 3}')}${stateScript('{"count": 9}')}`,
@@ -278,7 +278,7 @@ describe("payload resolution (KTD13)", () => {
   });
 });
 
-describe("hostile payloads (KTD18)", () => {
+describe("hostile payloads", () => {
   test("dangerous keys at any depth abort before state creation", () => {
     const samples = [
       '{"__proto__": {"polluted": true}}',

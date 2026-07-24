@@ -1,7 +1,7 @@
-// Clean-consumer verification for the packed @taipa/ui tarball (U1 test
-// scenario 6). Packs the library, installs it into a throwaway consumer with
+// Clean-consumer verification for the packed @taipa/ui tarball. Packs the
+// library, installs it into a throwaway consumer with
 // plain npm, and imports every subpath with the `node` currently on PATH.
-// CI runs this script on a Node 22.12 / Node 24 matrix.
+// CI runs this script on the supported Node version.
 //
 // Prerequisites: `vp run -r build` must have produced packages/ui/dist.
 // Usage: pnpm verify:consumer

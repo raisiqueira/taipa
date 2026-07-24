@@ -270,7 +270,7 @@ function releaseRemovedPendingHosts(
     if (hostRecord === undefined || !hostRecord.claims.has(record)) {
       continue;
     }
-    // Active instances are owned by U4's lifecycle observer: moves should keep
+    // Active instances are owned by the lifecycle observer: moves should keep
     // state, and true removals destroy after its microtask deferral. Pending
     // activations, however, must be cancelled so reinsertion can reschedule.
     if (hostRecord.status !== "active") {

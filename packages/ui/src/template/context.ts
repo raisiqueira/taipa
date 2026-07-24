@@ -1,5 +1,5 @@
 /**
- * Tagged-template context scanner (KTD19).
+ * Tagged-template context scanner.
  *
  * The scanner advances over each static template segment and reports the
  * context in which the following interpolation lands. Interpolation is

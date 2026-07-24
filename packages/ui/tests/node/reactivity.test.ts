@@ -8,7 +8,7 @@ import {
 import { batch, computed, effect, effectScope, signal } from "../../src/reactivity";
 
 test("reactive primitives are direct alien-signals re-exports", () => {
-  // KTD8 / design 2.9: Taipa does not wrap the reactive graph. batch() is the
+  // Taipa does not wrap the reactive graph. batch() is the
   // only wrapper, so the other four must be the very same functions.
   expect(signal).toBe(alienSignal);
   expect(computed).toBe(alienComputed);

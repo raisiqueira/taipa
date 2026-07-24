@@ -70,7 +70,7 @@ test("accepts diamond references and only rejects true cycles", () => {
 });
 
 // ---------------------------------------------------------------------------
-// assertJsonSafe: failures name the exact path (plan U3 scenario 4)
+// assertJsonSafe: failures name the exact path.
 // ---------------------------------------------------------------------------
 
 test("rejects undefined at the root, in objects, and in arrays with paths", () => {

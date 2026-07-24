@@ -19,7 +19,7 @@ const Badge = component<{ label: string }>("Badge", { contractVersion: "1" }).re
 );
 
 // ---------------------------------------------------------------------------
-// Plan U3 scenario 2: attributes and scripts for every hydration policy
+// Attributes and scripts for every hydration policy.
 // ---------------------------------------------------------------------------
 
 test("static island omits all hydration metadata and scripts", async () => {
@@ -95,7 +95,7 @@ test("module resolution attributes, id, and attribute escaping", async () => {
 });
 
 // ---------------------------------------------------------------------------
-// Plan U3 scenario 3: hostile payloads stay inert in both lanes (inner HTML
+// Hostile payloads stay inert in both lanes (inner HTML
 // via html``; JSON scripts via inert escaping)
 // ---------------------------------------------------------------------------
 
@@ -127,7 +127,7 @@ test("line separators and non-ASCII survive the props script round-trip", async 
 });
 
 // ---------------------------------------------------------------------------
-// Plan U3 scenario 5: client:only fallback rules
+// client:only fallback rules.
 // ---------------------------------------------------------------------------
 
 test("only renders no view, emits the fallback as inert content plus scripts", async () => {

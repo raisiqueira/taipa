@@ -1,5 +1,5 @@
-// Deliberate-failure smoke checks for the Vite+ toolchain (U1 test scenarios
-// 2 and 3). Proves that `vp check` catches type errors, lint violations, and
+// Deliberate-failure smoke checks for the Vite+ toolchain. Proves that
+// `vp check` catches type errors, lint violations, and
 // format violations without any standalone Oxc/ESLint/Prettier config, and
 // that the committed baseline stays green.
 //

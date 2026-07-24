@@ -1,9 +1,9 @@
 /**
- * Policy scheduler (design 4.2, AE3): every policy is a cancellable schedule
+ * Policy scheduler (design 4.2): every policy is a cancellable schedule
  * that rechecks host connection before firing. idle degrades to after-load or
  * next-macrotask without requestIdleCallback; visible degrades to load
  * without IntersectionObserver; policy/timeout/root-margin values are
- * validated data (KTD9) — invalid values fail before any scheduling.
+ * validated data — invalid values fail before any scheduling.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import { resolvePolicy, schedulePolicy } from "../../src/client/scheduler";
@@ -93,7 +93,7 @@ describe("schedulePolicy: load and only", () => {
     task.cancel();
   });
 
-  test("cancelling load before the microtask prevents activation (AE3)", async () => {
+  test("cancelling load before the microtask prevents activation", async () => {
     const fire = vi.fn();
     const task = schedulePolicy(island(`data-taipa-hydrate="load"`), { policy: "load" }, fire);
     task.cancel();

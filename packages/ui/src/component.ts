@@ -1,10 +1,10 @@
 /**
- * Universal component definitions (R1, design 3.2–3.3).
+ * Universal component definitions (design 3.2–3.3).
  *
  * A component definition is immutable metadata plus ordered lifecycle
  * registrations. No signals, effects, or DOM nodes exist here: state signals
- * and scopes are created per instance by the server renderer (U3) and the
- * client runtime (U4/U5). Every builder method returns a new frozen builder,
+ * and scopes are created per instance by the server renderer and the client
+ * runtime. Every builder method returns a new frozen builder,
  * and `.render()` finalizes the chain.
  */
 import type {

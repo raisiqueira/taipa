@@ -1,5 +1,5 @@
 /**
- * Entrypoint isolation (AE9, plan scenario 10): importing any package entry
+ * Entrypoint isolation: importing any package entry
  * in a DOM-less Node environment must succeed and must not mutate the
  * environment — no custom elements defined, no global runtime registry, no
  * DOM access at module evaluation time.

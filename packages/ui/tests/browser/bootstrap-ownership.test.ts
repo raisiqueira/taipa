@@ -1,5 +1,5 @@
 /**
- * Bootstrap ownership (KTD15): the document coordinator owns hosts and loader
+ * Bootstrap ownership: the document coordinator owns hosts and loader
  * promises, while each bootstrap handle owns only its claims/schedules.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";

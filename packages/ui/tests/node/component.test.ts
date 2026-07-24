@@ -123,7 +123,7 @@ test("required refs record only singular refs from .bind() and ref-targeted .on(
   expect(definition.requiredRefs).toEqual(["first", "second"]);
 });
 
-// Scenario 7 (AE9): importing the root entry in a DOM-free process must not
+// Importing the root entry in a DOM-free process must not
 // touch DOM globals, and first use of the universal surface must stay DOM-free.
 test("the root entry neither accesses DOM globals at import nor at first use", async () => {
   const domGlobals = [

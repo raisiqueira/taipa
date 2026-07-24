@@ -74,7 +74,7 @@ test("plain objects are not component definitions", async () => {
 });
 
 // ---------------------------------------------------------------------------
-// Plan U3 scenario 6: concurrent renders stay isolated
+// Concurrent renders stay isolated.
 // ---------------------------------------------------------------------------
 
 test("concurrent renders of one component never cross-contaminate", async () => {
@@ -132,7 +132,7 @@ test("a throwing initializer rejects without corrupting later renders", async ()
 });
 
 // ---------------------------------------------------------------------------
-// Plan U3 scenario 8: the server lane never touches DOM globals
+// The server lane never touches DOM globals.
 // ---------------------------------------------------------------------------
 
 test("importing and rendering on the server needs no DOM", () => {

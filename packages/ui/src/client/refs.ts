@@ -10,7 +10,7 @@
  * `.bind()`/`.on()` refs are singular by contract; repetition is only
  * reachable through `refs.all()` inside `.connected()`/`.effect()`. Singular
  * validation runs here, once, as part of the atomic preflight — before any
- * listener is attached or binding applied (KTD7/AE2).
+ * listener is attached or binding applied.
  */
 import type { RefMap } from "../types";
 import { ISLAND_TAG } from "../server/attributes";

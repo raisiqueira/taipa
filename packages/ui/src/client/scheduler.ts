@@ -1,5 +1,5 @@
 /**
- * Policy scheduling for island activation (design 4.2, AE3).
+ * Policy scheduling for island activation (design 4.2).
  *
  * Each hydration policy is a cancellable schedule, not a fire-and-forget
  * call: the scheduler rechecks cancellation and host connection before

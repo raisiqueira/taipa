@@ -4,7 +4,7 @@ import { renderToString } from "../../src/server/render";
 import { html } from "../../src/template/html";
 
 // ---------------------------------------------------------------------------
-// Plan U3 scenario 7: explicit overrides win, omitted keys use initializers,
+// Explicit overrides win, omitted keys use initializers,
 // unknown keys and initializer exceptions fail without leaking state
 // ---------------------------------------------------------------------------
 

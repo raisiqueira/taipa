@@ -1,5 +1,5 @@
 /**
- * Branded safe URLs (R4, KTD19).
+ * Branded safe URLs for template URL attributes.
  *
  * URL-bearing template attributes accept only values produced by this
  * factory. The default policy permits relative URLs plus `http:`, `https:`,

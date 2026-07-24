@@ -1,18 +1,18 @@
-// CDN topology verification for the disposable 0.0.0-cdn-probe.* canary (U1
-// test scenario 7). This is U1's closing gate: run it AFTER publishing the
-// probe to npm and BEFORE starting U2. It proves that exact-version esm.sh
+// CDN topology verification for the disposable 0.0.0-cdn-probe.* canary. Run
+// it after publishing the probe package and before relying on esm.sh delivery.
+// It proves that exact-version esm.sh
 // URLs for the root and client subpaths keep a single, shared alien-signals
 // mapping (import-map-ready), with no duplicated CDN signal graph.
 //
 // If this fails because the registry name is unavailable, a name conflict
-// appears, or the CDN graph is duplicated, STOP — the plan requires resolving
-// registry authority before U2.
+// appears, or the CDN graph is duplicated, resolve the registry or CDN topology
+// issue before treating CDN delivery as supported.
 //
 // Full gate sequence (requires `npm login` with publish rights to @taipa):
 //   1. vp run -r build                       # fresh dist
 //   2. pnpm --filter @taipa/ui publish       # publishes 0.0.0-cdn-probe.* (pnpm rewrites catalog:)
 //   3. pnpm verify:cdn                       # this script (network)
-//   4. (cd "$(mktemp -d)" && npm deprecate @taipa/ui@<version> "U1 CDN probe canary; superseded by supported alphas.")
+//   4. (cd "$(mktemp -d)" && npm deprecate @taipa/ui@<version> "CDN probe canary; superseded by supported alphas.")
 //      ^ run from a neutral directory: the repo root's devEngines pin makes
 //        npm refuse ANY command (EBADDEVENGINES) there, and pnpm deprecate
 //        can lag registry propagation right after publish.
@@ -137,9 +137,9 @@ Import map for the proven topology:
 
 if (failures > 0) {
   console.error(
-    `${failures} CDN check(s) failed. Per the plan: missing registry authority, a name conflict, or a duplicated CDN graph STOPS work before U2.`,
+    `${failures} CDN check(s) failed: resolve missing registry authority, name conflicts, or duplicated CDN graph issues before relying on CDN delivery.`,
   );
   process.exit(1);
 }
 console.log(`CDN topology verified. Deprecate the probe on npm when done (from a neutral directory — the repo root's devEngines pin makes npm refuse commands there):
-(cd "$(mktemp -d)" && npm deprecate @taipa/ui@${version} "U1 CDN probe canary; superseded by supported alphas.")`);
+(cd "$(mktemp -d)" && npm deprecate @taipa/ui@${version} "CDN probe canary; superseded by supported alphas.")`);

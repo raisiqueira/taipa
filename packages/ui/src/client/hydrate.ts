@@ -1,9 +1,9 @@
 /**
  * Direct-DOM hydration (design 2.3): attach behavior to the exact nodes the
- * server rendered. Hydration never renders, replaces, or re-parents nodes
- * (AE1); bindings are direct DOM API writes driven by alien-signals effects.
+ * server rendered. Hydration never renders, replaces, or re-parents nodes;
+ * bindings are direct DOM API writes driven by alien-signals effects.
  *
- * Attachment is atomic (KTD14): every preflight check — contract version,
+ * Attachment is atomic: every preflight check — contract version,
  * payload shape, required refs — completes before any listener, binding, or
  * connected hook touches the island, so a failure leaves the host inert apart
  * from one `taipa:error` event. If the commit phase itself fails, every

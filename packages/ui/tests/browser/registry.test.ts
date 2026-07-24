@@ -1,5 +1,5 @@
 /**
- * Registry normalization (design 4.3, KTD9/KTD18).
+ * Registry normalization (design 4.3).
  *
  * JavaScript registries are trusted application code and override page JSON.
  * The inert JSON registry is data: it is capped, duplicate-checked, sanitized
