@@ -69,8 +69,15 @@ createForm(document.querySelector("form")!, {
 - `pnpm ready` runs the main check, test, and build lanes.
 - `pnpm verify:consumer` packs `@taipa/ui` and imports all public subpaths in a clean Node consumer.
 - `pnpm verify:package` checks the packed artifact shape and release-facing metadata.
+- `pnpm verify:release` checks release preconditions used by the npm publishing workflow.
 - `pnpm --filter @taipa/playground dev` starts the local playground.
 - `pnpm --filter @taipa/benchmarks bench` runs the local benchmark subset.
+
+## Release Security
+
+JavaScript releases are published by `.github/workflows/release.yml` from tags that match `packages/ui/package.json` (`v<version>`). The workflow uses GitHub OIDC/npm trusted publishing with provenance instead of long-lived npm tokens, full-SHA-pinned third-party Actions, least-privilege permissions, a protected `npm-release` environment, and preflight checks that reject mismatched tags or unpinned Actions.
+
+The repository also runs CodeQL over GitHub Actions workflows to catch common workflow supply-chain risks before release automation changes land.
 
 ## Public Subpaths
 

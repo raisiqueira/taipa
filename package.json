@@ -14,7 +14,8 @@
     "verify:consumer": "node scripts/verify-consumer.mjs",
     "verify:cdn": "node scripts/verify-esm-sh.mjs",
     "prepare": "vp config",
-    "verify:package": "node scripts/verify-package.mjs"
+    "verify:package": "node scripts/verify-package.mjs",
+    "verify:release": "node scripts/verify-release.mjs"
   },
   "devDependencies": {
     "@types/node": "catalog:",
