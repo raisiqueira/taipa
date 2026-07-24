@@ -38,4 +38,4 @@ Run the automated local pass:
 pnpm --filter @taipa/benchmarks bench
 ```
 
-The runner prints one table per operation, sorted from best to worst, and writes the same output to `benchmarks/BENCHMARK_RESULTS.md` with the run timestamp and current git hash. CPU timings are ranked by lower milliseconds. Memory readings are ranked by lower Chromium `JSHeapUsedSize` bytes. Treat these as local development signals, not official js-framework-benchmark results.
+The runner performs five warmup executions before the measured pass for each framework/operation. It prints one table per operation, sorted from best to worst, and writes the same output to `benchmarks/BENCHMARK_RESULTS.md` with the run timestamp and current git hash. CPU timings are ranked by lower milliseconds. Memory readings are ranked by lower Chromium `JSHeapUsedSize` bytes. The `vs best` column shows the percentage slower or heavier than the top-ranked result for that operation. Treat these as local development signals, not official js-framework-benchmark results.

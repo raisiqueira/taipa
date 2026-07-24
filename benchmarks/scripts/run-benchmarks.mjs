@@ -4,6 +4,7 @@ import { once } from "node:events";
 import { writeFile } from "node:fs/promises";
 
 const frameworks = ["taipa", "ilha", "vanillajs", "lit-html", "react", "vue"];
+const warmupCount = 5;
 const operations = [
   { name: "create rows", metric: "milliseconds", unit: "ms" },
   { name: "replace all rows", metric: "milliseconds", unit: "ms" },
@@ -44,56 +45,32 @@ try {
 
     results.push(
       await measureCpu(page, framework, "create rows", async () => {
-        await click(page, "run");
-        await waitForRows(page, 1000);
+        await createRows(page);
       }),
     );
 
-    await click(page, "clear");
-    await waitForRows(page, 0);
-    await click(page, "run");
-    await waitForRows(page, 1000);
     results.push(
       await measureCpu(page, framework, "replace all rows", async () => {
-        const firstId = await firstRowId(page);
-        await click(page, "run");
-        await page.waitForFunction((previousId) => {
-          const row = document.querySelector("tbody tr");
-          return row !== null && row.firstElementChild?.textContent !== String(previousId);
-        }, firstId);
-        await waitForRows(page, 1000);
+        await replaceRows(page);
       }),
     );
 
-    await click(page, "clear");
-    await waitForRows(page, 0);
-    await click(page, "run");
-    await waitForRows(page, 1000);
     results.push(
       await measureCpu(page, framework, "partial update", async () => {
-        await click(page, "update");
-        await page.waitForFunction(
-          () =>
-            document
-              .querySelector("tbody tr:nth-child(1) td:nth-child(2) a")
-              ?.textContent?.includes("!!!") === true,
-        );
+        await partialUpdate(page);
       }),
     );
 
-    await click(page, "clear");
-    await waitForRows(page, 0);
-    await click(page, "run");
-    await waitForRows(page, 1000);
+    await warmup(page, async () => {
+      await createRows(page);
+    });
+    await createRows(page);
     results.push({ framework, operation: "run memory", bytes: await jsHeapUsed(page, client) });
 
-    await click(page, "update");
-    await page.waitForFunction(
-      () =>
-        document
-          .querySelector("tbody tr:nth-child(1) td:nth-child(2) a")
-          ?.textContent?.includes("!!!") === true,
-    );
+    await warmup(page, async () => {
+      await partialUpdate(page);
+    });
+    await partialUpdate(page);
     results.push({ framework, operation: "update memory", bytes: await jsHeapUsed(page, client) });
 
     await page.close();
@@ -110,6 +87,7 @@ try {
 }
 
 async function measureCpu(page, framework, operation, action) {
+  await warmup(page, action);
   const start = await page.evaluate(() => performance.now());
   await action();
   await page.evaluate(
@@ -140,15 +118,16 @@ function formatOperationResults(operation, results) {
       (left, right) => metricValue(left, operation.metric) - metricValue(right, operation.metric),
     );
   const valueHeading = operation.unit === "ms" ? "time" : "memory";
+  const bestValue = metricValue(sortedResults[0], operation.metric);
   const rows = sortedResults.map((result, index) => {
     const value = metricValue(result, operation.metric);
-    return `| ${index + 1} | ${result.framework} | ${formatValue(value, operation.unit)} |`;
+    return `| ${index + 1} | ${result.framework} | ${formatValue(value, operation.unit)} | ${formatRelative(value, bestValue)} |`;
   });
   return [
     `## ${operation.name}`,
     "",
-    `| rank | framework | ${valueHeading} |`,
-    "| ---: | --- | ---: |",
+    `| rank | framework | ${valueHeading} | vs best |`,
+    "| ---: | --- | ---: | ---: |",
     ...rows,
   ].join("\n");
 }
@@ -162,6 +141,47 @@ function formatValue(value, unit) {
   if (!Number.isFinite(value)) return "n/a";
   if (unit === "ms") return `${value.toFixed(1)} ms`;
   return `${value.toLocaleString("en-US")} bytes`;
+}
+
+function formatRelative(value, bestValue) {
+  if (!Number.isFinite(value) || !Number.isFinite(bestValue) || bestValue === 0) return "n/a";
+  if (value === bestValue) return "best";
+  return `+${(((value - bestValue) / bestValue) * 100).toFixed(1)}%`;
+}
+
+async function warmup(page, action) {
+  for (let i = 0; i < warmupCount; i += 1) {
+    await action();
+  }
+}
+
+async function createRows(page) {
+  await click(page, "clear");
+  await waitForRows(page, 0);
+  await click(page, "run");
+  await waitForRows(page, 1000);
+}
+
+async function replaceRows(page) {
+  await createRows(page);
+  const firstId = await firstRowId(page);
+  await click(page, "run");
+  await page.waitForFunction((previousId) => {
+    const row = document.querySelector("tbody tr");
+    return row !== null && row.firstElementChild?.textContent !== String(previousId);
+  }, firstId);
+  await waitForRows(page, 1000);
+}
+
+async function partialUpdate(page) {
+  await createRows(page);
+  await click(page, "update");
+  await page.waitForFunction(
+    () =>
+      document
+        .querySelector("tbody tr:nth-child(1) td:nth-child(2) a")
+        ?.textContent?.includes("!!!") === true,
+  );
 }
 
 async function currentGitHash() {
