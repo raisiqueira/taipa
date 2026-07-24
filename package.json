@@ -13,7 +13,8 @@
     "smoke:toolchain": "node scripts/smoke-toolchain.mjs",
     "verify:consumer": "node scripts/verify-consumer.mjs",
     "verify:cdn": "node scripts/verify-esm-sh.mjs",
-    "prepare": "vp config"
+    "prepare": "vp config",
+    "verify:package": "node scripts/verify-package.mjs"
   },
   "devDependencies": {
     "@types/node": "catalog:",

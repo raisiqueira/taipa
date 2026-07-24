@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@taipa/ui": "file:../../../packages/ui/taipa-ui-0.0.0-alpha.0.tgz"
+  }
+}

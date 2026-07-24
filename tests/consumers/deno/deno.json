@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@taipa/ui": "./dist/index.mjs",
+    "@taipa/ui/server": "./dist/server.mjs",
+    "alien-signals": "npm:alien-signals@3.2.1"
+  }
+}

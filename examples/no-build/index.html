@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Taipa UI no-build example</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "alien-signals": "https://esm.sh/alien-signals@3.2.1",
+          "@taipa/ui": "https://esm.sh/@taipa/ui@0.0.0-alpha.0",
+          "@taipa/ui/client": "https://esm.sh/@taipa/ui@0.0.0-alpha.0/client"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="counter"></div>
+    <script type="module">
+      import { component, html } from "@taipa/ui";
+      import { mount } from "@taipa/ui/client";
+
+      const Counter = component("Counter", { contractVersion: "1" })
+        .state("count", 0)
+        .bind("count", ({ element, state }) => {
+          element.textContent = String(state.count());
+        })
+        .on("increment@click", ({ state }) => {
+          state.count(state.count() + 1);
+        })
+        .render(
+          ({ state }) => html`
+            <button data-taipa-ref="increment">Increment</button>
+            <output data-taipa-ref="count">${state.count()}</output>
+          `,
+        );
+
+      await mount(document.querySelector("#counter"), Counter, { replace: true });
+    </script>
+  </body>
+</html>
