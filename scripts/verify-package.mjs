@@ -37,9 +37,8 @@ for (const file of requiredDistFiles) {
 const work = mkdtempSync(path.join(tmpdir(), "taipa-package-"));
 
 try {
-  execFileSync("pnpm", ["pack", "--pack-destination", work], {
+  execPnpm(["pack", "--pack-destination", work], {
     cwd: uiDir,
-    shell: isWindows,
     stdio: "pipe",
   });
 
@@ -264,4 +263,13 @@ function runDenoSmokeIfAvailable() {
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function execPnpm(args, options) {
+  const direct = spawnSync("pnpm", ["--version"], { encoding: "utf8", shell: isWindows });
+  if (direct.status === 0) {
+    return execFileSync("pnpm", args, { ...options, shell: isWindows });
+  }
+
+  return execFileSync("corepack", ["pnpm", ...args], { ...options, shell: isWindows });
 }

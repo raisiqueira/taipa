@@ -37,9 +37,8 @@ console.log(`Packing @taipa/ui@${pkg.version} with node ${process.version} ...`)
 // pnpm pack (not npm pack): pnpm rewrites the pnpm-only `catalog:` protocol
 // in dependencies to the resolved version, so consumers get a portable
 // package.json.
-execFileSync("pnpm", ["pack", "--pack-destination", work], {
+execPnpm(["pack", "--pack-destination", work], {
   cwd: uiDir,
-  shell: isWindows,
   stdio: "pipe",
 });
 const tarballs = readdirSync(work).filter((f) => f.endsWith(".tgz"));
@@ -152,3 +151,12 @@ for (const { subpath, assert, afterInstall } of checks) {
 }
 
 console.log(`\nAll ${checks.length} subpath imports verified on node ${process.version}.`);
+
+function execPnpm(args, options) {
+  const direct = spawnSync("pnpm", ["--version"], { encoding: "utf8", shell: isWindows });
+  if (direct.status === 0) {
+    return execFileSync("pnpm", args, { ...options, shell: isWindows });
+  }
+
+  return execFileSync("corepack", ["pnpm", ...args], { ...options, shell: isWindows });
+}
