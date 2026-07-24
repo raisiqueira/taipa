@@ -39,6 +39,9 @@ __pycache__/
 # Pack artifacts
 *.tgz
 
+# Local planning docs
+docs/plans/
+
 # AI agent worktrees
 .claude/worktrees/
 .opencode/worktrees/
