@@ -77,7 +77,7 @@ createForm(document.querySelector("form")!, {
 
 JavaScript releases are published by `.github/workflows/release.yml` from tags that match `packages/ui/package.json` (`v<version>`). The workflow uses GitHub OIDC/npm trusted publishing with provenance instead of long-lived npm tokens, full-SHA-pinned third-party Actions, least-privilege permissions, a protected `npm-release` environment, and preflight checks that reject mismatched tags or unpinned Actions.
 
-The repository also runs CodeQL over GitHub Actions workflows to catch common workflow supply-chain risks before release automation changes land.
+The repository includes a CodeQL workflow for GitHub Actions supply-chain checks. Private repositories must enable GitHub code scanning first, then set the repository variable `ENABLE_CODEQL=true`; until then the workflow is skipped so CI does not fail on SARIF upload.
 
 ## Public Subpaths
 
