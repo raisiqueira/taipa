@@ -21,6 +21,8 @@ Implemented operations:
 
 ## Results dashboard
 
+![Taipa UI Benchmarks dashboard](./docs/dashboard.png)
+
 Start the dev server to view the results dashboard — a single page that renders the latest run from `src/results.json` with an overall standing (geometric mean vs the best framework per operation) and a ranked bar chart per operation:
 
 ```sh
