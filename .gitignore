@@ -41,6 +41,7 @@ __pycache__/
 
 # Local planning docs
 docs/plans/
+outputs/taipa-ui-framework-design-plan.md
 
 # AI agent worktrees
 .claude/worktrees/
