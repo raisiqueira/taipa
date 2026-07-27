@@ -51,8 +51,8 @@ test("event registrations parse ref@type and host @type specs", () => {
 });
 
 test("duplicate state or derived names are rejected", () => {
-  // The `Exclude<K, keyof S>` name type rejects duplicates at compile time by
-  // design; cast around it to prove the runtime validation also throws.
+  // The name type rejects duplicates at compile time; cast around it to prove
+  // the runtime validation also throws.
   interface LooseBuilder {
     state(name: string, initial: unknown): LooseBuilder;
     derived(name: string, read: () => unknown): LooseBuilder;
@@ -99,8 +99,8 @@ test("repeated bind/on registrations on one ref keep a single required ref", () 
 
 test("invalid event specs are rejected", () => {
   const builder = component("events", { contractVersion: "1" });
-  // The template-literal spec type rejects these at compile time by design;
-  // cast around it to prove the runtime validation also throws.
+  // The template-literal spec type rejects these at compile time; cast around
+  // it to prove the runtime validation also throws.
   const onLoose = (spec: string) =>
     (builder as unknown as { on(spec: string, handler: () => void): unknown }).on(spec, () => {});
   expect(() => onLoose("click")).toThrow(/event spec/);

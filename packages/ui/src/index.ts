@@ -1,5 +1,5 @@
 /**
- * `@taipa/ui` — the universal entry point (design 3.2).
+ * `@taipa/ui` — the universal entry point.
  *
  * Universal component definitions, the safe `html` template, branded safe
  * values, and the alien-signals reactivity surface. This module is DOM-free

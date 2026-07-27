@@ -1,5 +1,5 @@
 /**
- * Instance lifecycle (design 2.4): deterministic, exactly-once teardown
+ * Instance lifecycle: deterministic, exactly-once teardown
  * in a fixed order; transient moves survive, real removal destroys after one
  * microtask; one compatible runtime owns the document.
  */

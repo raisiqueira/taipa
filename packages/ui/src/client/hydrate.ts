@@ -1,5 +1,5 @@
 /**
- * Direct-DOM hydration (design 2.3): attach behavior to the exact nodes the
+ * Direct-DOM hydration: attach behavior to the exact nodes the
  * server rendered. Hydration never renders, replaces, or re-parents nodes;
  * bindings are direct DOM API writes driven by alien-signals effects.
  *

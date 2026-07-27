@@ -1,5 +1,5 @@
 /**
- * Scoped ref collection (design 2.3/2.4).
+ * Scoped ref collection.
  *
  * A single TreeWalker traversal gathers `data-taipa-ref` elements inside a
  * host. Nested `<taipa-island>` subtrees are hard boundaries: their interiors

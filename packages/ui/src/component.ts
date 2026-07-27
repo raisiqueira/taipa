@@ -1,5 +1,5 @@
 /**
- * Universal component definitions (design 3.2–3.3).
+ * Universal component definitions.
  *
  * A component definition is immutable metadata plus ordered lifecycle
  * registrations. No signals, effects, or DOM nodes exist here: state signals
@@ -261,8 +261,7 @@ function makeBuilder<P, S, D>(
 export function component<P extends JsonObject = Record<string, never>>(
   name: string,
   options: ComponentOptions,
-  // The empty-S/D base must be `{}` so `Exclude<K, keyof S>` keeps K; the
-  // design's illustrative `Record<string, never>` base would erase every name.
+  // The empty-S/D base must be `{}` so `Exclude<K, keyof S>` keeps K.
 ): ComponentBuilder<P, {}, {}> {
   if (typeof name !== "string" || name.trim() === "") {
     throw new TypeError("component() requires a non-empty component name");

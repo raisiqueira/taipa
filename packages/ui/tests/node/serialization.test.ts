@@ -3,7 +3,7 @@ import { assertJsonSafe, toInertJson } from "../../src/server/json";
 
 // ---------------------------------------------------------------------------
 // toInertJson: markup-significant characters can never break out of the
-// <script type="application/json"> element (design 4.4 contract rule).
+// <script type="application/json"> element.
 // ---------------------------------------------------------------------------
 
 test("escapes angle brackets, ampersand, and the closing-script sequence", () => {

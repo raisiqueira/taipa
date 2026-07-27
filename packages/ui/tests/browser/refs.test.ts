@@ -1,5 +1,5 @@
 /**
- * Scoped ref collection (design 2.3/2.4): one traversal that gathers
+ * Scoped ref collection: one traversal that gathers
  * data-taipa-ref elements inside a host while never crossing into nested
  * island interiors. Nested islands own their refs independently, so the
  * parent must not see them (and vice versa).

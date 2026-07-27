@@ -1,5 +1,5 @@
 /**
- * mount() — client-side first render (design 3.5). Renders exactly once
+ * mount() — client-side first render. Renders exactly once
  * through the server renderer, installs the markup atomically via a native
  * template parse, then runs the same hydration path as SSR'd islands. After
  * that first render the view is never invoked again.

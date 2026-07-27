@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
 import { safeUrl } from "../../src/template/safe-url";
 
-// Scenario 3: approved relative and protocol URLs pass; hostile schemes fail.
+// Approved relative and protocol URLs pass; hostile schemes fail.
 
 test("relative URLs pass by default", () => {
   for (const value of [

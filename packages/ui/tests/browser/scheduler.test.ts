@@ -1,5 +1,5 @@
 /**
- * Policy scheduler (design 4.2): every policy is a cancellable schedule
+ * Policy scheduler: every policy is a cancellable schedule
  * that rechecks host connection before firing. idle degrades to after-load or
  * next-macrotask without requestIdleCallback; visible degrades to load
  * without IntersectionObserver; policy/timeout/root-margin values are

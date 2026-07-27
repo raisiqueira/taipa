@@ -3,7 +3,7 @@ import { html, raw } from "../../src/template/html";
 import { safeUrl } from "../../src/template/safe-url";
 
 // ---------------------------------------------------------------------------
-// Scenario 1: supported contexts escape, flatten, and drop nullish values
+// Supported contexts escape, flatten, and drop nullish values.
 // ---------------------------------------------------------------------------
 
 test("text interpolation escapes HTML-significant characters", () => {
@@ -60,7 +60,7 @@ test("SafeUrl renders its escaped value in text content", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Scenario 2: unsupported, executable, or compound contexts throw before output
+// Unsupported, executable, or compound contexts throw before output.
 // ---------------------------------------------------------------------------
 
 test("dynamic tag names throw", () => {
@@ -134,7 +134,7 @@ test("SafeUrl in an inert attribute throws (URLs belong in URL attributes)", () 
 });
 
 // ---------------------------------------------------------------------------
-// Scenario 3 (template side): URL-bearing attributes require SafeUrl
+// URL-bearing attributes require SafeUrl.
 // ---------------------------------------------------------------------------
 
 test("plain strings in URL-bearing attributes fail with a safeUrl hint", () => {
@@ -158,7 +158,7 @@ test("nullish values in URL-bearing attributes render empty", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Scenario 4: raw() preserves trusted content and cannot be forged
+// raw() preserves trusted content and cannot be forged.
 // ---------------------------------------------------------------------------
 
 test("raw() preserves trusted markup verbatim", () => {

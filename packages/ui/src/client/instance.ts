@@ -1,5 +1,5 @@
 /**
- * Component instances (design 3.5): the live attachment between a component
+ * Component instances: the live attachment between a component
  * definition and one island host. `destroy()` tears down exactly once and in
  * reverse attach order — connected cleanups, the effect scope (bindings and
  * effects), then the abort signal that removes every listener.

@@ -1,5 +1,5 @@
 /**
- * Runtime ownership (design 2.4): one compatible taipa runtime owns a
+ * Runtime ownership: one compatible taipa runtime owns a
  * page. Ownership lives in a globalThis record keyed by a well-known symbol
  * and carries protocol metadata; a second taipa copy with the same protocol
  * shares the registry, while an incompatible one is rejected without

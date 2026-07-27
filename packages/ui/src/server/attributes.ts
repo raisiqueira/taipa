@@ -1,5 +1,5 @@
 /**
- * Island host attribute names and deterministic serialization (design 4.4).
+ * Island host attribute names and deterministic serialization.
  *
  * Attribute order is fixed by `renderIsland` (id, component, module
  * resolution, policy, scheduling, version) so conformance fixtures and the

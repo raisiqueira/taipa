@@ -1,5 +1,5 @@
 /**
- * hydrate() — direct-DOM hydration (design 2.3/2.4).
+ * hydrate() — direct-DOM hydration.
  *
  * The runtime attaches behavior to the exact server-rendered nodes: it never
  * renders, replaces, or re-parents anything. Preflight (version, payload,

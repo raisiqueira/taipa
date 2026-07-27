@@ -1,5 +1,5 @@
 /**
- * Module registry normalization (design 4.3).
+ * Module registry normalization.
  *
  * Registries are data, not execution authority. JavaScript registries are
  * already trusted application code and win over inert page JSON; DOM-authored

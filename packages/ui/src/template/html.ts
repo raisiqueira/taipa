@@ -1,5 +1,5 @@
 /**
- * The server-safe `html` tagged template (design 2.6).
+ * The server-safe `html` tagged template.
  *
  * Interpolation is allowlist-based (see `./context.ts`): text content and
  * inert quoted attributes are escaped, URL-bearing attributes require branded

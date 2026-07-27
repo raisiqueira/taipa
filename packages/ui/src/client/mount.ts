@@ -1,5 +1,5 @@
 /**
- * Client-side mounting (design 3.5): the one place besides the server
+ * Client-side mounting: the one place besides the server
  * lane where a view renders. mount() renders exactly once through
  * renderToString, installs the markup atomically via a native template parse
  * (inserted scripts stay inert by construction), then hands the new nodes to

@@ -1,5 +1,5 @@
 /**
- * Event attachment (design 3.3): `.on()` registrations become native
+ * Event attachment: `.on()` registrations become native
  * listeners bound to the instance AbortSignal, so teardown removes every
  * listener without bookkeeping. Throwing or rejecting handlers surface as
  * `taipa:error` on the host instead of becoming unhandled failures.

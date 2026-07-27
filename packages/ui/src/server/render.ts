@@ -1,5 +1,5 @@
 /**
- * Server rendering: one initial render per call, then disposal (design 3.4).
+ * Server rendering: one initial render per call, then disposal.
  *
  * A render instantiates fresh state signals and derived computeds from the
  * component definition, applies validated state overrides, runs the view

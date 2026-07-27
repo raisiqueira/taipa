@@ -1,5 +1,5 @@
 /**
- * Policy scheduling for island activation (design 4.2).
+ * Policy scheduling for island activation.
  *
  * Each hydration policy is a cancellable schedule, not a fire-and-forget
  * call: the scheduler rechecks cancellation and host connection before
@@ -29,7 +29,7 @@ const DEFAULT_VISIBLE_ROOT_MARGIN = "200px 0px";
 export function resolvePolicy(host: HTMLElement): ResolvedPolicy | null {
   const raw = host.getAttribute(ATTR_HYDRATE);
   if (raw === null) {
-    // No hydrate attribute means never hydrate (design 4.4): the island is
+    // No hydrate attribute means never hydrate: the island is
     // static server-rendered HTML and bootstrap must leave it alone.
     return null;
   }

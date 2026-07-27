@@ -1,6 +1,6 @@
 /**
  * Island rendering: the `<taipa-island>` host around one initial render
- * (design 3.4 and 4.4).
+ * that the client runtime can activate.
  *
  * Hydratable islands carry the hydration policy, contract version, inert
  * props JSON, and optional state-override JSON. Static islands (no policy)

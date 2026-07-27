@@ -1,5 +1,5 @@
 /**
- * JSON serialization for island props/state scripts (design 4.4).
+ * JSON serialization for island props/state scripts.
  *
  * Two guarantees:
  *
