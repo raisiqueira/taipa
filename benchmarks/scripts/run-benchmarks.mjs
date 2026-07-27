@@ -15,6 +15,7 @@ const operations = [
 const port = Number(process.env.TAIPA_BENCH_PORT ?? 5190);
 const baseUrl = `http://127.0.0.1:${port}`;
 const reportFile = new URL("../BENCHMARK_RESULTS.md", import.meta.url);
+const dataFile = new URL("../src/results.json", import.meta.url);
 
 const server = spawn("pnpm", ["exec", "vite", "--host", "127.0.0.1", "--port", String(port)], {
   cwd: new URL("..", import.meta.url),
@@ -40,7 +41,7 @@ try {
     const page = await browser.newPage();
     const client = await page.context().newCDPSession(page);
     await client.send("Performance.enable");
-    await page.goto(`${baseUrl}/?framework=${framework}`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/harness.html?framework=${framework}`, { waitUntil: "networkidle" });
     await waitForRows(page, 0);
 
     results.push(
@@ -77,10 +78,15 @@ try {
   }
 
   await browser.close();
-  const report = await formatReport(results);
+  const timestamp = new Date().toISOString();
+  const gitHash = await currentGitHash();
+  const report = formatReport(results, timestamp, gitHash);
   await writeFile(reportFile, report);
+  const dataReport = buildDataReport(results, timestamp, gitHash);
+  await writeFile(dataFile, `${JSON.stringify(dataReport, null, 2)}\n`);
   process.stdout.write(report);
   process.stdout.write(`\nSaved benchmark report to ${reportFile.pathname}\n`);
+  process.stdout.write(`Saved dashboard data to ${dataFile.pathname}\n`);
 } finally {
   server.kill("SIGTERM");
   await once(server, "exit").catch(() => undefined);
@@ -97,9 +103,7 @@ async function measureCpu(page, framework, operation, action) {
   return { framework, operation, milliseconds: Number((end - start).toFixed(3)) };
 }
 
-async function formatReport(results) {
-  const timestamp = new Date().toISOString();
-  const gitHash = await currentGitHash();
+function formatReport(results, timestamp, gitHash) {
   return [
     "# Benchmark Results",
     "",
@@ -109,6 +113,30 @@ async function formatReport(results) {
     operations.map((operation) => formatOperationResults(operation, results)).join("\n\n"),
     "",
   ].join("\n");
+}
+
+// Emit the structured data consumed by the Vite dashboard (src/dashboard.ts).
+function buildDataReport(results, timestamp, gitHash) {
+  return {
+    timestamp,
+    gitHash,
+    frameworks,
+    operations: operations.map((operation) => ({
+      name: operation.name,
+      metric: operation.metric,
+      unit: operation.unit,
+      results: results
+        .filter((result) => result.operation === operation.name)
+        .toSorted(
+          (left, right) =>
+            metricValue(left, operation.metric) - metricValue(right, operation.metric),
+        )
+        .map((result) => ({
+          framework: result.framework,
+          value: metricValue(result, operation.metric),
+        })),
+    })),
+  };
 }
 
 function formatOperationResults(operation, results) {

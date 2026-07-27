@@ -20,11 +20,13 @@
     "vue": "catalog:"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "playwright": "catalog:",
+    "tailwindcss": "^4.3.3",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-cli": "catalog:",

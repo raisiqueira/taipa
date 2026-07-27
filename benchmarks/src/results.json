@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-07-24T13:36:15.926Z",
+  "gitHash": "c64cbe1ef75340aa8f8dd92f29be9b6d7f893a1f",
+  "frameworks": ["taipa", "ilha", "vanillajs", "lit-html", "react", "vue"],
+  "operations": [
+    {
+      "name": "create rows",
+      "metric": "milliseconds",
+      "unit": "ms",
+      "results": [
+        { "framework": "vanillajs", "value": 62.1 },
+        { "framework": "taipa", "value": 62.3 },
+        { "framework": "vue", "value": 68.1 },
+        { "framework": "ilha", "value": 69.5 },
+        { "framework": "react", "value": 101.3 },
+        { "framework": "lit-html", "value": 365.3 }
+      ]
+    },
+    {
+      "name": "replace all rows",
+      "metric": "milliseconds",
+      "unit": "ms",
+      "results": [
+        { "framework": "vanillajs", "value": 94.7 },
+        { "framework": "taipa", "value": 95.0 },
+        { "framework": "vue", "value": 98.1 },
+        { "framework": "ilha", "value": 129.9 },
+        { "framework": "react", "value": 216.8 },
+        { "framework": "lit-html", "value": 2442.4 }
+      ]
+    },
+    {
+      "name": "partial update",
+      "metric": "milliseconds",
+      "unit": "ms",
+      "results": [
+        { "framework": "vue", "value": 85.0 },
+        { "framework": "vanillajs", "value": 97.2 },
+        { "framework": "taipa", "value": 97.7 },
+        { "framework": "ilha", "value": 100.6 },
+        { "framework": "react", "value": 107.8 },
+        { "framework": "lit-html", "value": 1808.1 }
+      ]
+    },
+    {
+      "name": "run memory",
+      "metric": "bytes",
+      "unit": "bytes",
+      "results": [
+        { "framework": "vanillajs", "value": 2466048 },
+        { "framework": "taipa", "value": 2856876 },
+        { "framework": "ilha", "value": 3266472 },
+        { "framework": "lit-html", "value": 3724616 },
+        { "framework": "vue", "value": 5810080 },
+        { "framework": "react", "value": 10681340 }
+      ]
+    },
+    {
+      "name": "update memory",
+      "metric": "bytes",
+      "unit": "bytes",
+      "results": [
+        { "framework": "vanillajs", "value": 2397936 },
+        { "framework": "taipa", "value": 2771872 },
+        { "framework": "ilha", "value": 3256064 },
+        { "framework": "lit-html", "value": 3832164 },
+        { "framework": "vue", "value": 5958092 },
+        { "framework": "react", "value": 10772984 }
+      ]
+    }
+  ]
+}
