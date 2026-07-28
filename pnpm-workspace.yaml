@@ -25,6 +25,10 @@ catalog:
   "@types/react": ^19.2.17
   "@types/react-dom": ^19.2.3
   "@vitejs/plugin-vue": ^6.0.8
+  # CodSpeed benchmark harness for @taipa/ui. tinybench stays on v5: the
+  # CodSpeed plugin does not support tinybench v6 yet.
+  tinybench: 5.1.0
+  "@codspeed/tinybench-plugin": ^5.7.1
 overrides:
   vite: "catalog:"
 peerDependencyRules:
