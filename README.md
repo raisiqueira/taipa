@@ -1,5 +1,7 @@
 # Taipa UI
 
+[![CodSpeed](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://app.codspeed.io/raisiqueira/taipa?utm_source=badge)
+
 > Note: Taipa UI is alpha software. The public API is being validated through packed-artifact, browser, and server-rendering checks before the first npm prerelease.
 
 Taipa UI is a small ESM-first islands framework for server-authored HTML. It renders safe HTML on JavaScript servers, hydrates existing DOM without a Virtual DOM or reconciliation pass, and progressively enhances native forms.
@@ -82,6 +84,9 @@ createForm(document.querySelector("form")!, {
 - `pnpm verify:release` checks release preconditions used by the npm publishing workflow.
 - `pnpm --filter @taipa/playground dev` starts the local playground.
 - `pnpm --filter @taipa/benchmarks bench` runs the local benchmark subset.
+- `pnpm --filter @taipa/ui bench` runs the CodSpeed benchmarks for the packed
+  `@taipa/ui` artifacts (build first). CI runs the same suite under CodSpeed's
+  CPU simulation instrument on every push and pull request.
 
 ## Public Subpaths
 

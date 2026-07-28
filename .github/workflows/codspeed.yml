@@ -1,0 +1,38 @@
+name: codspeed
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # `workflow_dispatch` lets CodSpeed trigger backtest runs to seed the baseline.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # OpenID Connect authentication with CodSpeed; no upload token needed.
+  id-token: write
+
+jobs:
+  benchmarks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - uses: voidzero-dev/setup-vp@250f29ce396baf5e8f24498e17c0dfdebabc26eb # v1 (v1.15.0)
+        with:
+          node-version-file: ".node-version"
+          cache: true
+          run-install: false
+
+      - run: vp install --frozen-lockfile
+
+      # The benchmarks import the packed ESM artifacts, so `@taipa/ui` has to be
+      # built first. Only that package is needed here.
+      - run: vp run -F @taipa/ui build
+
+      - name: Run benchmarks
+        uses: CodSpeedHQ/action@f22792bfac16f3e14eb9fbea76f4a48e9cc22b93 # v4.19.1
+        with:
+          mode: simulation
+          working-directory: packages/ui
+          run: node bench/index.mjs
