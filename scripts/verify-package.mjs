@@ -182,21 +182,39 @@ function runViteBrowserConsumer(tarball) {
   writeFileSync(
     path.join(consumerDir, "src/main.ts"),
     `import { component, html } from "@taipa/ui";
-import { mount } from "@taipa/ui/client";
-import { createForm, issuesToFormErrors } from "@taipa/ui/forms";
+ import { mount } from "@taipa/ui/client";
+ import { createForm, issuesToFormErrors } from "@taipa/ui/forms";
 
-const Counter = component("Counter", { contractVersion: "1" })
-  .state("count", 0)
-  .bind("count", ({ element, state }) => {
-    element.textContent = String(state.count());
-  })
-  .on("increment@click", ({ state }) => {
-    state.count(state.count() + 1);
-  })
-  .render(({ state }) => html\`
-    <button data-taipa-ref="increment">Increment</button>
-    <output data-taipa-ref="count">\${state.count()}</output>
-  \`);
+function assertType<T>(_value: T): void {}
+
+ const Counter = component("Counter", { contractVersion: "1" })
+   .state("count", 0)
+   .bind("count", ({ element, state }) => {
+      assertType<Element>(element);
+      element.textContent = String(state.count());
+    })
+   .bind<"output", HTMLOutputElement>("output", ({ element }) => {
+     assertType<HTMLOutputElement>(element);
+   })
+   .on("increment@click", ({ event, refs, state }) => {
+      assertType<PointerEvent>(event);
+      assertType<Element>(refs.one("count"));
+     // @ts-expect-error packed declarations reject undeclared refs.
+      refs.one("missing");
+      state.count(state.count() + 1);
+    })
+   .on<"increment@click", PointerEvent, HTMLButtonElement>("increment@click", ({ target }) => {
+     assertType<HTMLButtonElement>(target);
+   })
+   .effect(({ refs }) => {
+     assertType<HTMLOutputElement>(refs.one("output"));
+     assertType<HTMLButtonElement>(refs.one("increment"));
+   })
+   .render(({ state }) => html\`
+     <button data-taipa-ref="increment">Increment</button>
+     <output data-taipa-ref="count">\${state.count()}</output>
+     <output data-taipa-ref="output"></output>
+   \`);
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("missing app root");

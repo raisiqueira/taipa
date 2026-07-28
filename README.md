@@ -38,6 +38,16 @@ const Counter = component("Counter", { contractVersion: "1" })
 const markup = await renderIsland(Counter, {}, { hydrate: "load" });
 ```
 
+Ref names declared through `.bind()` and ref-targeted `.on()` calls are retained
+in client callbacks. `refs.one("count")` is accepted here; an undeclared name
+fails type checking. Use an element generic when the element contract is known:
+
+```ts
+.bind<"count", HTMLOutputElement>("count", ({ element }) => {
+  element.value = "42";
+})
+```
+
 Hydrate that server-authored markup in the browser:
 
 ```ts

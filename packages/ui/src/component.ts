@@ -11,9 +11,14 @@ import type {
   Cleanup,
   ClientContext,
   Component,
+  EventForSpec,
   JsonObject,
   MaybePromise,
+  OnSpec,
+  ParseEvent,
+  ParseRef,
   ReactiveContext,
+  RefElement,
   SafeHtml,
 } from "./types";
 
@@ -78,40 +83,69 @@ export interface ComponentDefinition<P = any, S = any, D = any> extends Componen
   readonly connectedRegistrations: readonly ConnectedRegistration<P, S, D>[];
 }
 
-export interface ComponentBuilder<P, S, D> {
+type RefRecord = Record<string, Element>;
+
+type MergedRefElement<Refs extends RefRecord, Name extends string, E extends Element> = [
+  Element,
+] extends [E]
+  ? Name extends keyof Refs
+    ? Refs[Name]
+    : E
+  : E;
+
+type MergeRefs<Refs extends RefRecord, Name extends string, E extends Element> = Omit<Refs, Name> &
+  Record<Name, MergedRefElement<Refs, Name, E>>;
+
+type EventTarget<Refs extends RefRecord, Spec extends string, E extends Element> = [
+  ParseRef<Spec>,
+] extends [never]
+  ? HTMLElement
+  : RefElement<MergeRefs<Refs, ParseRef<Spec>, E>, ParseRef<Spec>>;
+
+type ValidOnSpec<Spec extends OnSpec> = [ParseEvent<Spec>] extends [never] ? never : Spec;
+
+export interface ComponentBuilder<P, S, D, Refs extends RefRecord = RefRecord> {
   state<K extends string, V>(
     name: Exclude<K, keyof S>,
     initial: V | ((context: { readonly props: Readonly<P> }) => V),
-  ): ComponentBuilder<P, S & Record<K, V>, D>;
+  ): ComponentBuilder<P, S & Record<K, V>, D, Refs>;
 
   derived<K extends string, V>(
     name: Exclude<K, keyof D>,
     read: (context: ReactiveContext<P, S, D>) => V,
-  ): ComponentBuilder<P, S, D & Record<K, V>>;
+  ): ComponentBuilder<P, S, D & Record<K, V>, Refs>;
 
-  on<E extends Event = Event>(
-    spec: `@${string}` | `${string}@${string}`,
+  on<
+    Spec extends OnSpec,
+    E extends EventForSpec<Spec> = EventForSpec<Spec>,
+    El extends Element = Element,
+  >(
+    spec: ValidOnSpec<Spec>,
     handler: (
-      context: ClientContext<P, S, D> & {
+      context: ClientContext<P, S, D, MergeRefs<Refs, ParseRef<Spec>, El>> & {
         readonly event: E;
-        readonly target: Element;
+        readonly target: EventTarget<Refs, Spec, El>;
       },
     ) => MaybePromise<void>,
     options?: AddEventListenerOptions,
-  ): ComponentBuilder<P, S, D>;
+  ): ComponentBuilder<P, S, D, MergeRefs<Refs, ParseRef<Spec>, El>>;
 
-  bind(
-    refName: string,
+  bind<Name extends string, E extends Element = Element>(
+    refName: Name,
     update: (
-      context: ClientContext<P, S, D> & {
-        readonly element: Element;
+      context: ClientContext<P, S, D, MergeRefs<Refs, Name, E>> & {
+        readonly element: RefElement<MergeRefs<Refs, Name, E>, Name>;
       },
     ) => void | Cleanup,
-  ): ComponentBuilder<P, S, D>;
+  ): ComponentBuilder<P, S, D, MergeRefs<Refs, Name, E>>;
 
-  effect(run: (context: ClientContext<P, S, D>) => void | Cleanup): ComponentBuilder<P, S, D>;
+  effect(
+    run: (context: ClientContext<P, S, D, Refs>) => void | Cleanup,
+  ): ComponentBuilder<P, S, D, Refs>;
 
-  connected(run: (context: ClientContext<P, S, D>) => void | Cleanup): ComponentBuilder<P, S, D>;
+  connected(
+    run: (context: ClientContext<P, S, D, Refs>) => void | Cleanup,
+  ): ComponentBuilder<P, S, D, Refs>;
 
   render(view: (context: ReactiveContext<P, S, D>) => MaybePromise<SafeHtml>): Component<P, S, D>;
 }
@@ -152,12 +186,12 @@ function freezeRecord<T extends object>(record: T): T {
   return Object.freeze(record);
 }
 
-function makeBuilder<P, S, D>(
+function makeBuilder<P, S, D, Refs extends RefRecord>(
   name: string,
   contractVersion: string,
   registrations: BuilderRegistrations<P, S, D>,
-): ComponentBuilder<P, S, D> {
-  function extend(patch: Partial<BuilderRegistrations<P, S, D>>): ComponentBuilder<P, S, D> {
+): ComponentBuilder<P, S, D, Refs> {
+  function extend(patch: Partial<BuilderRegistrations<P, S, D>>): ComponentBuilder<P, S, D, Refs> {
     return makeBuilder(name, contractVersion, { ...registrations, ...patch });
   }
 
@@ -255,14 +289,14 @@ function makeBuilder<P, S, D>(
       };
       return Object.freeze(definition);
     },
-  }) as ComponentBuilder<P, S, D>;
+  }) as unknown as ComponentBuilder<P, S, D, Refs>;
 }
 
 export function component<P extends JsonObject = Record<string, never>>(
   name: string,
   options: ComponentOptions,
   // The empty-S/D base must be `{}` so `Exclude<K, keyof S>` keeps K.
-): ComponentBuilder<P, {}, {}> {
+): ComponentBuilder<P, {}, {}, {}> {
   if (typeof name !== "string" || name.trim() === "") {
     throw new TypeError("component() requires a non-empty component name");
   }

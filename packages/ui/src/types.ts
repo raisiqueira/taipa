@@ -48,11 +48,55 @@ export interface SafeUrl {
   readonly [safeUrlBrand]: true;
 }
 
-export interface RefMap {
-  one<T extends Element = Element>(name: string): T;
-  optional<T extends Element = Element>(name: string): T | null;
-  all<T extends Element = Element>(name: string): readonly T[];
+export type RefElement<
+  Refs extends Record<string, Element>,
+  Name extends string,
+> = Name extends keyof Refs ? Refs[Name] : Element;
+
+export interface RefMap<Refs extends Record<string, Element> = Record<string, Element>> {
+  one<Name extends string & keyof Refs>(name: Name): RefElement<Refs, Name>;
+  optional<Name extends string>(name: Name): RefElement<Refs, Name> | null;
+  all<Name extends string>(name: Name): readonly RefElement<Refs, Name>[];
 }
+
+/**
+ * Spec parsing for `.on()` event specs. Module-exported so the spec-parse
+ * type tests can import them; intentionally NOT re-exported from the public
+ * entry points (root/server/client/forms) — they are internal type tools.
+ *
+ * `ParseRef` and `ParseEvent` resolve malformed specs (multiple `@`, empty
+ * event segment) to `never`, mirroring the runtime `parseEventSpec` rejection
+ * so the type layer never accepts a spec the runtime throws on. Host-targeted
+ * specs (`@type`, empty ref segment) resolve `ParseRef` to `never` (contribute
+ * nothing to the `Refs` accumulator) while remaining valid at the call site.
+ */
+export type OnSpec = `@${string}` | `${string}@${string}`;
+
+type HasSecondAt<S extends string> = S extends `${string}@${string}@${string}` ? true : false;
+
+export type ParseRef<S extends string> = S extends `${infer Ref}@${infer Ev}`
+  ? HasSecondAt<S> extends true
+    ? never
+    : Ev extends ""
+      ? never
+      : Ref extends ""
+        ? never
+        : Ref
+  : never;
+
+export type ParseEvent<S extends string> = S extends `${string}@${infer Ev}`
+  ? HasSecondAt<S> extends true
+    ? never
+    : Ev extends ""
+      ? never
+      : Ev
+  : never;
+
+export type EventFor<Name extends string> = Name extends keyof HTMLElementEventMap
+  ? HTMLElementEventMap[Name]
+  : Event;
+
+export type EventForSpec<S extends string> = EventFor<ParseEvent<S>>;
 
 export interface ReactiveContext<P, S, D> {
   readonly props: Readonly<P>;
@@ -60,9 +104,14 @@ export interface ReactiveContext<P, S, D> {
   readonly derived: DerivedSignals<D>;
 }
 
-export interface ClientContext<P, S, D> extends ReactiveContext<P, S, D> {
+export interface ClientContext<
+  P,
+  S,
+  D,
+  Refs extends Record<string, Element> = Record<string, Element>,
+> extends ReactiveContext<P, S, D> {
   readonly host: HTMLElement;
-  readonly refs: RefMap;
+  readonly refs: RefMap<Refs>;
   readonly signal: AbortSignal;
 }
 

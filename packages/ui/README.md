@@ -39,6 +39,16 @@ export const Counter = component("Counter", { contractVersion: "1" })
   );
 ```
 
+Refs declared through `.bind()` and ref-targeted `.on()` are type-checked in
+client callbacks. For a known element, provide an element generic:
+
+```ts
+.bind<"count", HTMLOutputElement>("count", ({ element, refs }) => {
+  element.value = "1";
+  refs.one("count").value = "1";
+})
+```
+
 Render an island on a JavaScript server:
 
 ```ts
