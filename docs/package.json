@@ -7,11 +7,13 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "test:demos": "pnpm run check && pnpm run build && node scripts/test-demos.mjs"
   },
   "dependencies": {
     "@cloudflare/nimbus-docs": "catalog:",
     "@iconify-json/ph": "catalog:",
+    "@taipa/ui": "workspace:*",
     "astro-icon": "catalog:",
     "astro-og-canvas": "catalog:",
     "canvaskit-wasm": "catalog:",
@@ -23,6 +25,7 @@
     "@tailwindcss/vite": "catalog:",
     "astro": "catalog:",
     "pagefind": "catalog:",
+    "playwright": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "^6.0.3",
     "vite-cli": "catalog:"

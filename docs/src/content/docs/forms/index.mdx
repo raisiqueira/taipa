@@ -16,23 +16,25 @@ and client share the same accessible destinations.
 
 <Code
   lang="html"
-  code={`<form action="/signup" method="post" novalidate>
-  <label>
-    Name
-    <input name="name" required aria-describedby="name-error" />
-  </label>
-  <p id="name-error" data-taipa-error-for="name"></p>
-
-<label>
-  Email
-  <input name="email" type="email" required aria-describedby="email-error" />
-</label>
-<p id="email-error" data-taipa-error-for="email"></p>
-
-  <p data-taipa-error-for="$form" data-taipa-form-status></p>
-  <button type="submit" data-taipa-disable-while-submitting>Join</button>
-  <button type="submit" formnovalidate>Save draft</button>
-</form>`}
+  lines={[
+    '<form action="/signup" method="post" novalidate>',
+    "  <label>",
+    "    Name",
+    '    <input name="name" required aria-describedby="name-error" />',
+    "  </label>",
+    '  <p id="name-error" data-taipa-error-for="name"></p>',
+    "",
+    "  <label>",
+    "    Email",
+    '    <input name="email" type="email" required aria-describedby="email-error" />',
+    "  </label>",
+    '  <p id="email-error" data-taipa-error-for="email"></p>',
+    "",
+    '  <p data-taipa-error-for="$form" data-taipa-form-status></p>',
+    '  <button type="submit" data-taipa-disable-while-submitting>Join</button>',
+    '  <button type="submit" formnovalidate>Save draft</button>',
+    "</form>",
+  ]}
 />
 
 The `formnovalidate` draft action intentionally bypasses both browser and Taipa validation for that
@@ -45,46 +47,94 @@ coercion under application control instead of accepting a hidden conversion conv
 
 <Code
   lang="ts"
-  code={`import { createForm, standardSchema } from "@taipa/ui/forms";
-
-const signupSchema = {
-"~standard": {
-version: 1,
-vendor: "my-app",
-validate(value: Readonly<{ name: string; email: string }>) {
-const issues: Array<{ message: string; path: string[] }> = [];
-
-      if (value.name.trim().length < 2) {
-        issues.push({ message: "Enter at least two characters.", path: ["name"] });
-      }
-      if (!value.email.includes("@")) {
-        issues.push({ message: "Enter a valid email address.", path: ["email"] });
-      }
-
-      return issues.length === 0 ? { value } : { issues };
-    },
-
-},
-};
-
-const form = document.querySelector("form");
-
-if (form instanceof HTMLFormElement) {
-createForm(form, {
-read({ formData }) {
-return {
-name: String(formData.get("name") ?? ""),
-email: String(formData.get("email") ?? ""),
-};
-},
-validate: standardSchema(signupSchema),
-});
-}`}
+  lines={[
+    'import { createForm, standardSchema } from "@taipa/ui/forms";',
+    "",
+    "const signupSchema = {",
+    '  "~standard": {',
+    "    version: 1,",
+    '    vendor: "my-app",',
+    "    validate(value: Readonly<{ name: string; email: string }>) {",
+    "      const issues: Array<{ message: string; path: string[] }> = [];",
+    "",
+    "      if (value.name.trim().length < 2) {",
+    '        issues.push({ message: "Enter at least two characters.", path: ["name"] });',
+    "      }",
+    '      if (!value.email.includes("@")) {',
+    '        issues.push({ message: "Enter a valid email address.", path: ["email"] });',
+    "      }",
+    "",
+    "      return issues.length === 0 ? { value } : { issues };",
+    "    },",
+    "  },",
+    "};",
+    "",
+    'const form = document.querySelector("form");',
+    "",
+    "if (form instanceof HTMLFormElement) {",
+    "  createForm(form, {",
+    "    read({ formData }) {",
+    "      return {",
+    '        name: String(formData.get("name") ?? ""),',
+    '        email: String(formData.get("email") ?? ""),',
+    "      };",
+    "    },",
+    "    validate: standardSchema(signupSchema),",
+    "  });",
+    "}",
+  ]}
 />
 
 Schema issues become text-only field errors. Nested paths map to dot names such as `user.email`;
 pathless issues target `$form`. Validation results from an older request cannot overwrite a newer
 attempt.
+
+## Keep the form enhancement with its component
+
+When a form appears inside an island, use the component lifecycle to attach enhancement and dispose
+the controller. The component owns setup; the browser still owns the controls and their values.
+
+<Code
+  lang="ts"
+  lines={[
+    'import { component, html } from "@taipa/ui";',
+    'import { createForm, standardSchema } from "@taipa/ui/forms";',
+    "",
+    'export const SignupForm = component("SignupForm", { contractVersion: "1" })',
+    "  .connected(({ refs }) => {",
+    '    const form = refs.optional("form");',
+    "",
+    "    if (!(form instanceof HTMLFormElement)) return;",
+    "",
+    "    const controller = createForm(form, {",
+    "      read({ formData }) {",
+    "        return {",
+    '          name: String(formData.get("name") ?? ""),',
+    '          email: String(formData.get("email") ?? ""),',
+    "        };",
+    "      },",
+    "      validate: standardSchema(signupSchema),",
+    "    });",
+    "",
+    "    return () => controller.destroy();",
+    "  })",
+    "  .render(",
+    "    () => html`",
+    '      <form data-taipa-ref="form" action="/signup" method="post">',
+    '        <input name="name" required />',
+    '        <input name="email" type="email" required />',
+    '        <p data-taipa-error-for="$form" data-taipa-form-status></p>',
+    '        <button type="submit">Join</button>',
+    "      </form>",
+    "    `,",
+    "  );",
+  ]}
+/>
+
+`connected()` runs once after the island attaches. Returning `controller.destroy()` keeps listeners,
+pending validation, and any submitting state scoped to that component instance.
+
+<ProgressiveFormDemo />
 
 ## Use Zod or Valibot directly
 
@@ -99,27 +149,29 @@ for an application; these are parallel examples, not dependencies to install tog
 
 <Code
   lang="ts"
-  code={`import { z } from "zod";
-import { createForm, standardSchema } from "@taipa/ui/forms";
-
-const signupSchema = z.object({
-name: z.string().trim().min(2, "Enter at least two characters."),
-email: z.email("Enter a valid email address."),
-});
-
-const form = document.querySelector("form");
-
-if (form instanceof HTMLFormElement) {
-createForm(form, {
-read({ formData }) {
-return {
-name: String(formData.get("name") ?? ""),
-email: String(formData.get("email") ?? ""),
-};
-},
-validate: standardSchema(signupSchema),
-});
-}`}
+  lines={[
+    'import { z } from "zod";',
+    'import { createForm, standardSchema } from "@taipa/ui/forms";',
+    "",
+    "const signupSchema = z.object({",
+    '  name: z.string().trim().min(2, "Enter at least two characters."),',
+    '  email: z.email("Enter a valid email address."),',
+    "});",
+    "",
+    'const form = document.querySelector("form");',
+    "",
+    "if (form instanceof HTMLFormElement) {",
+    "  createForm(form, {",
+    "    read({ formData }) {",
+    "      return {",
+    '        name: String(formData.get("name") ?? ""),',
+    '        email: String(formData.get("email") ?? ""),',
+    "      };",
+    "    },",
+    "    validate: standardSchema(signupSchema),",
+    "  });",
+    "}",
+  ]}
 />
 
   </TabItem>
@@ -129,27 +181,29 @@ validate: standardSchema(signupSchema),
 
 <Code
   lang="ts"
-  code={`import * as v from "valibot";
-import { createForm, standardSchema } from "@taipa/ui/forms";
-
-const signupSchema = v.object({
-name: v.pipe(v.string(), v.minLength(2, "Enter at least two characters.")),
-email: v.pipe(v.string(), v.email("Enter a valid email address.")),
-});
-
-const form = document.querySelector("form");
-
-if (form instanceof HTMLFormElement) {
-createForm(form, {
-read({ formData }) {
-return {
-name: String(formData.get("name") ?? ""),
-email: String(formData.get("email") ?? ""),
-};
-},
-validate: standardSchema(signupSchema),
-});
-}`}
+  lines={[
+    'import * as v from "valibot";',
+    'import { createForm, standardSchema } from "@taipa/ui/forms";',
+    "",
+    "const signupSchema = v.object({",
+    '  name: v.pipe(v.string(), v.minLength(2, "Enter at least two characters.")),',
+    '  email: v.pipe(v.string(), v.email("Enter a valid email address.")),',
+    "});",
+    "",
+    'const form = document.querySelector("form");',
+    "",
+    "if (form instanceof HTMLFormElement) {",
+    "  createForm(form, {",
+    "    read({ formData }) {",
+    "      return {",
+    '        name: String(formData.get("name") ?? ""),',
+    '        email: String(formData.get("email") ?? ""),',
+    "      };",
+    "    },",
+    "    validate: standardSchema(signupSchema),",
+    "  });",
+    "}",
+  ]}
 />
 
   </TabItem>
@@ -174,27 +228,28 @@ CSRF inputs and files, plus an abort signal for stale work.
 
 <Code
   lang="ts"
-  code={`createForm(form, {
-  read({ formData }) {
-    return {
-      name: String(formData.get("name") ?? ""),
-      email: String(formData.get("email") ?? ""),
-    };
-  },
-  validate: standardSchema(signupSchema),
-  async submit({ formData, signal, setErrors }) {
-    const response = await fetch("/signup", {
-      method: "POST",
-      body: formData,
-      signal,
-    });
-
-    if (!response.ok) {
-      setErrors({ $form: ["We could not save your signup. Try again."] });
-    }
-
-},
-});`}
+  lines={[
+    "createForm(form, {",
+    "  read({ formData }) {",
+    "    return {",
+    '      name: String(formData.get("name") ?? ""),',
+    '      email: String(formData.get("email") ?? ""),',
+    "    };",
+    "  },",
+    "  validate: standardSchema(signupSchema),",
+    "  async submit({ formData, signal, setErrors }) {",
+    '    const response = await fetch("/signup", {',
+    '      method: "POST",',
+    "      body: formData,",
+    "      signal,",
+    "    });",
+    "",
+    "    if (!response.ok) {",
+    '      setErrors({ $form: ["We could not save your signup. Try again."] });',
+    "    }",
+    "  },",
+    "});",
+  ]}
 />
 
 Only controls marked `data-taipa-disable-while-submitting` are disabled while that handler runs.

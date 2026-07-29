@@ -1,0 +1,59 @@
+<section class="docs-demo" data-docs-counter-demo aria-labelledby="client-counter-demo-title">
+  <div class="docs-demo__heading">
+    <p class="docs-demo__eyebrow">Try it</p>
+    <h2 id="client-counter-demo-title">Mount the counter in this guide</h2>
+    <p>These buttons belong to the same component from the example above.</p>
+  </div>
+
+  <div class="docs-demo__surface">
+    <div data-docs-counter-host></div>
+    <p data-docs-counter-fallback>JavaScript mounts the counter into this empty host.</p>
+  </div>
+
+  <p class="docs-demo__next">
+    When the interaction feels right, <a href="/advanced/server-islands/">render this Counter on the server</a>.
+  </p>
+</section>
+
+<script>
+  import { component, html } from "@taipa/ui";
+  import { mount } from "@taipa/ui/client";
+
+  const Counter = component("DocsCounter", { contractVersion: "1" })
+    .state("count", 0)
+    .bind("count", ({ element, state }) => {
+      element.textContent = String(state.count());
+    })
+    .on("increment@click", ({ state }) => {
+      state.count(state.count() + 1);
+    })
+    .on("decrement@click", ({ state }) => {
+      state.count(state.count() - 1);
+    })
+    .render(
+      ({ state }) => html`
+        <div class="docs-counter" aria-label="Mounted counter">
+          <button type="button" data-taipa-ref="decrement" aria-label="Decrease count">Decrease</button>
+          <output data-taipa-ref="count" aria-live="polite">${state.count()}</output>
+          <button type="button" data-taipa-ref="increment" aria-label="Increase count">Increase</button>
+        </div>
+      `,
+    );
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-docs-counter-demo]")) {
+    const host = root.querySelector<HTMLElement>("[data-docs-counter-host]");
+    const fallback = root.querySelector<HTMLElement>("[data-docs-counter-fallback]");
+
+    if (host === null) continue;
+
+    void mount(host, Counter, { state: { count: 0 } })
+      .then(() => {
+        fallback?.setAttribute("hidden", "");
+      })
+      .catch(() => {
+        if (fallback !== null) {
+          fallback.textContent = "The counter could not mount in this page.";
+        }
+      });
+  }
+</script>

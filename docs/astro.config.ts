@@ -4,6 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 import nimbus, { defineConfig as defineNimbusConfig } from "@cloudflare/nimbus-docs";
 import { tableScroll } from "@cloudflare/nimbus-docs/markdown";
 
+const source = (path: string) => new URL(`../packages/ui/src/${path}`, import.meta.url).pathname;
+
 const nimbusConfig = defineNimbusConfig({
   site: "https://taipa-ui.dev",
   title: "Taipa UI",
@@ -16,6 +18,14 @@ const nimbusConfig = defineNimbusConfig({
 export default defineConfig({
   output: "static",
   vite: {
+    resolve: {
+      alias: [
+        { find: "@taipa/ui/client", replacement: source("client/index.ts") },
+        { find: "@taipa/ui/forms", replacement: source("forms/index.ts") },
+        { find: "@taipa/ui/server", replacement: source("server/index.ts") },
+        { find: "@taipa/ui", replacement: source("index.ts") },
+      ],
+    },
     plugins: [tailwindcss()],
   },
   prefetch: {

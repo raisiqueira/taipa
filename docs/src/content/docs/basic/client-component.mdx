@@ -60,6 +60,8 @@ await mount(host, Counter, { state: { count: 3 } });
 `mount()` renders once, installs the result through a native template, and then uses the same
 direct-DOM attachment path as hydration. Updating `count` does not render a second tree.
 
+<ClientCounterDemo />
+
 <Aside type="tip" title="The next step">
   Your component is already portable. [Render the same Counter on the
   server](/advanced/server-islands/) when the initial markup should arrive in the HTML response.
