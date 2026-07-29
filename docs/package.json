@@ -1,0 +1,30 @@
+{
+  "name": "@taipa/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@cloudflare/nimbus-docs": "catalog:",
+    "@iconify-json/ph": "catalog:",
+    "astro-icon": "catalog:",
+    "astro-og-canvas": "catalog:",
+    "canvaskit-wasm": "catalog:",
+    "clsx": "catalog:",
+    "tailwind-merge": "catalog:"
+  },
+  "devDependencies": {
+    "@astrojs/check": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "astro": "catalog:",
+    "pagefind": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "^6.0.3",
+    "vite-cli": "catalog:"
+  }
+}

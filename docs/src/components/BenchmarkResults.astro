@@ -1,0 +1,47 @@
+---
+import results from "../../../benchmarks/src/results.json";
+
+const timestamp = new Date(results.timestamp).toLocaleString("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "UTC",
+});
+const format = (value: number, unit: string) =>
+  unit === "bytes" ? `${(value / 1_000_000).toFixed(2)} MB` : `${value.toFixed(1)} ms`;
+const metricLabel = (unit: string) => (unit === "bytes" ? "Heap used" : "Time");
+const comparison = (value: number, best: number, unit: string, index: number) => {
+  if (index === 0) return "Reference";
+
+  const difference = (((value - best) / best) * 100).toFixed(1);
+  return unit === "bytes" ? `+${difference}% more heap` : `+${difference}% slower`;
+};
+---
+
+<aside class="benchmark-provenance">
+  <strong>How to read this snapshot</strong>
+  <p>
+    Recorded {timestamp} UTC at commit <code>{results.gitHash.slice(0, 8)}</code> with {results.environment.chromium}, {results.environment.node}, and {results.environment.platform}. Each operation has {results.environment.warmups} warmups before one measured run.
+  </p>
+</aside>
+
+{results.operations.map((operation) => {
+  const best = operation.results[0]?.value ?? 0;
+  return (
+    <section>
+      <h2>{operation.name}</h2>
+      <p>{operation.unit === "bytes" ? "Lower heap use is better." : "Lower time is better."}</p>
+      <table>
+        <thead><tr><th>Framework</th><th>{metricLabel(operation.unit)}</th><th>Compared with reference</th></tr></thead>
+        <tbody>
+          {operation.results.map((result, index) => (
+            <tr>
+              <td><strong>{result.framework}</strong></td>
+              <td>{format(result.value, operation.unit)}</td>
+              <td>{comparison(result.value, best, operation.unit, index)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+})}

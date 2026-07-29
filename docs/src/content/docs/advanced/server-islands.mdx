@@ -1,0 +1,176 @@
+---
+title: Server islands
+description: Render a component on the server and attach browser behavior to its existing nodes.
+---
+
+# Advanced: move the first render to the server.
+
+Take the `Counter` from the basic path unchanged. The server produces its initial HTML; the browser
+loads the approved component module and attaches bindings and events to those exact nodes.
+
+## Render the island
+
+<Code
+  lang="ts"
+  lines={[
+    'import { renderIsland } from "@taipa/ui/server";',
+    'import { Counter } from "./counter";',
+    "",
+    "const island = await renderIsland(",
+    "  Counter,",
+    "  {},",
+    "  {",
+    '    id: "counter",',
+    '    hydrate: "load",',
+    '    module: "/assets/counter.js",',
+    '    exportName: "Counter",',
+    "    state: { count: 3 },",
+    "  },",
+    ");",
+  ]}
+/>
+
+The island string contains its host, component contract version, hydration policy, module metadata,
+and inert state payload. Write it into an ordinary HTML response from the runtime you already use.
+
+## Return the page from your runtime
+
+The component and island renderer are runtime-neutral ESM. Only the few lines that create the HTTP
+response differ between Node, Deno, and Bun.
+
+<Tabs>
+  <TabItem label="Node + Hono">
+
+<Code lang="sh" code="pnpm add hono @hono/node-server" />
+
+<Code
+  lang="ts"
+  lines={[
+    'import { Hono } from "hono";',
+    'import { serve } from "@hono/node-server";',
+    'import { renderIsland } from "@taipa/ui/server";',
+    'import { Counter } from "./counter.js";',
+    "",
+    "const app = new Hono();",
+    "",
+    'app.get("/", async (context) => {',
+    "  const island = await renderIsland(Counter, {}, {",
+    '    id: "counter",',
+    '    hydrate: "load",',
+    '    module: "/assets/counter.js",',
+    '    exportName: "Counter",',
+    "    state: { count: 3 },",
+    "  });",
+    "",
+    "  return context.html(",
+    "    [",
+    '      "<!doctype html>",',
+    '      "<main>" + island + "</main>",',
+    '      "<script type=\\"module\\" src=\\"/assets/bootstrap.js\\"></script>",',
+    '    ].join(""),',
+    "  );",
+    "});",
+    "",
+    "serve(app);",
+  ]}
+/>
+
+  </TabItem>
+  <TabItem label="Deno">
+
+<Code
+  lang="ts"
+  lines={[
+    'import { renderIsland } from "@taipa/ui/server";',
+    'import { Counter } from "./counter.ts";',
+    "",
+    "Deno.serve(async () => {",
+    "  const island = await renderIsland(Counter, {}, {",
+    '    id: "counter",',
+    '    hydrate: "load",',
+    '    module: "/assets/counter.js",',
+    '    exportName: "Counter",',
+    "    state: { count: 3 },",
+    "  });",
+    "",
+    "  return new Response(",
+    "    [",
+    '      "<!doctype html>",',
+    '      "<main>" + island + "</main>",',
+    '      "<script type=\\"module\\" src=\\"/assets/bootstrap.js\\"></script>",',
+    '    ].join(""),',
+    "    {",
+    '      headers: { "content-type": "text/html; charset=utf-8" },',
+    "    },",
+    "  );",
+    "});",
+  ]}
+/>
+
+  </TabItem>
+  <TabItem label="Bun">
+
+<Code
+  lang="ts"
+  lines={[
+    'import { renderIsland } from "@taipa/ui/server";',
+    'import { Counter } from "./counter.ts";',
+    "",
+    "Bun.serve({",
+    "  async fetch() {",
+    "    const island = await renderIsland(Counter, {}, {",
+    '      id: "counter",',
+    '      hydrate: "load",',
+    '      module: "/assets/counter.js",',
+    '      exportName: "Counter",',
+    "      state: { count: 3 },",
+    "    });",
+    "",
+    "    return new Response(",
+    "      [",
+    '        "<!doctype html>",',
+    '        "<main>" + island + "</main>",',
+    '        "<script type=\\"module\\" src=\\"/assets/bootstrap.js\\"></script>",',
+    '      ].join(""),',
+    "      {",
+    '        headers: { "content-type": "text/html; charset=utf-8" },',
+    "      },",
+    "    );",
+    "  },",
+    "});",
+  ]}
+/>
+
+  </TabItem>
+</Tabs>
+
+## Register the browser module
+
+<Code
+  lang="ts"
+  lines={[
+    'import { bootstrap } from "@taipa/ui/client";',
+    'import { Counter } from "./counter";',
+    "",
+    "bootstrap({",
+    "  registry: {",
+    '    Counter: { load: async () => ({ Counter }), exportName: "Counter" },',
+    "  },",
+    "});",
+  ]}
+/>
+
+`bootstrap()` discovers eligible island hosts, resolves only registry-approved modules, and follows
+the `load` policy from the server output. The three server examples above can all serve this same
+browser module.
+
+## Keep the server markup authoritative
+
+Hydration preflights the contract version and every singular declared ref before it adds listeners
+or starts effects. A missing or duplicated `data-taipa-ref` leaves the server HTML intact and
+reports an error rather than replacing nodes.
+
+<Aside type="note" title="Continue the advanced path">
+  Choose [when an island activates](/advanced/hydration/) or configure [no-build
+  delivery](/advanced/no-build/) with an exact import map.
+</Aside>

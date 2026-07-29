@@ -1,0 +1,211 @@
+---
+title: Progressive forms
+description: Build native-first forms with validation, accessible errors, and optional enhanced submission.
+---
+
+# Forms: native first, enhanced deliberately.
+
+Taipa does not replace browser controls, submitters, files, constraint validation, or a normal HTML
+form post. It reads fresh `FormData`, mirrors useful state in signals, and only intercepts a submit
+when you give it application validation or a submission handler.
+
+## Start with server HTML
+
+This form works before JavaScript arrives. Error containers are part of the markup, so the server
+and client share the same accessible destinations.
+
+<Code
+  lang="html"
+  code={`<form action="/signup" method="post" novalidate>
+  <label>
+    Name
+    <input name="name" required aria-describedby="name-error" />
+  </label>
+  <p id="name-error" data-taipa-error-for="name"></p>
+
+<label>
+  Email
+  <input name="email" type="email" required aria-describedby="email-error" />
+</label>
+<p id="email-error" data-taipa-error-for="email"></p>
+
+  <p data-taipa-error-for="$form" data-taipa-form-status></p>
+  <button type="submit" data-taipa-disable-while-submitting>Join</button>
+  <button type="submit" formnovalidate>Save draft</button>
+</form>`}
+/>
+
+The `formnovalidate` draft action intentionally bypasses both browser and Taipa validation for that
+submission attempt. Without JavaScript, both controls retain their ordinary native behavior.
+
+## Read values and validate them
+
+`read()` is your one explicit FormData-to-values boundary. Keep files, repeated names, and custom
+coercion under application control instead of accepting a hidden conversion convention.
+
+<Code
+  lang="ts"
+  code={`import { createForm, standardSchema } from "@taipa/ui/forms";
+
+const signupSchema = {
+"~standard": {
+version: 1,
+vendor: "my-app",
+validate(value: Readonly<{ name: string; email: string }>) {
+const issues: Array<{ message: string; path: string[] }> = [];
+
+      if (value.name.trim().length < 2) {
+        issues.push({ message: "Enter at least two characters.", path: ["name"] });
+      }
+      if (!value.email.includes("@")) {
+        issues.push({ message: "Enter a valid email address.", path: ["email"] });
+      }
+
+      return issues.length === 0 ? { value } : { issues };
+    },
+
+},
+};
+
+const form = document.querySelector("form");
+
+if (form instanceof HTMLFormElement) {
+createForm(form, {
+read({ formData }) {
+return {
+name: String(formData.get("name") ?? ""),
+email: String(formData.get("email") ?? ""),
+};
+},
+validate: standardSchema(signupSchema),
+});
+}`}
+/>
+
+Schema issues become text-only field errors. Nested paths map to dot names such as `user.email`;
+pathless issues target `$form`. Validation results from an older request cannot overwrite a newer
+attempt.
+
+## Use Zod or Valibot directly
+
+`standardSchema()` accepts Standard Schema-compatible validators. Zod and Valibot both implement
+that contract, so keep your existing schema library and pass its schema straight to Taipa. Pick one
+for an application; these are parallel examples, not dependencies to install together.
+
+<Tabs>
+  <TabItem label="Zod">
+
+<Code lang="sh" code="pnpm add zod" />
+
+<Code
+  lang="ts"
+  code={`import { z } from "zod";
+import { createForm, standardSchema } from "@taipa/ui/forms";
+
+const signupSchema = z.object({
+name: z.string().trim().min(2, "Enter at least two characters."),
+email: z.email("Enter a valid email address."),
+});
+
+const form = document.querySelector("form");
+
+if (form instanceof HTMLFormElement) {
+createForm(form, {
+read({ formData }) {
+return {
+name: String(formData.get("name") ?? ""),
+email: String(formData.get("email") ?? ""),
+};
+},
+validate: standardSchema(signupSchema),
+});
+}`}
+/>
+
+  </TabItem>
+  <TabItem label="Valibot">
+
+<Code lang="sh" code="pnpm add valibot" />
+
+<Code
+  lang="ts"
+  code={`import * as v from "valibot";
+import { createForm, standardSchema } from "@taipa/ui/forms";
+
+const signupSchema = v.object({
+name: v.pipe(v.string(), v.minLength(2, "Enter at least two characters.")),
+email: v.pipe(v.string(), v.email("Enter a valid email address.")),
+});
+
+const form = document.querySelector("form");
+
+if (form instanceof HTMLFormElement) {
+createForm(form, {
+read({ formData }) {
+return {
+name: String(formData.get("name") ?? ""),
+email: String(formData.get("email") ?? ""),
+};
+},
+validate: standardSchema(signupSchema),
+});
+}`}
+/>
+
+  </TabItem>
+</Tabs>
+
+Taipa validates the value returned from `read()`, not raw `FormData`. That keeps files, repeated
+names, and coercion under your application’s control. A schema may transform a successful value,
+but the controller’s live `values()` remains the value currently read from the native controls.
+
+## Choose the submission path
+
+### Keep native submission
+
+When you omit `submit`, Taipa runs browser constraints and application validation. If both pass, it
+replays the original submitter once through `requestSubmit()`. Your server receives the same normal
+form post, including the chosen submit button.
+
+### Handle submission in JavaScript
+
+Add `submit` only when you need to stay on the current page. It receives real `FormData`, including
+CSRF inputs and files, plus an abort signal for stale work.
+
+<Code
+  lang="ts"
+  code={`createForm(form, {
+  read({ formData }) {
+    return {
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+    };
+  },
+  validate: standardSchema(signupSchema),
+  async submit({ formData, signal, setErrors }) {
+    const response = await fetch("/signup", {
+      method: "POST",
+      body: formData,
+      signal,
+    });
+
+    if (!response.ok) {
+      setErrors({ $form: ["We could not save your signup. Try again."] });
+    }
+
+},
+});`}
+/>
+
+Only controls marked `data-taipa-disable-while-submitting` are disabled while that handler runs.
+Rejected requests are retryable and never replay a native POST.
+
+## Validate while people edit
+
+Use `mode: "blur"` or `mode: "input"` when immediate field feedback is appropriate. The controller
+still reads the complete current form, but applies field-filtered errors for the edited name. Use the
+
+<Aside type="tip" title="Keep server validation authoritative">
+  Client validation improves feedback; it does not replace validation in the form endpoint. Preserve
+  server-rendered errors and let the client adopt them when it enhances the form.
+</Aside>

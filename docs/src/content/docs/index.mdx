@@ -1,0 +1,43 @@
+---
+title: Server-authored HTML, kept alive
+description: Taipa UI is a small ESM-first islands framework for server-authored HTML.
+---
+
+# Learn Taipa from a client component to server HTML.
+
+Start with one small component mounted in the browser. Then take the same definition to the
+server, keep its HTML, and attach behavior without a virtual DOM.
+
+<div class="flex flex-wrap gap-3 my-8">
+  <LinkButton href="/basic/client-component/" icon>
+    Start the basic path
+  </LinkButton>
+  <LinkButton href="/advanced/server-islands/" variant="secondary" icon>
+    Jump to server islands
+  </LinkButton>
+</div>
+
+<CardGrid>
+  <Card title="Basic: mount one component" icon="ph:play-circle">
+    Define state, bind a retained node, and mount it into an empty browser target.
+  </Card>
+  <Card title="Advanced: render the same component" icon="ph:arrows-left-right">
+    Move the initial render to your server, then hydrate its existing DOM in place.
+  </Card>
+  <Card title="Forms: enhance, do not replace" icon="ph:note">
+    Add validation and optional async submission while native fallback stays intact.
+  </Card>
+</CardGrid>
+
+## Pick a path
+
+| Path                                  | What you build                                 | Best for                                               |
+| ------------------------------------- | ---------------------------------------------- | ------------------------------------------------------ |
+| [Basic](/basic/client-component/)     | A browser-mounted counter                      | Learning the component model in a few minutes          |
+| [Advanced](/advanced/server-islands/) | The same counter as server HTML plus hydration | Integrating with a server-rendered application         |
+| [Forms](/forms/)                      | A validated native signup form                 | Adding progressive enhancement without losing fallback |
+
+<Aside type="caution" title="Alpha software">
+  The package surface is being validated through packed-artifact, browser, and server-rendering
+  checks. Expect the API to tighten before a stable release.
+</Aside>

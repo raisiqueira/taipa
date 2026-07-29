@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#fffdf6"/>
+  <rect x="72" y="72" width="1056" height="486" rx="30" fill="#f5efe2" stroke="#d8cbaa" stroke-width="3"/>
+  <rect x="132" y="132" width="74" height="74" rx="16" fill="#0d6b4f"/>
+  <path d="M151 151h36v10h-13v27h-10v-27h-13z" fill="#fffdf6"/>
+  <text x="132" y="300" fill="#362f25" font-family="Arial, sans-serif" font-size="80" font-weight="700">Taipa UI</text>
+  <text x="132" y="372" fill="#64594a" font-family="Arial, sans-serif" font-size="36">Direct-DOM islands for server-authored HTML.</text>
+  <text x="132" y="492" fill="#0d6b4f" font-family="monospace" font-size="26">@taipa/ui</text>
+</svg>

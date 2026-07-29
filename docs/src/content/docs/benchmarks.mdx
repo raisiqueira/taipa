@@ -1,0 +1,18 @@
+---
+title: Benchmarks
+description: Local benchmark evidence for Taipa UI and peer frameworks.
+---
+
+# Local benchmark snapshot
+
+These results compare a 1,000-row table workload across six implementations. Lower time and lower heap use are better. Treat this page as a reproducible local signal, not a universal framework ranking.
+
+The tables show one measured run after five warmups. Use them to investigate a regression or compare a change on the same machine and Chromium version, not to choose a framework from a single number.
+
+<BenchmarkResults />
+
+## Reproduce locally
+
+<Code lang="sh" code="pnpm --filter @taipa/benchmarks bench" />
+
+The harness creates 1,000 rows, replaces all 1,000 rows, updates every tenth row, and records Chromium heap after creation and update. Each table names whether it measures time or heap. Compare runs only on the same machine and browser build.

@@ -1,0 +1,29 @@
+---
+title: Markup contract
+description: The stable server-to-client island markup contract.
+---
+
+# Markup is the handoff.
+
+The server emits the island host, inert data, and fallback content. The client reads that contract without creating a second DOM tree.
+
+## Island host
+
+<Code
+  lang="html"
+  code={`<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1">
+  <button data-taipa-ref="increment">Increment</button>
+  <output data-taipa-ref="count">0</output>
+  <script type="application/json" data-taipa-props>
+    {}
+  </script>
+</taipa-island>`}
+/>
+
+## Preflight before attachment
+
+Before attaching effects or listeners, hydration validates the component version, payload shapes, and every singular ref declared through `bind()` and `on()`. Missing or duplicated singular refs leave the island inert and report one error.
+
+<Aside type="note" title="Nested islands are boundaries">
+  Ref collection and bindings do not cross into nested `<taipa-island>` hosts.
+</Aside>

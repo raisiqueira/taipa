@@ -1,0 +1,66 @@
+---
+title: Client component
+description: Mount a small interactive component in the browser.
+---
+
+# Basic: mount one component.
+
+This path proves the component model before a server is involved. You define markup once, retain
+named nodes with `data-taipa-ref`, and connect state to those nodes with direct DOM writes.
+
+## Define a counter
+
+<Code
+  lang="ts"
+  code={`import { component, html } from "@taipa/ui";
+
+export const Counter = component("Counter", { contractVersion: "1" })
+  .state("count", 0)
+  .bind("count", ({ element, state }) => {
+    element.textContent = String(state.count());
+  })
+  .on("increment@click", ({ state }) => {
+    state.count(state.count() + 1);
+  })
+  .on("decrement@click", ({ state }) => {
+    state.count(state.count() - 1);
+  })
+  .render(
+    ({ state }) => html\`
+      <section aria-label="Counter">
+        <button data-taipa-ref="decrement">Decrease</button>
+        <output data-taipa-ref="count">\${state.count()}</output>
+        <button data-taipa-ref="increment">Increase</button>
+      </section>
+    \`,
+  );`}
+/>
+
+`bind()` and ref-targeted `on()` declarations make those refs required at hydration time. They also
+make callback-side `refs.one("count")` name-checked in TypeScript.
+
+## Mount it once
+
+Start with an empty host in your page.
+
+<Code lang="html" code={`<div id="counter"></div>`} />
+
+<Code
+  lang="ts"
+  code={`import { mount } from "@taipa/ui/client";
+import { Counter } from "./counter";
+
+const host = document.querySelector("#counter");
+
+if (host instanceof HTMLElement) {
+await mount(host, Counter, { state: { count: 3 } });
+}`}
+/>
+
+`mount()` renders once, installs the result through a native template, and then uses the same
+direct-DOM attachment path as hydration. Updating `count` does not render a second tree.
+
+<Aside type="tip" title="The next step">
+  Your component is already portable. [Render the same Counter on the
+  server](/advanced/server-islands/) when the initial markup should arrive in the HTML response.
+</Aside>

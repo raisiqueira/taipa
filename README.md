@@ -82,8 +82,9 @@ createForm(document.querySelector("form")!, {
 - `pnpm verify:consumer` packs `@taipa/ui` and imports all public subpaths in a clean Node consumer.
 - `pnpm verify:package` checks the packed artifact shape and release-facing metadata.
 - `pnpm verify:release` checks release preconditions used by the npm publishing workflow.
+- `pnpm docs:check` validates the Astro documentation site.
 - `pnpm --filter @taipa/playground dev` starts the local playground.
-- `pnpm --filter @taipa/benchmarks bench` runs the local benchmark subset.
+- `pnpm benchmark` runs the local benchmark subset and records its environment.
 - `pnpm --filter @taipa/ui bench` runs the CodSpeed benchmarks for the packed
   `@taipa/ui` artifacts (build first). CI runs the same suite under CodSpeed's
   CPU simulation instrument on every push and pull request.

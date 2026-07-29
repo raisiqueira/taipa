@@ -1,0 +1,25 @@
+---
+title: Hydration policies
+description: Choose when Taipa islands become interactive.
+---
+
+# Choose when an island wakes up.
+
+Hydration is explicit data on the island host. Static HTML stays static until a policy says otherwise.
+
+| Policy    | When it activates                                  | Use it for                                  |
+| --------- | -------------------------------------------------- | ------------------------------------------- |
+| `load`    | As soon as the component module resolves.          | Primary interactions.                       |
+| `idle`    | During browser idle time, with a timeout fallback. | Secondary controls.                         |
+| `visible` | When the host approaches the viewport.             | Below-the-fold widgets.                     |
+| `only`    | After client rendering succeeds off-DOM.           | Client-only islands with truthful fallback. |
+
+## Keep fallback honest
+
+For `only`, author fallback content that remains useful if the module cannot load. Taipa replaces
+it only after the component is rendered and preflighted successfully.
+
+<Aside type="note" title="Server ownership is the invariant">
+  Hydration attaches listeners, effects, and bindings to existing nodes. It does not reconcile a
+  second tree over your server markup.
+</Aside>

@@ -1,0 +1,94 @@
+---
+import "../styles/global.css";
+import { Icon } from "astro-icon/components";
+import NimbusHead from "@cloudflare/nimbus-docs/components/NimbusHead.astro";
+import type { DocsPageProps } from "@cloudflare/nimbus-docs/types";
+
+type Props = DocsPageProps;
+type NavigationItem = readonly [label: string, href: string];
+type NavigationSection = { readonly label: string; readonly items: readonly NavigationItem[] };
+
+const { title, description, headings, noindex, collection, entryId } = Astro.props;
+const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const normalizePath = (path: string) => path.replace(/\/$/, "") || "/";
+const sections: readonly NavigationSection[] = [
+  { label: "Start here", items: [["Overview", "/"], ["Getting started", "/getting-started/"]] },
+  {
+    label: "Basic",
+    items: [["Client component", "/basic/client-component/"]],
+  },
+  {
+    label: "Advanced",
+    items: [
+      ["Server islands", "/advanced/server-islands/"],
+      ["Hydration policies", "/advanced/hydration/"],
+      ["No-build delivery", "/advanced/no-build/"],
+    ],
+  },
+  { label: "Forms", items: [["Progressive forms", "/forms/"]] },
+  {
+    label: "Reference",
+    items: [
+      ["Public API", "/reference/public-api/"],
+      ["Markup contract", "/reference/markup-contract/"],
+      ["Security boundaries", "/reference/security/"],
+      ["Benchmarks", "/benchmarks/"],
+    ],
+  },
+] as const;
+const navigation = sections.flatMap((section) => section.items);
+const currentIndex = navigation.findIndex(([, href]) => normalizePath(href) === currentPath);
+const previous = currentIndex > 0 ? navigation[currentIndex - 1] : undefined;
+const next = currentIndex >= 0 ? navigation[currentIndex + 1] : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <NimbusHead
+      title={title}
+      description={description}
+      noindex={noindex}
+      collection={collection}
+      entryId={entryId}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="/">Taipa UI <span>alpha</span></a>
+      <a class="github" href="https://github.com/raisiqueira/taipa" aria-label="Taipa UI on GitHub">
+        <Icon name="ph:github-logo" />
+      </a>
+    </header>
+    <div class="docs-grid">
+      <aside class="sidebar" aria-label="Documentation navigation">
+        {sections.map((section) => (
+          <section class="sidebar-group" aria-label={section.label}>
+            <p>{section.label}</p>
+            {section.items.map(([label, href]) => (
+              <a href={href} aria-current={normalizePath(href) === currentPath ? "page" : undefined}>{label}</a>
+            ))}
+          </section>
+        ))}
+      </aside>
+      <main id="content" class="prose" data-pagefind-body>
+        <slot />
+        <nav class="prev-next" aria-label="Documentation navigation">
+          {previous ? <a href={previous[1]}>← {previous[0]}</a> : <span />}
+          {next ? <a href={next[1]}>{next[0]} →</a> : <span />}
+        </nav>
+      </main>
+      <aside class="toc" aria-label="On this page">
+        {headings !== false && headings.length > 0 && (
+          <>
+            <p>On this page</p>
+            {headings.map((heading) => <a href={`#${heading.slug}`}>{heading.text}</a>)}
+          </>
+        )}
+      </aside>
+    </div>
+  </body>
+</html>

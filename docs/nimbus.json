@@ -1,0 +1,111 @@
+{
+  "$schema": "https://nimbus-docs.com/schema/nimbus.json",
+  "version": null,
+  "templatesTag": null,
+  "variant": null,
+  "registry": "https://nimbus-docs.com/registry",
+  "reconstructed": true,
+  "install": {
+    "root": "src",
+    "aliases": {
+      "@/*": "src/*"
+    }
+  },
+  "components": [
+    {
+      "slug": "cn",
+      "type": "registry:lib",
+      "version": "0.8.2",
+      "source": "https://nimbus-docs.com/registry",
+      "hash": "sha256:7c54894573a1398333b41a63838db5de40ba05ad3fdb71048414baf912bb0070",
+      "files": ["src/lib/cn.ts"]
+    },
+    {
+      "slug": "aside",
+      "type": "registry:ui",
+      "version": "0.8.2",
+      "source": "https://nimbus-docs.com/registry",
+      "hash": "sha256:22bbd0c0ec0043e53acf11c3bcf692abd8b0f8ada4499c3ed844b5922eb4d91c",
+      "files": ["src/components/ui/aside/Aside.astro", "src/components/ui/aside/index.ts"]
+    },
+    {
+      "slug": "card",
+      "type": "registry:ui",
+      "version": "0.8.2",
+      "source": "https://nimbus-docs.com/registry",
+      "hash": "sha256:5f6fe7bee744599473f05ebf1a0b3d0888418783a942bc0d7030b2310888da95",
+      "files": ["src/components/ui/card/Card.astro", "src/components/ui/card/index.ts"]
+    },
+    {
+      "slug": "card-grid",
+      "type": "registry:ui",
+      "version": "0.8.2",
+      "source": "https://nimbus-docs.com/registry",
+      "hash": "sha256:428117e01734727c4467da3d63471ca82e60cf0675dfb5756165a77301a7152d",
+      "files": [
+        "src/components/ui/card-grid/CardGrid.astro",
+        "src/components/ui/card-grid/index.ts"
+      ]
+    },
+    {
+      "slug": "steps",
+      "type": "registry:ui",
+      "version": "0.8.2",
+      "source": "https://nimbus-docs.com/registry",
+      "hash": "sha256:80f99f91316886f985ef94061509e212496c88fc561734ad882054e4d6c3a040",
+      "files": [
+        "src/components/ui/steps/Step.astro",
+        "src/components/ui/steps/Steps.astro",
+        "src/components/ui/steps/index.ts",
+        "src/components/ui/steps/steps.client.ts"
+      ]
+    },
+    {
+      "slug": "tabs",
+      "type": "registry:ui",
+      "version": "0.8.2",
+      "source": "https://nimbus-docs.com/registry",
+      "hash": "sha256:baf32af78444eb0b2825a75b2e20fcff33652ad5edfc989a0fba3546110a2f43",
+      "files": [
+        "src/components/ui/tabs/TabItem.astro",
+        "src/components/ui/tabs/Tabs.astro",
+        "src/components/ui/tabs/TabsContent.astro",
+        "src/components/ui/tabs/TabsList.astro",
+        "src/components/ui/tabs/TabsTrigger.astro",
+        "src/components/ui/tabs/index.ts",
+        "src/components/ui/tabs/tabs.client.ts"
+      ]
+    },
+    {
+      "slug": "button",
+      "type": "registry:ui",
+      "version": "0.8.2",
+      "source": "https://nimbus-docs.com/registry",
+      "hash": "sha256:21b3be6ed4356a3b0d28e2e85a0aca1b4a9a8729351c6090b26de67ce62b3a94",
+      "files": [
+        "src/components/ui/button/Button.astro",
+        "src/components/ui/button/index.ts",
+        "src/components/ui/button/variants.ts"
+      ]
+    },
+    {
+      "slug": "link-button",
+      "type": "registry:ui",
+      "version": "0.8.2",
+      "source": "https://nimbus-docs.com/registry",
+      "hash": "sha256:ef7fd9736ccb682188a7f39adce245425df10cfdce20cf742256569d90a01d9b",
+      "files": [
+        "src/components/ui/link-button/LinkButton.astro",
+        "src/components/ui/link-button/index.ts"
+      ]
+    },
+    {
+      "slug": "code",
+      "type": "registry:ui",
+      "version": "0.8.2",
+      "source": "https://nimbus-docs.com/registry",
+      "hash": "sha256:ace7341defa70add47e3d0c072acb8d2ecafc636c646c2f84380a76dd780ce97",
+      "files": ["src/components/ui/code/Code.astro", "src/components/ui/code/index.ts"]
+    }
+  ]
+}

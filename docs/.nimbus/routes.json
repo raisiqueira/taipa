@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "base": "/",
+  "knownRoutes": [
+    "/",
+    "/advanced/hydration",
+    "/advanced/no-build",
+    "/advanced/server-islands",
+    "/basic/client-component",
+    "/benchmarks",
+    "/forms",
+    "/getting-started",
+    "/reference/markup-contract",
+    "/reference/public-api",
+    "/reference/security"
+  ],
+  "opaqueNamespaces": []
+}

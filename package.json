@@ -15,7 +15,9 @@
     "verify:cdn": "node scripts/verify-esm-sh.mjs",
     "prepare": "vp config",
     "verify:package": "node scripts/verify-package.mjs",
-    "verify:release": "node scripts/verify-release.mjs"
+    "verify:release": "node scripts/verify-release.mjs",
+    "docs:check": "pnpm --dir docs run check",
+    "benchmark": "pnpm --filter @taipa/benchmarks bench"
   },
   "devDependencies": {
     "@types/node": "catalog:",
