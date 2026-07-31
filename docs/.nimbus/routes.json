@@ -10,6 +10,7 @@
     "/benchmarks",
     "/forms",
     "/getting-started",
+    "/reference/entrypoints",
     "/reference/markup-contract",
     "/reference/public-api",
     "/reference/security"

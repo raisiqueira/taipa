@@ -1,0 +1,109 @@
+---
+title: Entrypoint API index
+description: Every public Taipa UI value and type, grouped by ESM import path.
+---
+
+# Entrypoint API index
+
+Taipa publishes four ESM entrypoints. Import the smallest surface for the runtime where the code
+executes; none of them auto-start behavior when imported.
+
+## `@taipa/ui`
+
+Universal, DOM-free component definitions, safe templates, URLs, and reactivity.
+
+### Component builder
+
+`component(name, { contractVersion })` starts an immutable builder. Each call returns a new builder;
+`render()` finishes it and produces a `Component`.
+
+| Method                        | Purpose                                                                                       |
+| ----------------------------- | --------------------------------------------------------------------------------------------- |
+| `state(name, initial)`        | Register state. An initializer may read readonly component props.                             |
+| `derived(name, read)`         | Register a synchronous derived read over props, state, and other derived values.              |
+| `bind(ref, update)`           | Run a direct DOM update for one singular ref. The callback may return cleanup.                |
+| `on(spec, handler, options?)` | Attach an event handler. Use `ref@click` for a ref or `@click` for the island host.           |
+| `effect(run)`                 | Run reactive client work; return cleanup when the effect reruns or the instance is destroyed. |
+| `connected(run)`              | Run once after client attachment; return cleanup for teardown.                                |
+| `render(view)`                | Return safe initial markup and finish the builder.                                            |
+
+`bind()` and ref-targeted `on()` register singular refs. In client callbacks, `refs.one(name)`,
+`refs.optional(name)`, and `refs.all(name)` read them. Known ref names and standard event types are
+inferred from builder declarations; the `data-taipa-ref` markup itself remains a hydration-time
+contract.
+
+### Templates and URLs
+
+| Export                     | Purpose                                                            |
+| -------------------------- | ------------------------------------------------------------------ |
+| `html`                     | Tagged template for escaped, context-aware `SafeHtml`.             |
+| `raw(value)`               | Mark an already-trusted string as `SafeHtml`. Keep its use narrow. |
+| `safeUrl(value, options?)` | Validate an allowed URL or relative path for URL attributes.       |
+
+### Reactivity
+
+| Export             | Purpose                                            |
+| ------------------ | -------------------------------------------------- |
+| `signal(value)`    | Read/write reactive state.                         |
+| `computed(read)`   | Derive a read-only reactive value.                 |
+| `effect(run)`      | React to signal reads and return optional cleanup. |
+| `effectScope(run)` | Group effects for explicit disposal.               |
+| `batch(run)`       | Coalesce signal notifications until `run` returns. |
+
+### Exported types
+
+`Component`, `ComponentOptions`, `ReactiveContext`, `ClientContext`, `RefMap`, `Signal`,
+`ReadSignal`, `StateSignals`, `DerivedSignals`, `SafeHtml`, `SafeUrl`, `SafeUrlOptions`, `Cleanup`,
+`MaybePromise`, `JsonPrimitive`, `JsonValue`, and `JsonObject` describe this entrypoint’s values and
+callbacks.
+
+## `@taipa/ui/server`
+
+Server-only initial rendering with no DOM shim.
+
+| Export                                       | Purpose                                                                            |
+| -------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `renderToString(component, props, options?)` | Return only a component’s safe inner HTML.                                         |
+| `renderIsland(component, props, options?)`   | Return a complete `<taipa-island>` host with props, state, and hydration metadata. |
+
+`RenderOptions` accepts initial state overrides. `IslandRenderOptions` additionally accepts an id,
+hydration policy, module/export metadata, scheduling options, and an `only` fallback. `HydrationPolicy`
+is `false`, `load`, `idle`, `visible`, or `only`.
+
+## `@taipa/ui/client`
+
+Direct-DOM attachment and optional island discovery. Importing it is side-effect free.
+
+| Export                               | Purpose                                                                                         |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `hydrate(host, component, options?)` | Attach behavior to existing island markup without rendering it again.                           |
+| `mount(host, component, options?)`   | Render once into an empty host, then attach behavior. Use `replace: true` for an occupied host. |
+| `unmount(host)`                      | Destroy the live component instance for a host; returns whether one existed.                    |
+| `bootstrap(options?)`                | Discover islands, resolve approved modules, and activate their hydration policies.              |
+
+`HydrateOptions`, `MountOptions`, and `ComponentInstance` describe individual instances. For
+discovery, use `BootstrapOptions`, `BootstrapHandle`, `ComponentLoader`, `ComponentRegistry`, and
+`RegistryEntry`.
+
+## `@taipa/ui/forms`
+
+Progressive enhancement for native forms. It does not mount components or bootstrap islands.
+
+| Export                                 | Purpose                                                                                  |
+| -------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `createForm(form, options)`            | Read values, validate, enhance submission, and expose a controller for an existing form. |
+| `standardSchema(schema, options?)`     | Adapt a Standard Schema V1 validator to `createForm()` validation.                       |
+| `issuesToFormErrors(issues, options?)` | Map Standard Schema issues to Taipa `FormErrors`.                                        |
+
+`FormController` exposes `values`, `errors`, `dirty`, `touched`, `validating`, `submitting`, and
+`valid` reads plus `validate()`, `setErrors()`, `setValue()`, `reset()`, and `destroy()` methods.
+
+The form contracts are `CreateFormOptions`, `FormErrors`, `FormReadContext`,
+`FormValidationContext`, `FormSubmitContext`, and `ValidationMode`. Standard Schema contracts are
+`StandardSchemaV1`, `StandardSchemaResult`, `StandardSchemaIssue`, `StandardSchemaPathSegment`, and
+`StandardSchemaAdapterOptions`.
+
+<Aside type="tip" title="Choose by runtime">
+  Define components with `@taipa/ui`, render them with `@taipa/ui/server`, attach them with
+  `@taipa/ui/client`, and enhance native forms with `@taipa/ui/forms`.
+</Aside>
