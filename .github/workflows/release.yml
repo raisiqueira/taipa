@@ -39,7 +39,7 @@ jobs:
       - run: vp check
 
       - name: Check documentation
-        run: pnpm --dir docs run check
+        run: vp run --filter @taipa/docs check
 
       - run: vp run -r build
 
