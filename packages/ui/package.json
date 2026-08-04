@@ -1,8 +1,12 @@
 {
   "name": "@taipa/ui",
-  "version": "0.0.0-alpha.3",
+  "version": "0.0.0-alpha.4",
   "description": "Direct-DOM islands, server rendering, and progressive forms for server-authored HTML.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raisiqueira/taipa"
+  },
   "files": [
     "dist"
   ],
