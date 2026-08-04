@@ -11,7 +11,7 @@ import { RUNTIME_PROTOCOL } from "../../src/client/runtime-owner";
 
 const created: HTMLElement[] = [];
 
-function island(inner: string, attributes = `data-taipa-version="1"`): HTMLElement {
+function island(inner: string, attributes = ""): HTMLElement {
   const template = document.createElement("template");
   template.innerHTML = `<taipa-island ${attributes}>${inner}</taipa-island>`;
   const host = template.content.firstElementChild as HTMLElement;
@@ -36,7 +36,7 @@ afterEach(() => {
 describe("teardown", () => {
   test("destroy() runs connected, effect, and binding cleanups then abort, exactly once", () => {
     const order: string[] = [];
-    const teardown = component("teardown", { contractVersion: "1" })
+    const teardown = component("teardown")
       .state("count", 0)
       .bind("out", ({ element, state }) => {
         element.textContent = String(state.count());
@@ -81,7 +81,7 @@ describe("teardown", () => {
 
   test("destroy() detaches listeners and stops reactivity without node churn", () => {
     const handler = vi.fn();
-    const probe = component("probe", { contractVersion: "1" })
+    const probe = component("probe")
       .state("count", 0)
       .bind("out", ({ element, state }) => {
         element.textContent = String(state.count());
@@ -109,7 +109,7 @@ describe("teardown", () => {
 
   test("the context signal is aborted by destroy", () => {
     let observed: AbortSignal | undefined;
-    const probe = component("probe", { contractVersion: "1" })
+    const probe = component("probe")
       .connected(({ signal }) => {
         observed = signal;
       })
@@ -123,7 +123,7 @@ describe("teardown", () => {
 
   test("unmount() destroys a live instance once and reports false afterwards", () => {
     const cleanup = vi.fn();
-    const probe = component("probe", { contractVersion: "1" })
+    const probe = component("probe")
       .connected(() => cleanup)
       .render(() => html`<span>x</span>`);
     const host = island(`<span></span>`);
@@ -137,7 +137,7 @@ describe("teardown", () => {
 
   test("async handler rejections surface as taipa:error with phase event", async () => {
     const failure = new Error("handler failed");
-    const probe = component("probe", { contractVersion: "1" })
+    const probe = component("probe")
       .on("btn@click", () => Promise.reject(failure))
       .render(() => html`<span>x</span>`);
     const host = island(`<button data-taipa-ref="btn">b</button>`);
@@ -156,7 +156,7 @@ describe("teardown", () => {
 
 describe("disconnection semantics", () => {
   test("moving the host within the document keeps the instance alive with its state", async () => {
-    const probe = component("probe", { contractVersion: "1" })
+    const probe = component("probe")
       .state("count", 5)
       .bind("out", ({ element, state }) => {
         element.textContent = String(state.count());
@@ -179,7 +179,7 @@ describe("disconnection semantics", () => {
 
   test("removing the host destroys the instance after the deferred check", async () => {
     const cleanup = vi.fn();
-    const probe = component("probe", { contractVersion: "1" })
+    const probe = component("probe")
       .connected(() => cleanup)
       .render(() => html`<span>x</span>`);
     const host = island(`<span></span>`);
@@ -194,7 +194,7 @@ describe("disconnection semantics", () => {
 
   test("reinserting after a completed removal does not resurrect the instance", async () => {
     const cleanup = vi.fn();
-    const probe = component("probe", { contractVersion: "1" })
+    const probe = component("probe")
       .connected(() => cleanup)
       .render(() => html`<span>x</span>`);
     const host = island(`<span></span>`);
@@ -226,7 +226,7 @@ describe("runtime ownership", () => {
     const restore = swapRegistry({ protocol: 999 });
     try {
       const host = island(`<span></span>`);
-      const probe = component("probe", { contractVersion: "1" }).render(() => html`<span>x</span>`);
+      const probe = component("probe").render(() => html`<span>x</span>`);
       expect(() => hydrate(host, probe)).toThrowError(/incompatible taipa runtime/);
       expect((globalThis as Record<PropertyKey, unknown>)[registryKey]).toEqual({
         protocol: 999,
@@ -246,7 +246,7 @@ describe("runtime ownership", () => {
     const restore = swapRegistry(shared);
     try {
       const host = island(`<span></span>`);
-      const probe = component("probe", { contractVersion: "1" }).render(() => html`<span>x</span>`);
+      const probe = component("probe").render(() => html`<span>x</span>`);
       const instance = hydrate(host, probe);
       expect(shared.instances.get(host)).toBe(instance);
       instance.destroy();

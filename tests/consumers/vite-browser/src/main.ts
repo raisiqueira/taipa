@@ -2,7 +2,7 @@ import { component, html } from "@taipa/ui";
 import { mount } from "@taipa/ui/client";
 import { createForm } from "@taipa/ui/forms";
 
-const Counter = component("Counter", { contractVersion: "1" })
+const Counter = component("Counter")
   .state("count", 0)
   .bind("count", ({ element, state }) => {
     element.textContent = String(state.count());

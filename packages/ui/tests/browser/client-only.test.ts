@@ -12,7 +12,7 @@ const handles: { destroy(): void }[] = [];
 
 function host(inner: string): HTMLElement {
   const template = document.createElement("template");
-  template.innerHTML = `<taipa-island data-taipa-component="Counter" data-taipa-hydrate="only" data-taipa-version="1">${inner}</taipa-island>`;
+  template.innerHTML = `<taipa-island data-taipa-component="Counter" data-taipa-hydrate="only">${inner}</taipa-island>`;
   const island = template.content.firstElementChild as HTMLElement;
   document.body.append(island);
   elements.push(island);
@@ -37,7 +37,7 @@ function track<T extends { destroy(): void }>(handle: T): T {
 }
 
 function counter() {
-  return component<{ start: number }>("Counter", { contractVersion: "1" })
+  return component<{ start: number }>("Counter")
     .state("count", ({ props }) => props.start)
     .bind("label", ({ state, element }) => {
       element.textContent = String(state.count());
@@ -100,7 +100,7 @@ describe("client-only islands", () => {
 
   test("render failures keep the alert fallback so applications can update it text-only", async () => {
     const island = host(`${fallback("Loading")}${payload(1)}`);
-    const broken = component<{ start: number }>("Counter", { contractVersion: "1" }).render(() => {
+    const broken = component<{ start: number }>("Counter").render(() => {
       throw new Error("<strong>boom</strong>");
     });
     island.addEventListener("taipa:error", (event) => {
@@ -122,7 +122,7 @@ describe("client-only islands", () => {
 
   test("off-DOM ref preflight failures keep fallback untouched", async () => {
     const island = host(`${fallback("Loading")}${payload(1)}`);
-    const missingRef = component<{ start: number }>("Counter", { contractVersion: "1" })
+    const missingRef = component<{ start: number }>("Counter")
       .bind("label", ({ element }) => {
         element.textContent = "attached";
       })

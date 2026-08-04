@@ -23,7 +23,7 @@ Create a component once:
 ```ts
 import { component, html } from "@taipa/ui";
 
-export const Counter = component("Counter", { contractVersion: "1" })
+export const Counter = component("Counter")
   .state("count", 0)
   .bind("count", ({ element, state }) => {
     element.textContent = String(state.count());
@@ -56,6 +56,18 @@ import { renderIsland } from "@taipa/ui/server";
 import { Counter } from "./counter";
 
 const html = await renderIsland(Counter, {}, { hydrate: "load" });
+```
+
+Render static repeated markup with the universal helper. Each callback result must be `SafeHtml`; this
+does not reconcile items after hydration.
+
+```ts
+import { html, repeat } from "@taipa/ui";
+
+const rows = repeat(products, (product) => html`<li>${product.name}</li>`);
+const markup = html`<ul>
+  ${rows}
+</ul>`;
 ```
 
 Activate the island in the browser:

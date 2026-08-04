@@ -44,6 +44,33 @@ export function raw(trustedHtml: string): SafeHtml {
   return brandSafeHtml(trustedHtml);
 }
 
+export function repeat<T>(
+  items: Iterable<T>,
+  render: (item: T, index: number) => SafeHtml,
+): SafeHtml {
+  if (
+    items === null ||
+    typeof (items as { [Symbol.iterator]?: unknown })[Symbol.iterator] !== "function"
+  ) {
+    throw new TypeError("repeat() expects a synchronous iterable");
+  }
+  if (typeof render !== "function") {
+    throw new TypeError("repeat() expects a render callback");
+  }
+
+  let output = "";
+  let index = 0;
+  for (const item of items) {
+    const rendered = render(item, index);
+    if (!isSafeHtml(rendered)) {
+      throw new TypeError("repeat() callback must return SafeHtml from html() or raw()");
+    }
+    output += rendered.value;
+    index += 1;
+  }
+  return brandSafeHtml(output);
+}
+
 function renderTextValue(value: unknown): string {
   if (value === null || value === undefined) {
     return "";

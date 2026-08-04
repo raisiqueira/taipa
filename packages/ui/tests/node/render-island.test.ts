@@ -5,16 +5,16 @@ import { renderIsland, type IslandRenderOptions } from "../../src/server/island"
 import { html, raw } from "../../src/template/html";
 import type { Component, JsonObject } from "../../src/types";
 
-const Counter = component<{ initial: number }>("Counter", { contractVersion: "1" })
+const Counter = component<{ initial: number }>("Counter")
   .state("count", ({ props }) => props.initial)
   .state("step", 1)
   .render(({ state }) => html`<output data-taipa-ref="count">${state.count()}</output>`);
 
-const PriceChart = component<{ symbol: string }>("PriceChart", { contractVersion: "2" }).render(
+const PriceChart = component<{ symbol: string }>("PriceChart").render(
   ({ props }) => html`<p data-taipa-ref="status">${props.symbol}</p>`,
 );
 
-const Badge = component<{ label: string }>("Badge", { contractVersion: "1" }).render(
+const Badge = component<{ label: string }>("Badge").render(
   ({ props }) => html`<span>${props.label}</span>`,
 );
 
@@ -28,7 +28,7 @@ test("static island omits all hydration metadata and scripts", async () => {
   );
 });
 
-test("load island carries policy, version, and inert JSON scripts", async () => {
+test("load island carries policy and inert JSON scripts", async () => {
   const output = await renderIsland(
     Counter,
     { initial: 3 },
@@ -38,7 +38,7 @@ test("load island carries policy, version, and inert JSON scripts", async () => 
     },
   );
   expect(output).toBe(
-    '<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1"><output data-taipa-ref="count">5</output><script type="application/json" data-taipa-props>{"initial":3}</script><script type="application/json" data-taipa-state>{"count":5}</script></taipa-island>',
+    '<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load"><output data-taipa-ref="count">5</output><script type="application/json" data-taipa-props>{"initial":3}</script><script type="application/json" data-taipa-state>{"count":5}</script></taipa-island>',
   );
 });
 
@@ -56,10 +56,10 @@ test("state script contains only the provided overrides, not the full state", as
 });
 
 test("empty props and empty overrides omit their scripts", async () => {
-  const Empty = component("Empty", { contractVersion: "1" }).render(() => html`<p>hi</p>`);
+  const Empty = component("Empty").render(() => html`<p>hi</p>`);
   const output = await renderIsland(Empty, {}, { hydrate: "load", state: {} });
   expect(output).toBe(
-    '<taipa-island data-taipa-component="Empty" data-taipa-hydrate="load" data-taipa-version="1"><p>hi</p></taipa-island>',
+    '<taipa-island data-taipa-component="Empty" data-taipa-hydrate="load"><p>hi</p></taipa-island>',
   );
 });
 
@@ -67,7 +67,7 @@ test("idle island serializes the timeout; visible island serializes the root mar
   expect(
     await renderIsland(PriceChart, { symbol: "T" }, { hydrate: "idle", idleTimeout: 500 }),
   ).toBe(
-    '<taipa-island data-taipa-component="PriceChart" data-taipa-hydrate="idle" data-taipa-idle-timeout="500" data-taipa-version="2"><p data-taipa-ref="status">T</p><script type="application/json" data-taipa-props>{"symbol":"T"}</script></taipa-island>',
+    '<taipa-island data-taipa-component="PriceChart" data-taipa-hydrate="idle" data-taipa-idle-timeout="500"><p data-taipa-ref="status">T</p><script type="application/json" data-taipa-props>{"symbol":"T"}</script></taipa-island>',
   );
   expect(
     await renderIsland(
@@ -132,7 +132,7 @@ test("line separators and non-ASCII survive the props script round-trip", async 
 
 test("only renders no view, emits the fallback as inert content plus scripts", async () => {
   let viewCalls = 0;
-  const ClientOnly = component<{ token: string }>("ClientOnly", { contractVersion: "3" })
+  const ClientOnly = component<{ token: string }>("ClientOnly")
     .state("ready", false)
     .render(() => {
       viewCalls += 1;
@@ -146,17 +146,15 @@ test("only renders no view, emits the fallback as inert content plus scripts", a
   );
   expect(viewCalls).toBe(0);
   expect(output).toBe(
-    '<taipa-island data-taipa-component="ClientOnly" data-taipa-hydrate="only" data-taipa-version="3"><div data-taipa-fallback class="skeleton">Loading…</div><script type="application/json" data-taipa-props>{"token":"abc"}</script><script type="application/json" data-taipa-state>{"ready":false}</script></taipa-island>',
+    '<taipa-island data-taipa-component="ClientOnly" data-taipa-hydrate="only"><div data-taipa-fallback class="skeleton">Loading…</div><script type="application/json" data-taipa-props>{"token":"abc"}</script><script type="application/json" data-taipa-state>{"ready":false}</script></taipa-island>',
   );
 });
 
 test("only without a fallback emits empty content but still serializes props", async () => {
-  const ClientOnly = component<{ token: string }>("ClientOnly", { contractVersion: "3" }).render(
-    () => html`<p>never</p>`,
-  );
+  const ClientOnly = component<{ token: string }>("ClientOnly").render(() => html`<p>never</p>`);
   const output = await renderIsland(ClientOnly, { token: "abc" }, { hydrate: "only" });
   expect(output).toBe(
-    '<taipa-island data-taipa-component="ClientOnly" data-taipa-hydrate="only" data-taipa-version="3"><script type="application/json" data-taipa-props>{"token":"abc"}</script></taipa-island>',
+    '<taipa-island data-taipa-component="ClientOnly" data-taipa-hydrate="only"><script type="application/json" data-taipa-props>{"token":"abc"}</script></taipa-island>',
   );
 });
 

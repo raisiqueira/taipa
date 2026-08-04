@@ -10,7 +10,7 @@ test("runs in a real browser", () => {
 test("client entry mounts a component on a plain host", async () => {
   const host = document.createElement("div");
   document.body.append(host);
-  const greeter = component("greeter", { contractVersion: "1" })
+  const greeter = component("greeter")
     .bind("out", ({ element }) => {
       element.textContent = "hello";
     })

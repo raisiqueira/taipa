@@ -2,7 +2,7 @@
  * Island host attribute names and deterministic serialization.
  *
  * Attribute order is fixed by `renderIsland` (id, component, module
- * resolution, policy, scheduling, version) so conformance fixtures and the
+ * resolution, policy, scheduling) so conformance fixtures and the
  * Django adapter can compare markup byte-for-byte. The order is a fixture
  * convention, not a public byte-stability promise.
  */
@@ -13,7 +13,6 @@ export const ATTR_COMPONENT = "data-taipa-component";
 export const ATTR_SRC = "data-taipa-src";
 export const ATTR_EXPORT = "data-taipa-export";
 export const ATTR_HYDRATE = "data-taipa-hydrate";
-export const ATTR_VERSION = "data-taipa-version";
 export const ATTR_IDLE_TIMEOUT = "data-taipa-idle-timeout";
 export const ATTR_VISIBLE_ROOT_MARGIN = "data-taipa-visible-root-margin";
 export const ATTR_PROPS_SCRIPT = "data-taipa-props";

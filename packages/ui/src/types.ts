@@ -118,7 +118,6 @@ export interface ClientContext<
 // oxlint-disable-next-line no-unused-vars, no-explicit-any -- phantom params carry P/S/D identity; bare Component reads as an opaque handle
 export interface Component<P = any, S = any, D = any> {
   readonly name: string;
-  readonly contractVersion: string;
   readonly requiredRefs: readonly string[];
 }
 

@@ -2,8 +2,8 @@
  * Island rendering: the `<taipa-island>` host around one initial render
  * that the client runtime can activate.
  *
- * Hydratable islands carry the hydration policy, contract version, inert
- * props JSON, and optional state-override JSON. Static islands (no policy)
+ * Hydratable islands carry the hydration policy, inert props JSON, and
+ * optional state-override JSON. Static islands (no policy)
  * omit every piece of hydration metadata. `client:only` islands skip the
  * server render entirely and carry the optional fallback element as inert
  * content; the bootstrapper replaces it after an off-DOM render succeeds.
@@ -18,7 +18,6 @@ import {
   ATTR_PROPS_SCRIPT,
   ATTR_SRC,
   ATTR_STATE_SCRIPT,
-  ATTR_VERSION,
   ATTR_VISIBLE_ROOT_MARGIN,
   FALLBACK_MARKER,
   ISLAND_TAG,
@@ -125,7 +124,7 @@ export async function renderIsland<P extends JsonObject, S, D>(
   }
 
   // Canonical attribute order: id, component, module resolution, policy,
-  // scheduling hints, contract version.
+  // scheduling hints.
   const attributes: Attribute[] = [];
   if (options.id !== undefined) {
     attributes.push(["id", options.id]);
@@ -145,7 +144,6 @@ export async function renderIsland<P extends JsonObject, S, D>(
     if (options.idleTimeout !== undefined) {
       attributes.push([ATTR_IDLE_TIMEOUT, String(options.idleTimeout)]);
     }
-    attributes.push([ATTR_VERSION, definition.contractVersion]);
   }
 
   const scripts: string[] = [];

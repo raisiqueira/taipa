@@ -70,7 +70,7 @@ export function register(bench) {
       return runs;
     })
     .add("component: build a definition with 12 registrations", () => {
-      return component("Wide", { contractVersion: "1" })
+      return component("Wide")
         .state("a", 0)
         .state("b", 1)
         .state("c", ({ props }) => props.seed)

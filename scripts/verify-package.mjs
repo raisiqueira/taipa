@@ -181,13 +181,18 @@ function runViteBrowserConsumer(tarball) {
   );
   writeFileSync(
     path.join(consumerDir, "src/main.ts"),
-    `import { component, html } from "@taipa/ui";
+    `import { component, html, repeat } from "@taipa/ui";
  import { mount } from "@taipa/ui/client";
  import { createForm, issuesToFormErrors } from "@taipa/ui/forms";
 
 function assertType<T>(_value: T): void {}
 
- const Counter = component("Counter", { contractVersion: "1" })
+const rows = repeat(["first"], (value, index) => html\`<li>\${index}:\${value}</li>\`);
+if (rows.value !== "<li>0:first</li>") throw new Error("repeat failed");
+// @ts-expect-error repeat callbacks must return SafeHtml.
+repeat(["invalid"], () => "<li>invalid</li>");
+
+   const Counter = component("Counter")
    .state("count", 0)
    .bind("count", ({ element, state }) => {
       assertType<Element>(element);
@@ -270,7 +275,7 @@ function runDenoSmokeIfAvailable() {
     path.join(denoDir, "main.ts"),
     `import { component, html } from "@taipa/ui";\n` +
       `import { renderToString } from "@taipa/ui/server";\n` +
-      `const Probe = component("Probe", { contractVersion: "1" }).render(() => html\`<p>ok</p>\`);\n` +
+      `const Probe = component("Probe").render(() => html\`<p>ok</p>\`);\n` +
       `if (await renderToString(Probe, {}) !== "<p>ok</p>") throw new Error("bad render");\n`,
   );
   const result = spawnSync("deno", ["run", "--allow-read", path.join(denoDir, "main.ts")], {

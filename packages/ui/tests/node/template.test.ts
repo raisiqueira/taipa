@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { html, raw } from "../../src/template/html";
+import { html, raw, repeat } from "../../src/template/html";
 import { safeUrl } from "../../src/template/safe-url";
 
 // ---------------------------------------------------------------------------
@@ -40,6 +40,44 @@ test("arrays flatten in text and inert attributes; nested arrays recurse", () =>
   expect(html`<div class="${["is-", "active"]}">x</div>`.value).toBe(
     '<div class="is-active">x</div>',
   );
+});
+
+test("repeat renders synchronous iterables in order with their index", () => {
+  const rows = repeat(["one", "two"], (item, index) => html`<li>${index}:${item}</li>`);
+  const strings = Object.assign(["<ul>", "</ul>"], {
+    raw: ["<ul>", "</ul>"],
+  }) as TemplateStringsArray;
+  expect(html(strings, rows).value).toBe("<ul><li>0:one</li><li>1:two</li></ul>");
+
+  function* values(): Generator<string> {
+    yield "three";
+    yield "four";
+  }
+
+  expect(repeat(values(), (item) => html`<span>${item}</span>`).value).toBe(
+    "<span>three</span><span>four</span>",
+  );
+});
+
+test("repeat returns empty SafeHtml for an empty iterable", () => {
+  expect(repeat([], (item) => html`<span>${item}</span>`).value).toBe("");
+});
+
+test("repeat composes SafeHtml while escaping dynamic item content", () => {
+  const rows = repeat(["<unsafe>"], (item) => html`<li>${item}</li>`);
+  expect(rows.value).toBe("<li>&lt;unsafe&gt;</li>");
+});
+
+test("repeat rejects plain strings and promises from its callback", () => {
+  expect(() => repeat(["row"], () => "<li>row</li>" as never)).toThrow(/SafeHtml/);
+  expect(() => repeat(["row"], () => Promise.resolve(raw("<li>row</li>")) as never)).toThrow(
+    /SafeHtml/,
+  );
+});
+
+test("repeat rejects non-iterable input and non-function callbacks", () => {
+  expect(() => repeat(null as never, () => raw("<li>row</li>"))).toThrow(/iterable/);
+  expect(() => repeat(["row"], null as never)).toThrow(/render callback/);
 });
 
 test("null and undefined render nothing in text and attributes", () => {

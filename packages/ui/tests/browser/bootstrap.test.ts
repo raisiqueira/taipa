@@ -25,7 +25,7 @@ function wait(): Promise<void> {
 }
 
 function counter(name = "Counter") {
-  return component<{ start: number }>(name, { contractVersion: "1" })
+  return component<{ start: number }>(name)
     .state("count", ({ props }) => props.start)
     .bind("label", ({ state, element }) => {
       element.textContent = String(state.count());
@@ -71,11 +71,11 @@ describe("bootstrap", () => {
   test("load policy resolves one module for concurrent hosts and hydrates each host", async () => {
     const first = island(
       `<button data-taipa-ref="button">+</button><output data-taipa-ref="label"></output>${payload(1)}`,
-      `data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1"`,
+      `data-taipa-component="Counter" data-taipa-hydrate="load"`,
     );
     const second = island(
       `<button data-taipa-ref="button">+</button><output data-taipa-ref="label"></output>${payload(5)}`,
-      `data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1"`,
+      `data-taipa-component="Counter" data-taipa-hydrate="load"`,
     );
     const load = vi.fn(async () => ({ default: counter() }));
 
@@ -97,12 +97,12 @@ describe("bootstrap", () => {
     elements.push(container);
     const inside = island(
       `<button data-taipa-ref="button">+</button><output data-taipa-ref="label"></output>${payload(3)}`,
-      `data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1"`,
+      `data-taipa-component="Counter" data-taipa-hydrate="load"`,
     );
     container.append(inside);
     const outside = island(
       `<button data-taipa-ref="button">+</button><output data-taipa-ref="label"></output>${payload(9)}`,
-      `data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1"`,
+      `data-taipa-component="Counter" data-taipa-hydrate="load"`,
     );
     const load = vi.fn(async () => ({ default: counter() }));
 
@@ -119,8 +119,8 @@ describe("bootstrap", () => {
 
   test("static islands are skipped and never resolve modules", async () => {
     const host = island(
-      `<output data-taipa-ref="label"></output>${payload(1)}`,
-      `data-taipa-component="Counter" data-taipa-version="1"`,
+      `<button data-taipa-ref="button">+</button><output data-taipa-ref="label"></output>${payload(1)}`,
+      `data-taipa-component="Counter"`,
     );
     const load = vi.fn(async () => ({ default: counter() }));
 
@@ -135,7 +135,7 @@ describe("bootstrap", () => {
     const host = island(
       `<output data-taipa-ref="label"></output>` +
         `<script type="application/json" data-taipa-props>{"start":1}</script>`,
-      `data-taipa-component="Missing" data-taipa-hydrate="load" data-taipa-version="1"`,
+      `data-taipa-component="Missing" data-taipa-hydrate="load"`,
     );
     const errors: CustomEvent[] = [];
     const onError = vi.fn();
@@ -152,20 +152,16 @@ describe("bootstrap", () => {
     expect(unmount(host)).toBe(false);
   });
 
-  test("component export and contract mismatches surface as one error", async () => {
+  test("legacy version attributes are ignored during activation", async () => {
     const host = island(
-      `<output data-taipa-ref="label"></output>${payload(1)}`,
+      `<button data-taipa-ref="button">+</button><output data-taipa-ref="label"></output>${payload(1)}`,
       `data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="2"`,
     );
-    const errors: CustomEvent[] = [];
-    host.addEventListener("taipa:error", (event) => errors.push(event as CustomEvent));
-
     track(bootstrap({ registry: { Counter: async () => ({ default: counter() }) } }));
     await wait();
     await wait();
 
-    expect(errors).toHaveLength(1);
-    expect(String(errors[0]?.detail.error)).toMatch(/contract version mismatch/i);
-    expect(unmount(host)).toBe(false);
+    expect(host.querySelector("output")?.textContent).toBe("1");
+    expect(unmount(host)).toBe(true);
   });
 });

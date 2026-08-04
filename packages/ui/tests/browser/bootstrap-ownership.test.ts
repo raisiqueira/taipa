@@ -22,7 +22,7 @@ function payload(start: number): string {
 
 function host(start = 1): HTMLElement {
   const template = document.createElement("template");
-  template.innerHTML = `<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1"><button data-taipa-ref="button">+</button><output data-taipa-ref="label"></output>${payload(start)}</taipa-island>`;
+  template.innerHTML = `<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load"><button data-taipa-ref="button">+</button><output data-taipa-ref="label"></output>${payload(start)}</taipa-island>`;
   const island = template.content.firstElementChild as HTMLElement;
   document.body.append(island);
   elements.push(island);
@@ -30,7 +30,7 @@ function host(start = 1): HTMLElement {
 }
 
 function counter() {
-  return component<{ start: number }>("Counter", { contractVersion: "1" })
+  return component<{ start: number }>("Counter")
     .state("count", ({ props }) => props.start)
     .bind("label", ({ state, element }) => {
       element.textContent = String(state.count());

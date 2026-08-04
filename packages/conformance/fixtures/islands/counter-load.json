@@ -4,5 +4,5 @@
   "props": { "initial": 3 },
   "state": { "count": 5 },
   "options": { "hydrate": "load" },
-  "expect": "<taipa-island data-taipa-component=\"Counter\" data-taipa-hydrate=\"load\" data-taipa-version=\"1\"><output data-taipa-ref=\"count\">5</output><script type=\"application/json\" data-taipa-props>{\"initial\":3}</script><script type=\"application/json\" data-taipa-state>{\"count\":5}</script></taipa-island>"
+  "expect": "<taipa-island data-taipa-component=\"Counter\" data-taipa-hydrate=\"load\"><output data-taipa-ref=\"count\">5</output><script type=\"application/json\" data-taipa-props>{\"initial\":3}</script><script type=\"application/json\" data-taipa-state>{\"count\":5}</script></taipa-island>"
 }
