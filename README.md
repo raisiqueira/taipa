@@ -22,7 +22,7 @@ Define one component and use it from both server rendering and browser hydration
 import { component, html } from "@taipa/ui";
 import { renderIsland } from "@taipa/ui/server";
 
-const Counter = component("Counter", { contractVersion: "1" })
+const Counter = component("Counter")
   .state("count", 0)
   .bind("count", ({ element, state }) => {
     element.textContent = String(state.count());
@@ -38,6 +38,18 @@ const Counter = component("Counter", { contractVersion: "1" })
   );
 
 const markup = await renderIsland(Counter, {}, { hydrate: "load" });
+```
+
+Render a static sequence as safe initial markup. `repeat()` does not reconcile items after hydration;
+use direct DOM code when a list must change later.
+
+```ts
+import { html, repeat } from "@taipa/ui";
+
+const rows = repeat(products, (product) => html`<li>${product.name}</li>`);
+const markup = html`<ul>
+  ${rows}
+</ul>`;
 ```
 
 Ref names declared through `.bind()` and ref-targeted `.on()` calls are retained

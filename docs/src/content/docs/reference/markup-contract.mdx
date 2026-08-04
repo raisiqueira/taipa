@@ -11,7 +11,7 @@ The server emits the island host, inert data, and fallback content. The client r
 
 <Code
   lang="html"
-  code={`<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1">
+  code={`<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load">
   <button data-taipa-ref="increment">Increment</button>
   <output data-taipa-ref="count">0</output>
   <script type="application/json" data-taipa-props>
@@ -22,7 +22,12 @@ The server emits the island host, inert data, and fallback content. The client r
 
 ## Preflight before attachment
 
-Before attaching effects or listeners, hydration validates the component version, payload shapes, and every singular ref declared through `bind()` and `on()`. Missing or duplicated singular refs leave the island inert and report one error.
+Before attaching effects or listeners, hydration validates payload shapes and every singular ref declared through `bind()` and `on()`. Missing or duplicated singular refs leave the island inert and report one error.
+
+<Aside type="caution" title="Deploy matching server and browser assets">
+  Taipa 0.1 removed the per-island version handshake. Deploy the server output and browser modules
+  together, and invalidate cached browser assets when releasing a new version.
+</Aside>
 
 <Aside type="note" title="Nested islands are boundaries">
   Ref collection and bindings do not cross into nested `<taipa-island>` hosts.

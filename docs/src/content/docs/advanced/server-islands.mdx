@@ -30,8 +30,8 @@ loads the approved component module and attaches bindings and events to those ex
   ]}
 />
 
-The island string contains its host, component contract version, hydration policy, module metadata,
-and inert state payload. Write it into an ordinary HTML response from the runtime you already use.
+The island string contains its host, hydration policy, module metadata, and inert state payload. Write
+it into an ordinary HTML response from the runtime you already use.
 
 ## Return the page from your runtime
 
@@ -166,9 +166,9 @@ browser module.
 
 ## Keep the server markup authoritative
 
-Hydration preflights the contract version and every singular declared ref before it adds listeners
-or starts effects. A missing or duplicated `data-taipa-ref` leaves the server HTML intact and
-reports an error rather than replacing nodes.
+Hydration preflights payload shapes and every singular declared ref before it adds listeners or starts
+effects. A missing or duplicated `data-taipa-ref` leaves the server HTML intact and reports an error
+rather than replacing nodes.
 
 <Aside type="note" title="Continue the advanced path">
   Choose [when an island activates](/advanced/hydration/) or configure [no-build

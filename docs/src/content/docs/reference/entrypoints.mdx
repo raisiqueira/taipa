@@ -14,7 +14,7 @@ Universal, DOM-free component definitions, safe templates, URLs, and reactivity.
 
 ### Component builder
 
-`component(name, { contractVersion })` starts an immutable builder. Each call returns a new builder;
+`component(name)` starts an immutable builder. Each call returns a new builder;
 `render()` finishes it and produces a `Component`.
 
 | Method                        | Purpose                                                                                       |
@@ -38,7 +38,11 @@ contract.
 | -------------------------- | ------------------------------------------------------------------ |
 | `html`                     | Tagged template for escaped, context-aware `SafeHtml`.             |
 | `raw(value)`               | Mark an already-trusted string as `SafeHtml`. Keep its use narrow. |
+| `repeat(items, render)`    | Render synchronous items into initial `SafeHtml` markup.           |
 | `safeUrl(value, options?)` | Validate an allowed URL or relative path for URL attributes.       |
+
+`repeat()` is initial-markup only. It requires each callback result to be `SafeHtml` from `html()` or
+`raw()` and does not add, remove, reorder, or otherwise reconcile DOM nodes after attachment.
 
 ### Reactivity
 
@@ -52,10 +56,9 @@ contract.
 
 ### Exported types
 
-`Component`, `ComponentOptions`, `ReactiveContext`, `ClientContext`, `RefMap`, `Signal`,
-`ReadSignal`, `StateSignals`, `DerivedSignals`, `SafeHtml`, `SafeUrl`, `SafeUrlOptions`, `Cleanup`,
-`MaybePromise`, `JsonPrimitive`, `JsonValue`, and `JsonObject` describe this entrypoint’s values and
-callbacks.
+`Component`, `ReactiveContext`, `ClientContext`, `RefMap`, `Signal`, `ReadSignal`, `StateSignals`,
+`DerivedSignals`, `SafeHtml`, `SafeUrl`, `SafeUrlOptions`, `Cleanup`, `MaybePromise`, `JsonPrimitive`,
+`JsonValue`, and `JsonObject` describe this entrypoint’s values and callbacks.
 
 ## `@taipa/ui/server`
 

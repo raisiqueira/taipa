@@ -1,6 +1,6 @@
 import { component, html } from "@taipa/ui";
 
-export const Counter = component("Counter", { contractVersion: "1" })
+export const Counter = component("Counter")
   .state("count", 0)
   .derived("double", ({ state }) => state.count() * 2)
   .bind("count", ({ element, state }) => {

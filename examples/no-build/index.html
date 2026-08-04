@@ -7,8 +7,8 @@
       {
         "imports": {
           "alien-signals": "https://esm.sh/alien-signals@3.2.1",
-          "@taipa/ui": "https://esm.sh/@taipa/ui@0.0.0-alpha.0",
-          "@taipa/ui/client": "https://esm.sh/@taipa/ui@0.0.0-alpha.0/client"
+          "@taipa/ui": "https://esm.sh/@taipa/ui@0.1.0",
+          "@taipa/ui/client": "https://esm.sh/@taipa/ui@0.1.0/client"
         }
       }
     </script>
@@ -19,7 +19,7 @@
       import { component, html } from "@taipa/ui";
       import { mount } from "@taipa/ui/client";
 
-      const Counter = component("Counter", { contractVersion: "1" })
+      const Counter = component("Counter")
         .state("count", 0)
         .bind("count", ({ element, state }) => {
           element.textContent = String(state.count());

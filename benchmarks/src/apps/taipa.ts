@@ -4,7 +4,7 @@ import { buildData, updateEveryTenth } from "../data";
 import { replaceRows } from "../dom";
 import type { BenchmarkApp, RowData } from "../types";
 
-const TaipaBenchmark = component("TaipaBenchmark", { contractVersion: "1" })
+const TaipaBenchmark = component("TaipaBenchmark")
   .state("rows", [] as RowData[])
   .state("selectedId", 0)
   .bind("tbody", ({ element, state }) => {
