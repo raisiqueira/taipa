@@ -28,6 +28,9 @@ jobs:
 
       - run: vp check
 
+      - name: Check documentation
+        run: vp run --filter @taipa/docs check
+
       - run: vp run -r build
 
       - name: Provision Playwright Chromium and Linux system dependencies

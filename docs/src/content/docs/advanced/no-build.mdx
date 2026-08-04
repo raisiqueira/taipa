@@ -1,0 +1,32 @@
+---
+title: No-build delivery
+description: Use Taipa UI through exact-version ESM imports and an import map.
+---
+
+# Use exact ESM versions in the browser.
+
+No-build delivery remains explicit: each Taipa subpath and the shared `alien-signals` dependency
+must resolve through one import map.
+
+<Code
+  lang="html"
+  lines={[
+    '<script type="importmap">',
+    "{",
+    '  "imports": {',
+    '    "@taipa/ui": "https://esm.sh/@taipa/ui@VERSION?external=alien-signals",',
+    '    "@taipa/ui/client": "https://esm.sh/@taipa/ui@VERSION/client?external=alien-signals",',
+    '    "alien-signals": "https://esm.sh/alien-signals@3.2.1"',
+    "  }",
+    "}",
+    "</script>",
+  ]}
+/>
+
+Replace `VERSION` with the published exact alpha version. The post-publish CDN check validates this
+root-and-client topology before no-build delivery is documented as supported.
+
+<Aside type="caution" title="One reactivity graph">
+  Keep `alien-signals` external and mapped once. Mapping it through each Taipa URL separately can
+  split reactive state across module graphs.
+</Aside>

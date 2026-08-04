@@ -1,0 +1,50 @@
+---
+title: Getting started
+description: Install Taipa UI and choose the shortest path to a working component.
+---
+
+# Pick your first route.
+
+Taipa has one component definition that can run in the browser or render on the server. Start
+with the browser path to learn the model, then advance to retained server HTML when it matches
+your application.
+
+## Install
+
+<Tabs>
+  <TabItem label="pnpm">
+
+<Code lang="sh" code="pnpm add @taipa/ui alien-signals" />
+
+  </TabItem>
+  <TabItem label="npm">
+
+<Code lang="sh" code="npm install @taipa/ui alien-signals" />
+
+  </TabItem>
+</Tabs>
+
+`alien-signals` is Taipa's runtime reactivity dependency. Install it explicitly when you use import maps or no-build browser delivery.
+
+## What you need
+
+Install the package and its single reactivity dependency.
+
+## Choose your next page
+
+<CardGrid>
+  <Card title="Basic: client component" href="/basic/client-component/" icon="ph:play-circle">
+    Mount a counter into a browser node. This is the shortest route to the component model.
+  </Card>
+  <Card title="Advanced: server islands" href="/advanced/server-islands/" icon="ph:cloud-arrow-up">
+    Render that same counter as server HTML and attach behavior to the retained nodes.
+  </Card>
+  <Card title="Forms" href="/forms/" icon="ph:note">
+    Start with native HTML, then add validation and submission behavior only where it helps.
+  </Card>
+</CardGrid>
+
+<Aside type="tip" title="Experienced with server rendering?">
+  Skip the browser-mounted introduction and go directly to [server
+  islands](/advanced/server-islands/).
+</Aside>

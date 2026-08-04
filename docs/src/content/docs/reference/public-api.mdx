@@ -1,0 +1,23 @@
+---
+title: Public API
+description: The four public ESM entrypoints for Taipa UI.
+---
+
+# Four entrypoints, clear runtime boundaries.
+
+Import only the surface required by the environment where your code runs.
+
+| Entrypoint         | Use                                                  | Import-time behavior           |
+| ------------------ | ---------------------------------------------------- | ------------------------------ |
+| `@taipa/ui`        | Components, safe templates, URLs, signals.           | Universal and DOM-free.        |
+| `@taipa/ui/server` | String rendering and island serialization.           | DOM-free.                      |
+| `@taipa/ui/client` | Hydrate, mount, unmount, bootstrap.                  | Side-effect free until called. |
+| `@taipa/ui/forms`  | Native form enhancement and Standard Schema adapter. | Does not bootstrap islands.    |
+
+## Component builder
+
+`component(name, contract)` creates immutable metadata. Add state, derived values, event handlers, bindings, effects, and connection hooks before ending the chain with `render()`.
+
+## Typed callback refs
+
+Refs declared by `bind()` and ref-targeted `on()` calls are available to client callbacks. `refs.one()` rejects undeclared names at type-check time; markup attributes remain verified at hydration time.

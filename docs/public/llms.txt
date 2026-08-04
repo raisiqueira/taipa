@@ -1,0 +1,9 @@
+# Taipa UI
+
+Taipa UI is a direct-DOM islands framework for server-authored HTML.
+
+Documentation: https://taipa-ui.dev/
+Package: https://www.npmjs.com/package/@taipa/ui
+Source: https://github.com/raisiqueira/taipa
+
+Key topics: server rendering, client hydration, progressive forms, Standard Schema validation, no-build delivery, and the public markup contract.

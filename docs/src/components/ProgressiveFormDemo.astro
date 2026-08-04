@@ -1,0 +1,110 @@
+<section class="docs-demo" data-docs-form-demo aria-labelledby="docs-form-demo-title">
+  <div class="docs-demo__heading">
+    <p class="docs-demo__eyebrow">Try it</p>
+    <h2 id="docs-form-demo-title">Validate a native form in place</h2>
+    <p>Use an email address and a name with at least two characters. Nothing is sent from this page.</p>
+  </div>
+
+  <form class="docs-demo__form" action="/forms/" method="post">
+    <label>
+      Name
+      <input name="name" required aria-describedby="docs-demo-name-error" autocomplete="name" />
+    </label>
+    <p id="docs-demo-name-error" data-taipa-error-for="name"></p>
+
+    <label>
+      Email
+      <input
+        name="email"
+        type="email"
+        required
+        aria-describedby="docs-demo-email-error"
+        autocomplete="email"
+      />
+    </label>
+    <p id="docs-demo-email-error" data-taipa-error-for="email"></p>
+
+    <p data-taipa-error-for="$form" data-taipa-form-status></p>
+    <button type="submit" data-taipa-disable-while-submitting disabled>Try enhanced submit</button>
+    <p data-docs-form-success aria-live="polite"></p>
+  </form>
+
+  <noscript>
+    <p class="docs-demo__note">This interactive demo requires JavaScript and will not submit data.</p>
+  </noscript>
+
+  <p class="docs-demo__note">
+    This guide simulates an enhanced handler. A production form still validates on the server.
+  </p>
+</section>
+
+<script>
+  import { createForm, standardSchema } from "../../../packages/ui/src/forms/index";
+  import type { StandardSchemaV1 } from "../../../packages/ui/src/forms/index";
+
+  interface DemoValues {
+    readonly name: string;
+    readonly email: string;
+  }
+
+  const schema: StandardSchemaV1<DemoValues> = {
+    "~standard": {
+      version: 1,
+      vendor: "taipa-docs",
+      validate(value) {
+        const issues: Array<{ readonly message: string; readonly path: readonly string[] }> = [];
+
+        if (value.name.trim().length < 2) {
+          issues.push({ message: "Enter at least two characters.", path: ["name"] });
+        }
+
+        return issues.length === 0 ? { value } : { issues };
+      },
+    },
+  };
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-docs-form-demo]")) {
+    const form = root.querySelector<HTMLFormElement>("form");
+    const success = root.querySelector<HTMLElement>("[data-docs-form-success]");
+
+    if (form === null || success === null) continue;
+
+    form.querySelector<HTMLButtonElement>('button[type="submit"]')?.removeAttribute("disabled");
+
+    createForm<DemoValues>(form, {
+      read({ formData }) {
+        return {
+          name: stringValue(formData.get("name")),
+          email: stringValue(formData.get("email")),
+        };
+      },
+      validate: standardSchema(schema),
+      async submit({ signal }) {
+        success.textContent = "Simulating an enhanced submission…";
+        await pause(signal);
+
+        if (!signal.aborted) {
+          success.textContent = "Submitted locally. Connect this handler to your server when ready.";
+        }
+      },
+    });
+  }
+
+  function stringValue(value: FormDataEntryValue | null): string {
+    return typeof value === "string" ? value : "";
+  }
+
+  function pause(signal: AbortSignal): Promise<void> {
+    return new Promise((resolve) => {
+      const timeout = window.setTimeout(resolve, 300);
+      signal.addEventListener(
+        "abort",
+        () => {
+          window.clearTimeout(timeout);
+          resolve();
+        },
+        { once: true },
+      );
+    });
+  }
+</script>

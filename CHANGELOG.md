@@ -1,0 +1,13 @@
+# Changelog
+
+All notable changes to `@taipa/ui` are documented here.
+
+## Unreleased
+
+- Added a complete documentation site for server rendering, hydration, forms, no-build delivery, public APIs, security boundaries, and benchmark evidence.
+- Added type-safe component refs for builder registrations and callback-side ref access.
+- Added package, consumer, and release preflight verification for the JavaScript alpha.
+
+## 0.0.0-alpha.0
+
+- Initial JavaScript alpha: universal component builder, safe templates and URLs, server rendering, direct-DOM hydration, island bootstrap, progressive forms, and Standard Schema-compatible validation.

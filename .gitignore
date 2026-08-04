@@ -41,6 +41,8 @@ __pycache__/
 
 # Local planning docs
 docs/plans/
+docs/.astro/
+docs/.impeccable/
 outputs/taipa-ui-framework-design-plan.md
 
 # AI agent worktrees

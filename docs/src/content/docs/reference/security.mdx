@@ -1,0 +1,26 @@
+---
+title: Security boundaries
+description: What Taipa UI validates and what remains application responsibility.
+---
+
+# Keep executable context explicit.
+
+Taipa's safety model protects template interpolation, inert payload data, approved URLs, registry inputs, and form error rendering. It does not turn arbitrary application HTML into trusted content.
+
+## What Taipa validates
+
+- HTML interpolation is allowed only in safe text and inert-attribute contexts.
+- Hydration props and state are recursively JSON-safe and inert-script escaped.
+- Registry sources reject dangerous keys, oversized payloads, and unapproved URL schemes before loading a module.
+- Form errors are written with text APIs, never as trusted HTML.
+
+## What the application owns
+
+- Authentication, authorization, CSRF, CORS, and Content Security Policy.
+- Safety of server-authored inner templates and any content passed to `raw()`.
+- Approval of modules exposed through `resolveDomModule()`.
+
+<Aside type="caution" title="Public data stays public">
+  Island props and serialized state are page-visible data. Do not put credentials or secrets in
+  them.
+</Aside>

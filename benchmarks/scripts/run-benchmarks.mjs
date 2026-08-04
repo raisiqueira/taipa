@@ -77,12 +77,17 @@ try {
     await page.close();
   }
 
-  await browser.close();
   const timestamp = new Date().toISOString();
   const gitHash = await currentGitHash();
-  const report = formatReport(results, timestamp, gitHash);
+  const environment = {
+    chromium: browser.version(),
+    node: process.version,
+    platform: process.platform,
+  };
+  await browser.close();
+  const report = formatReport(results, timestamp, gitHash, environment);
   await writeFile(reportFile, report);
-  const dataReport = buildDataReport(results, timestamp, gitHash);
+  const dataReport = buildDataReport(results, timestamp, gitHash, environment);
   await writeFile(dataFile, `${JSON.stringify(dataReport, null, 2)}\n`);
   process.stdout.write(report);
   process.stdout.write(`\nSaved benchmark report to ${reportFile.pathname}\n`);
@@ -103,12 +108,15 @@ async function measureCpu(page, framework, operation, action) {
   return { framework, operation, milliseconds: Number((end - start).toFixed(3)) };
 }
 
-function formatReport(results, timestamp, gitHash) {
+function formatReport(results, timestamp, gitHash, environment) {
   return [
     "# Benchmark Results",
     "",
     `- Timestamp: ${timestamp}`,
     `- Git hash: ${gitHash}`,
+    `- Chromium: ${environment.chromium}`,
+    `- Node: ${environment.node} on ${environment.platform}`,
+    `- Warmups: ${warmupCount}`,
     "",
     operations.map((operation) => formatOperationResults(operation, results)).join("\n\n"),
     "",
@@ -116,10 +124,11 @@ function formatReport(results, timestamp, gitHash) {
 }
 
 // Emit the structured data consumed by the Vite dashboard (src/dashboard.ts).
-function buildDataReport(results, timestamp, gitHash) {
+function buildDataReport(results, timestamp, gitHash, environment) {
   return {
     timestamp,
     gitHash,
+    environment: { ...environment, warmups: warmupCount },
     frameworks,
     operations: operations.map((operation) => ({
       name: operation.name,
