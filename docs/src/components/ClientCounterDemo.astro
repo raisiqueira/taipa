@@ -16,8 +16,8 @@
 </section>
 
 <script>
-  import { component, html } from "@taipa/ui";
-  import { mount } from "@taipa/ui/client";
+  import { component, html } from "../../../packages/ui/src/index";
+  import { mount } from "../../../packages/ui/src/client/index";
 
   const Counter = component("DocsCounter", { contractVersion: "1" })
     .state("count", 0)
