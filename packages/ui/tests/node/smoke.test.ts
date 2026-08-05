@@ -9,7 +9,7 @@ test("runs in the node environment", () => {
 });
 
 test("the root universal surface works in node", () => {
-  const counter = component("smoke", { contractVersion: "1" })
+  const counter = component("smoke")
     .state("count", 0)
     .render(({ state }) => html`<output>${state.count()}</output>`);
   expect(counter.name).toBe("smoke");
@@ -20,7 +20,7 @@ test("the root universal surface works in node", () => {
 });
 
 test("server-safe subpaths are importable in node", async () => {
-  const badge = component("badge", { contractVersion: "1" }).render(() => html`<b>ok</b>`);
+  const badge = component("badge").render(() => html`<b>ok</b>`);
   expect(await renderToString(badge, {})).toBe("<b>ok</b>");
   expect(await renderIsland(badge, {})).toBe(
     '<taipa-island data-taipa-component="badge"><b>ok</b></taipa-island>',

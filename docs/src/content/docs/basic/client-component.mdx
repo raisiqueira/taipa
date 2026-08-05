@@ -14,7 +14,7 @@ named nodes with `data-taipa-ref`, and connect state to those nodes with direct 
   lang="ts"
   code={`import { component, html } from "@taipa/ui";
 
-export const Counter = component("Counter", { contractVersion: "1" })
+export const Counter = component("Counter")
   .state("count", 0)
   .bind("count", ({ element, state }) => {
     element.textContent = String(state.count());

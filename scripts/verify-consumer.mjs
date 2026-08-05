@@ -74,12 +74,13 @@ const checks = [
   {
     subpath: "@taipa/ui",
     assert: `const m = await import("@taipa/ui");
-for (const key of ["component","html","raw","safeUrl","signal","computed","effect","effectScope","batch"]) {
+for (const key of ["component","html","raw","repeat","safeUrl","signal","computed","effect","effectScope","batch"]) {
   if (typeof m[key] !== "function") throw new Error("missing root export: " + key);
 }
-const c = m.component("probe", { contractVersion: "1" }).state("n", 0).render(() => m.html\`<p>x</p>\`);
-if (c.name !== "probe" || c.contractVersion !== "1") throw new Error("component metadata broken");
+const c = m.component("probe").state("n", 0).render(() => m.html\`<p>x</p>\`);
+if (c.name !== "probe") throw new Error("component metadata broken");
 if (m.html\`<p>\${"<e>"}</p>\`.value !== "<p>&lt;e&gt;</p>") throw new Error("html escaping broken");
+if (m.repeat(["<e>"], (value) => m.html\`<li>\${value}</li>\`).value !== "<li>&lt;e&gt;</li>") throw new Error("repeat broken");
 const s = m.signal(1);
 m.batch(() => { s(41); });
 if (s() !== 41) throw new Error("alien-signals reactivity broken");
@@ -92,13 +93,13 @@ const ui = await import("@taipa/ui");
 for (const key of ["renderToString","renderIsland"]) {
   if (typeof m[key] !== "function") throw new Error("missing server export: " + key);
 }
-const c = ui.component("Probe", { contractVersion: "1" })
+const c = ui.component("Probe")
   .state("n", ({ props }) => props.start)
   .render(({ state }) => ui.html\`<output>\${state.n()}</output>\`);
 const inner = await m.renderToString(c, { start: 2 });
 if (inner !== "<output>2</output>") throw new Error("renderToString broken: " + inner);
 const island = await m.renderIsland(c, { start: 2 }, { hydrate: "load", state: { n: 5 } });
-const expected = '<taipa-island data-taipa-component="Probe" data-taipa-hydrate="load" data-taipa-version="1"><output>5</output><script type="application/json" data-taipa-props>{"start":2}</script><script type="application/json" data-taipa-state>{"n":5}</script></taipa-island>';
+const expected = '<taipa-island data-taipa-component="Probe" data-taipa-hydrate="load"><output>5</output><script type="application/json" data-taipa-props>{"start":2}</script><script type="application/json" data-taipa-state>{"n":5}</script></taipa-island>';
 if (island !== expected) throw new Error("renderIsland broken: " + island);
 if ("window" in globalThis || "document" in globalThis) throw new Error("DOM global leaked");`,
   },

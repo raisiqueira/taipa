@@ -22,10 +22,6 @@ import type {
   SafeHtml,
 } from "./types";
 
-export interface ComponentOptions {
-  readonly contractVersion: string;
-}
-
 export type EventRegistrationHandler<P, S, D> = (
   context: ClientContext<P, S, D> & {
     readonly event: Event;
@@ -69,8 +65,7 @@ export interface ConnectedRegistration<P, S, D> {
 /**
  * The full internal metadata carried by a component definition. Later units
  * (server rendering, hydration) consume these ordered registrations; the
- * public surface exposes only `Component` (name, contractVersion,
- * requiredRefs).
+ * public surface exposes only `Component` (name, requiredRefs).
  */
 // oxlint-disable-next-line no-explicit-any -- bare ComponentDefinition reads as an opaque handle
 export interface ComponentDefinition<P = any, S = any, D = any> extends Component<P, S, D> {
@@ -188,11 +183,10 @@ function freezeRecord<T extends object>(record: T): T {
 
 function makeBuilder<P, S, D, Refs extends RefRecord>(
   name: string,
-  contractVersion: string,
   registrations: BuilderRegistrations<P, S, D>,
 ): ComponentBuilder<P, S, D, Refs> {
   function extend(patch: Partial<BuilderRegistrations<P, S, D>>): ComponentBuilder<P, S, D, Refs> {
-    return makeBuilder(name, contractVersion, { ...registrations, ...patch });
+    return makeBuilder(name, { ...registrations, ...patch });
   }
 
   function assertUniqueValueName(valueName: string): void {
@@ -277,7 +271,6 @@ function makeBuilder<P, S, D, Refs extends RefRecord>(
     ): Component<P, S, D> {
       const definition: ComponentDefinition<P, S, D> = {
         name,
-        contractVersion,
         requiredRefs: Object.freeze([...registrations.requiredRefs]),
         view,
         stateRegistrations: Object.freeze([...registrations.states]),
@@ -294,16 +287,12 @@ function makeBuilder<P, S, D, Refs extends RefRecord>(
 
 export function component<P extends JsonObject = Record<string, never>>(
   name: string,
-  options: ComponentOptions,
   // The empty-S/D base must be `{}` so `Exclude<K, keyof S>` keeps K.
 ): ComponentBuilder<P, {}, {}, {}> {
   if (typeof name !== "string" || name.trim() === "") {
     throw new TypeError("component() requires a non-empty component name");
   }
-  if (typeof options?.contractVersion !== "string" || options.contractVersion.trim() === "") {
-    throw new TypeError(`component("${name}") requires a non-empty options.contractVersion string`);
-  }
-  return makeBuilder(name, options.contractVersion, {
+  return makeBuilder(name, {
     states: Object.freeze([]),
     deriveds: Object.freeze([]),
     events: Object.freeze([]),

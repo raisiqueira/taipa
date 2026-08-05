@@ -21,9 +21,7 @@ function host(inner = ""): HTMLElement {
 }
 
 function counter() {
-  return component<{ start: number }>("counter", {
-    contractVersion: "1",
-  })
+  return component<{ start: number }>("counter")
     .state("count", ({ props }) => props.start)
     .bind("label", ({ state, element }) => {
       element.textContent = `count=${state.count()}`;
@@ -58,9 +56,7 @@ test("never re-renders: state writes update bindings without invoking the view a
   const view = vi.fn(({ state }: { state: { count: () => number } }) => {
     return html`<output data-taipa-ref="label">${state.count()}</output>`;
   });
-  const probe = component<{ start: number }>("probe", {
-    contractVersion: "1",
-  })
+  const probe = component<{ start: number }>("probe")
     .state("count", ({ props }) => props.start)
     .bind("label", ({ state, element }) => {
       element.textContent = String(state.count());
@@ -117,15 +113,14 @@ test("mounting over a live instance fails before rendering or DOM writes", async
   expect(target.querySelector("output")?.textContent).toBe("count=1");
 });
 
-test("no version attribute is required on the mount target", async () => {
+test("mount targets need no island protocol attributes", async () => {
   const target = host();
-  expect(target.hasAttribute("data-taipa-version")).toBe(false);
   await mount(target, counter(), { props: { start: 4 } });
   expect(target.querySelector("output")?.textContent).toBe("count=4");
 });
 
 test("initializer failures reject before any DOM mutation", async () => {
-  const broken = component("broken", { contractVersion: "1" })
+  const broken = component("broken")
     .state("count", () => {
       throw new Error("boom");
     })
@@ -137,7 +132,7 @@ test("initializer failures reject before any DOM mutation", async () => {
 
 test("mounted instances tear down like hydrated ones", async () => {
   const cleanup = vi.fn();
-  const probe = component("probe", { contractVersion: "1" })
+  const probe = component("probe")
     .connected(() => cleanup)
     .render(() => html`<span>x</span>`);
   const target = host();

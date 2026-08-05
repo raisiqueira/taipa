@@ -37,10 +37,5 @@ export async function mount<P extends JsonObject, S, D>(
   } else {
     host.append(template.content);
   }
-  return attachComponent(
-    host,
-    definition,
-    { props, state: options?.state },
-    { skipVersionCheck: true },
-  );
+  return attachComponent(host, definition, { props, state: options?.state });
 }

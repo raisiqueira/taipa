@@ -12,7 +12,7 @@ import { unmount } from "../../src/client/instance";
 
 const created: HTMLElement[] = [];
 
-function island(inner: string, attributes = `data-taipa-version="1"`): HTMLElement {
+function island(inner: string, attributes = ""): HTMLElement {
   const template = document.createElement("template");
   template.innerHTML = `<taipa-island ${attributes}>${inner}</taipa-island>`;
   const host = template.content.firstElementChild as HTMLElement;
@@ -37,7 +37,7 @@ test("preflight failure preserves the island and does not mark it errored", () =
   const markup = `<button data-taipa-ref="increment">+</button><script type="application/json" data-taipa-state="">{"bogus": 1}</script>`;
   const host = island(markup);
   const errors = watchErrors(host);
-  const probe = component("probe", { contractVersion: "1" })
+  const probe = component("probe")
     .state("count", 0)
     .render(() => html`<span>x</span>`);
 
@@ -51,7 +51,7 @@ test("preflight failure preserves the island and does not mark it errored", () =
 
 test("a binding fault disposes everything, marks the host, and emits one error", () => {
   const order: string[] = [];
-  const probe = component("probe", { contractVersion: "1" })
+  const probe = component("probe")
     .state("count", 0)
     .bind("out", ({ element, state }) => {
       if (state.count() === 0) {
@@ -88,7 +88,7 @@ test("a binding fault disposes everything, marks the host, and emits one error",
 
 test("an effect fault stops the bindings that were already attached", () => {
   const order: string[] = [];
-  const probe = component("probe", { contractVersion: "1" })
+  const probe = component("probe")
     .state("count", 0)
     .bind("out", ({ element, state }) => {
       element.textContent = String(state.count());
@@ -115,7 +115,7 @@ test("a listener fault detaches the listeners that were already attached", () =>
   const first = vi.fn();
   const second = vi.fn();
   const order: string[] = [];
-  const probe = component("probe", { contractVersion: "1" })
+  const probe = component("probe")
     .bind("out", ({ element }) => {
       element.textContent = "bound";
       return () => {
@@ -151,7 +151,7 @@ test("a listener fault detaches the listeners that were already attached", () =>
 
 test("a connected fault runs the cleanups of the hooks that already ran", () => {
   const order: string[] = [];
-  const probe = component("probe", { contractVersion: "1" })
+  const probe = component("probe")
     .bind("out", ({ element }) => {
       element.textContent = "bound";
       return () => {
@@ -181,12 +181,12 @@ test("a connected fault runs the cleanups of the hooks that already ran", () => 
 });
 
 test("a host recovers: re-attaching after a commit fault succeeds and clears the mark", () => {
-  const broken = component("broken", { contractVersion: "1" })
+  const broken = component("broken")
     .connected(() => {
       throw new Error("boom");
     })
     .render(() => html`<span>x</span>`);
-  const good = component("good", { contractVersion: "1" })
+  const good = component("good")
     .bind("out", ({ element }) => {
       element.textContent = "alive";
     })

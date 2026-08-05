@@ -5,7 +5,7 @@ import { renderToString } from "../../src/server/render";
 import { html } from "../../src/template/html";
 import type { SafeHtml } from "../../src/types";
 
-const Counter = component<{ initial: number }>("Counter", { contractVersion: "1" })
+const Counter = component<{ initial: number }>("Counter")
   .state("count", ({ props }) => props.initial)
   .derived("doubled", ({ state }) => state.count() * 2)
   .render(({ state, derived }) => {
@@ -25,7 +25,7 @@ test("renders only the inner HTML, never an island host", async () => {
 });
 
 test("view output stays escaped for hostile props", async () => {
-  const Echo = component<{ value: string }>("Echo", { contractVersion: "1" }).render(
+  const Echo = component<{ value: string }>("Echo").render(
     ({ props }) => html`<p>${props.value}</p>`,
   );
   expect(await renderToString(Echo, { value: `<script>alert("x")</script>` })).toBe(
@@ -34,7 +34,7 @@ test("view output stays escaped for hostile props", async () => {
 });
 
 test("state accepts plain value initializers and function initializers with props", async () => {
-  const Both = component<{ base: number }>("Both", { contractVersion: "1" })
+  const Both = component<{ base: number }>("Both")
     .state("constant", 10)
     .state("fromProps", ({ props }) => props.base * 2)
     .render(({ state }) => html`<i>${state.constant()}</i><b>${state.fromProps()}</b>`);
@@ -42,7 +42,7 @@ test("state accepts plain value initializers and function initializers with prop
 });
 
 test("async views are awaited", async () => {
-  const Async = component("Async", { contractVersion: "1" }).render(async () => {
+  const Async = component("Async").render(async () => {
     await Promise.resolve();
     return html`<p>ready</p>`;
   });
@@ -50,26 +50,22 @@ test("async views are awaited", async () => {
 });
 
 test("props arrive frozen and non-JSON-safe props fail with a path", async () => {
-  const Probe = component<{ at?: string }>("Probe", { contractVersion: "1" }).render(
-    ({ props }) => {
-      expect(Object.isFrozen(props)).toBe(true);
-      return html`<p>ok</p>`;
-    },
-  );
+  const Probe = component<{ at?: string }>("Probe").render(({ props }) => {
+    expect(Object.isFrozen(props)).toBe(true);
+    return html`<p>ok</p>`;
+  });
   await expect(renderToString(Probe, {})).resolves.toBe("<p>ok</p>");
   const hostile = (() => {}) as unknown as string;
   await expect(renderToString(Probe, { at: hostile })).rejects.toThrow(/props\.at: /);
 });
 
 test("views returning non-SafeHtml values are rejected", async () => {
-  const Loose = component("Loose", { contractVersion: "1" }).render(
-    () => "not-safe" as unknown as SafeHtml,
-  );
+  const Loose = component("Loose").render(() => "not-safe" as unknown as SafeHtml);
   await expect(renderToString(Loose, {})).rejects.toThrow(/SafeHtml|html`/);
 });
 
 test("plain objects are not component definitions", async () => {
-  const impostor = { name: "Fake", contractVersion: "1", requiredRefs: [] };
+  const impostor = { name: "Fake", requiredRefs: [] };
   await expect(renderToString(impostor as never, {})).rejects.toThrowError(TypeError);
 });
 
@@ -78,7 +74,7 @@ test("plain objects are not component definitions", async () => {
 // ---------------------------------------------------------------------------
 
 test("concurrent renders of one component never cross-contaminate", async () => {
-  const Greeter = component<{ name: string }>("Greeter", { contractVersion: "1" })
+  const Greeter = component<{ name: string }>("Greeter")
     .state("greeting", ({ props }) => `hello ${props.name}`)
     .render(async ({ state }) => {
       await new Promise((resolve) => setTimeout(resolve, Math.random() * 5));
@@ -101,7 +97,7 @@ test("concurrent renders of one component never cross-contaminate", async () => 
 test("effects created during render run once and are disposed afterwards", async () => {
   let runs = 0;
   let cleanups = 0;
-  const WithEffect = component("WithEffect", { contractVersion: "1" }).render(() => {
+  const WithEffect = component("WithEffect").render(() => {
     effect(() => {
       runs += 1;
       return () => {
@@ -117,7 +113,7 @@ test("effects created during render run once and are disposed afterwards", async
 
 test("a throwing initializer rejects without corrupting later renders", async () => {
   let shouldThrow = true;
-  const Flaky = component("Flaky", { contractVersion: "1" })
+  const Flaky = component("Flaky")
     .state("value", () => {
       if (shouldThrow) {
         throw new Error("boom");

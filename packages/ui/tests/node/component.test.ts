@@ -9,7 +9,7 @@ type CounterDefinition = ComponentDefinition<
 >;
 
 function defineCounter() {
-  return component<{ readonly label: string }>("counter", { contractVersion: "1" })
+  return component<{ readonly label: string }>("counter")
     .state("count", 0)
     .state("step", ({ props }) => (props.label === "tens" ? 10 : 1))
     .derived("doubled", ({ state }) => state.count() * 2)
@@ -23,10 +23,9 @@ function defineCounter() {
     .render(({ derived }) => html`<output>${derived.doubled()}</output>`);
 }
 
-test("component definitions carry name, contract version, and required refs", () => {
+test("component definitions carry name and required refs", () => {
   const definition = defineCounter();
   expect(definition.name).toBe("counter");
-  expect(definition.contractVersion).toBe("1");
   expect(definition.requiredRefs).toEqual(["increment", "output"]);
 });
 
@@ -59,18 +58,16 @@ test("duplicate state or derived names are rejected", () => {
   }
   const asLoose = (builder: unknown) => builder as LooseBuilder;
 
-  const builder = asLoose(component("dupes", { contractVersion: "1" }).state("count", 0));
+  const builder = asLoose(component("dupes").state("count", 0));
   expect(() => builder.state("count", 1)).toThrow(/duplicate/);
   expect(() => builder.derived("count", () => 2)).toThrow(/duplicate/);
-  const withDerived = asLoose(
-    component("dupes-2", { contractVersion: "1" }).derived("total", () => 1),
-  );
+  const withDerived = asLoose(component("dupes-2").derived("total", () => 1));
   expect(() => withDerived.state("total", 0)).toThrow(/duplicate/);
   expect(() => withDerived.derived("total", () => 2)).toThrow(/duplicate/);
 });
 
 test("builder chains are immutable: extending a builder does not mutate it", () => {
-  const base = component("immutable", { contractVersion: "1" });
+  const base = component("immutable");
   const extended = base.state("count", 0).bind("output", () => {});
   const baseDefinition = base.render(() => html`<p>base</p>`) as unknown as CounterDefinition;
   expect(baseDefinition.requiredRefs).toEqual([]);
@@ -89,7 +86,7 @@ test("component definitions and their registration arrays are frozen", () => {
 });
 
 test("repeated bind/on registrations on one ref keep a single required ref", () => {
-  const definition = component("multi", { contractVersion: "1" })
+  const definition = component("multi")
     .bind("list", () => {})
     .on("list@scroll", () => {})
     .on("list@click", () => {})
@@ -98,7 +95,7 @@ test("repeated bind/on registrations on one ref keep a single required ref", () 
 });
 
 test("invalid event specs are rejected", () => {
-  const builder = component("events", { contractVersion: "1" });
+  const builder = component("events");
   // The template-literal spec type rejects these at compile time; cast around
   // it to prove the runtime validation also throws.
   const onLoose = (spec: string) =>
@@ -109,13 +106,12 @@ test("invalid event specs are rejected", () => {
   expect(() => onLoose("@")).toThrow(/event spec/);
 });
 
-test("component name and contract version are required", () => {
-  expect(() => component("", { contractVersion: "1" })).toThrow(/name/);
-  expect(() => component("x", { contractVersion: "" })).toThrow(/contractVersion/);
+test("component name is required", () => {
+  expect(() => component("")).toThrow(/name/);
 });
 
 test("required refs record only singular refs from .bind() and ref-targeted .on()", () => {
-  const definition = component("refs", { contractVersion: "1" })
+  const definition = component("refs")
     .on("@click", () => {})
     .bind("first", () => {})
     .on("second@keydown", () => {})
@@ -148,7 +144,7 @@ test("the root entry neither accesses DOM globals at import nor at first use", a
   try {
     const root = await import("../../src/index");
     const counter = root
-      .component("isolated", { contractVersion: "1" })
+      .component("isolated")
       .state("count", 0)
       .derived("doubled", ({ state }) => state.count() * 2)
       .render(({ state }) => root.html`<output>${state.count()}</output>`);

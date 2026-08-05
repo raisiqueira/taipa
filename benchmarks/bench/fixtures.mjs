@@ -1,5 +1,5 @@
 /**
- * Shared benchmark fixtures.
+ * Shared Taipa UI benchmark fixtures.
  *
  * Everything here is built once, at module load, so the measured task bodies
  * only contain the work under test. The data shapes mirror the server-rendering
@@ -45,7 +45,7 @@ export const largeProps = {
 };
 
 /** The smallest interesting island: one state signal bound to one ref. */
-export const Counter = component("Counter", { contractVersion: "1" })
+export const Counter = component("Counter")
   .state("count", ({ props }) => props.initial)
   .state("step", 1)
   .derived("doubled", ({ state }) => state.count() * 2)
@@ -57,7 +57,7 @@ export const Counter = component("Counter", { contractVersion: "1" })
   );
 
 /** A wide component: many states, deriveds, and escaped interpolations. */
-export const Dashboard = component("Dashboard", { contractVersion: "3" })
+export const Dashboard = component("Dashboard")
   .state("query", ({ props }) => props.query)
   .state("page", 1)
   .state("pageSize", 25)
@@ -75,7 +75,7 @@ export const Dashboard = component("Dashboard", { contractVersion: "3" })
   );
 
 /** The table scenario: one nested SafeHtml fragment per row. */
-export const Table = component("Table", { contractVersion: "1" })
+export const Table = component("Table")
   .state("rowCount", ({ props }) => props.rows.length)
   .render(
     ({ props }) => html`

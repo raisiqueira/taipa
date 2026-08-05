@@ -43,9 +43,28 @@ Run the automated local pass:
 pnpm --filter @taipa/benchmarks bench
 ```
 
-The runner performs five warmup executions before the measured pass for each framework/operation. It drives the per-framework harness (`harness.html`), prints one table per operation sorted from best to worst, and writes two artifacts with the run timestamp and current git hash:
+The runner performs five warmup executions before the measured pass for each framework/operation. It drives the per-framework harness (`harness.html`), prints one table per operation sorted from best to worst, and records the timestamp, git hash, browser/runtime, host processor, logical core count, architecture, and physical memory in two artifacts:
 
 - `benchmarks/src/results.json` — structured data consumed by the dashboard.
 - `benchmarks/BENCHMARK_RESULTS.md` — the same numbers as Markdown tables.
 
 CPU timings are ranked by lower milliseconds. Memory readings are ranked by lower Chromium `JSHeapUsedSize` bytes. The `vs best` column shows the percentage slower or heavier than the top-ranked result for that operation. Treat these as local development signals, not official js-framework-benchmark results.
+
+## Running the Taipa UI microbenchmarks
+
+Build the packaged UI entry points, then run the Tinybench/CodSpeed suite:
+
+```sh
+pnpm --filter @taipa/ui build
+pnpm --filter @taipa/benchmarks bench:ui
+```
+
+Run the production-browser comparison between Taipa's `repeat()` helper and Lit's keyed
+`repeat` directive with:
+
+```sh
+pnpm --filter @taipa/benchmarks bench:repeat
+```
+
+The repeat runner rebuilds `@taipa/ui`, bundles both libraries in Vite production mode, validates
+equivalent output and DOM identity, and prints a Markdown-ready report from headless Chromium.

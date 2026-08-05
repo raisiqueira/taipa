@@ -5,7 +5,7 @@ import { raw } from "../../src/template/html";
 
 function assertType<T>(_value: T): void {}
 
-export const inferredRefs = component("InferredRefs", { contractVersion: "1" })
+export const inferredRefs = component("InferredRefs")
   .bind("count", (context) => {
     assertType<Element>(context.element);
     assertType<Element>(context.refs.one("count"));
@@ -33,7 +33,7 @@ export const inferredRefs = component("InferredRefs", { contractVersion: "1" })
   })
   .render(() => raw(""));
 
-export const typedRefs = component("TypedRefs", { contractVersion: "1" })
+export const typedRefs = component("TypedRefs")
   .bind<"count", HTMLOutputElement>("count", (context) => {
     assertType<HTMLOutputElement>(context.element);
     assertType<HTMLOutputElement>(context.refs.one("count"));
@@ -48,7 +48,7 @@ export const typedRefs = component("TypedRefs", { contractVersion: "1" })
   })
   .render(() => raw(""));
 
-export const preservedRef = component("PreservedRef", { contractVersion: "1" })
+export const preservedRef = component("PreservedRef")
   .bind<"save", HTMLButtonElement>("save", (context) => {
     assertType<HTMLButtonElement>(context.element);
   })
@@ -58,7 +58,7 @@ export const preservedRef = component("PreservedRef", { contractVersion: "1" })
   })
   .render(() => raw(""));
 
-export const replacedRef = component("ReplacedRef", { contractVersion: "1" })
+export const replacedRef = component("ReplacedRef")
   .bind<"save", HTMLButtonElement>("save", () => {})
   .bind<"save", HTMLInputElement>("save", (context) => {
     assertType<HTMLInputElement>(context.element);
@@ -66,13 +66,13 @@ export const replacedRef = component("ReplacedRef", { contractVersion: "1" })
   })
   .render(() => raw(""));
 
-export const unknownEvent = component("UnknownEvent", { contractVersion: "1" })
+export const unknownEvent = component("UnknownEvent")
   .on("save@customthing", (context) => {
     assertType<Event>(context.event);
   })
   .render(() => raw(""));
 
-export const explicitEvent = component("ExplicitEvent", { contractVersion: "1" })
+export const explicitEvent = component("ExplicitEvent")
   .on<"save@customthing", CustomEvent>("save@customthing", (context) => {
     assertType<CustomEvent>(context.event);
     assertType<Element>(context.refs.one("save"));
@@ -80,12 +80,9 @@ export const explicitEvent = component("ExplicitEvent", { contractVersion: "1" }
   .render(() => raw(""));
 
 // @ts-expect-error known native events cannot be overridden incompatibly.
-component("InvalidEventOverride", { contractVersion: "1" }).on<"save@click", KeyboardEvent>(
-  "save@click",
-  () => {},
-);
+component("InvalidEventOverride").on<"save@click", KeyboardEvent>("save@click", () => {});
 
-const malformedSpecs = component("MalformedSpecs", { contractVersion: "1" });
+const malformedSpecs = component("MalformedSpecs");
 // @ts-expect-error malformed specs are rejected before runtime parsing.
 malformedSpecs.on("save@", () => {});
 // @ts-expect-error malformed specs are rejected before runtime parsing.

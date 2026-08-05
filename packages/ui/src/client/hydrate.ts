@@ -3,8 +3,8 @@
  * server rendered. Hydration never renders, replaces, or re-parents nodes;
  * bindings are direct DOM API writes driven by alien-signals effects.
  *
- * Attachment is atomic: every preflight check — contract version,
- * payload shape, required refs — completes before any listener, binding, or
+ * Attachment is atomic: every preflight check — payload shape, required refs
+ * — completes before any listener, binding, or
  * connected hook touches the island, so a failure leaves the host inert apart
  * from one `taipa:error` event. If the commit phase itself fails, every
  * runtime resource created so far is disposed in reverse order and the host
@@ -13,7 +13,7 @@
  */
 import { effect, effectScope } from "alien-signals";
 import type { ComponentDefinition } from "../component";
-import { ATTR_PROPS_SCRIPT, ATTR_STATE_SCRIPT, ATTR_VERSION } from "../server/attributes";
+import { ATTR_PROPS_SCRIPT, ATTR_STATE_SCRIPT } from "../server/attributes";
 import {
   asComponentDefinition,
   prepareContext,
@@ -42,10 +42,6 @@ import { claimRuntimeOwner } from "./runtime-owner";
 const MAX_PAYLOAD_BYTES = 64 * 1024;
 const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 
-export interface AttachOptions {
-  readonly skipVersionCheck?: boolean;
-}
-
 export function hydrate<P, S, D>(
   host: HTMLElement,
   component: Component<P, S, D>,
@@ -58,7 +54,6 @@ export function attachComponent<P, S, D>(
   host: HTMLElement,
   component: Component<P, S, D>,
   options: HydrateOptions<P, S> | undefined,
-  attachOptions?: AttachOptions,
 ): ComponentInstance<P, S, D> {
   const definition = asComponentDefinition(component);
   const owner = claimRuntimeOwner();
@@ -69,19 +64,6 @@ export function attachComponent<P, S, D>(
   try {
     if (owner.liveInstanceFor(host) !== undefined) {
       throw new Error(`host already has a live instance of a taipa component`);
-    }
-    if (attachOptions?.skipVersionCheck !== true) {
-      const version = host.getAttribute(ATTR_VERSION);
-      if (version === null) {
-        throw new Error(
-          `component "${definition.name}" requires a data-taipa-version attribute on the island host`,
-        );
-      }
-      if (version !== definition.contractVersion) {
-        throw new Error(
-          `contract version mismatch for component "${definition.name}": the markup declares "${version}" but the component requires "${definition.contractVersion}"`,
-        );
-      }
     }
     const { props: payloadProps, state: payloadState } = readHostPayloads(host, definition);
     if (options?.props !== undefined) {

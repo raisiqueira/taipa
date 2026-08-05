@@ -167,6 +167,16 @@ describe("JSON registry safety", () => {
       elements.splice(0).forEach((element) => element.remove());
     }
   });
+
+  test("ignores legacy contract version fields", () => {
+    for (const version of ['"1"', "42"]) {
+      registry(`{"Counter":{"src":"/counter.js","contractVersion":${version}}}`);
+      expect(resolveRegistryEntry(host(`data-taipa-component="Counter"`), {}).exportName).toBe(
+        "default",
+      );
+      elements.splice(0).forEach((element) => element.remove());
+    }
+  });
 });
 
 describe("approved specifiers", () => {

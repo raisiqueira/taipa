@@ -9,6 +9,7 @@ const timestamp = new Date(results.timestamp).toLocaleString("en-US", {
 const format = (value: number, unit: string) =>
   unit === "bytes" ? `${(value / 1_000_000).toFixed(2)} MB` : `${value.toFixed(1)} ms`;
 const metricLabel = (unit: string) => (unit === "bytes" ? "Heap used" : "Time");
+const hostMemory = `${(results.environment.hostMemoryBytes / 1024 ** 3).toFixed(1)} GiB`;
 const comparison = (value: number, best: number, unit: string, index: number) => {
   if (index === 0) return "Reference";
 
@@ -20,7 +21,7 @@ const comparison = (value: number, best: number, unit: string, index: number) =>
 <aside class="benchmark-provenance">
   <strong>How to read this snapshot</strong>
   <p>
-    Recorded {timestamp} UTC at commit <code>{results.gitHash.slice(0, 8)}</code> with {results.environment.chromium}, {results.environment.node}, and {results.environment.platform}. Each operation has {results.environment.warmups} warmups before one measured run.
+    Recorded {timestamp} UTC at commit <code>{results.gitHash.slice(0, 8)}</code> with {results.environment.chromium}, {results.environment.node} on {results.environment.platform}, {results.environment.processor} ({results.environment.logicalCores} logical cores, {results.environment.architecture}), and {hostMemory} host memory. Each operation has {results.environment.warmups} warmups before one measured run.
   </p>
 </aside>
 

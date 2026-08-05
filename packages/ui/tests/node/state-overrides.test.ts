@@ -8,7 +8,7 @@ import { html } from "../../src/template/html";
 // unknown keys and initializer exceptions fail without leaking state
 // ---------------------------------------------------------------------------
 
-const Inventory = component<{ base: number }>("Inventory", { contractVersion: "1" })
+const Inventory = component<{ base: number }>("Inventory")
   .state("quantity", ({ props }) => props.base)
   .state("warehouse", "main")
   .derived("label", ({ state }) => `${state.quantity()} @ ${state.warehouse()}`)
@@ -31,7 +31,7 @@ test("omitted keys fall back to initializers and derived reflect the override", 
 });
 
 test("overrides apply before derived values compute", async () => {
-  const Doubler = component("Doubler", { contractVersion: "1" })
+  const Doubler = component("Doubler")
     .state("n", 1)
     .derived("double", ({ state }) => state.n() * 2)
     .render(({ derived }) => html`<p>${derived.double()}</p>`);
@@ -58,7 +58,7 @@ test("overrides must be plain JSON-safe objects", async () => {
 
 test("function initializers run per render and never share references", async () => {
   const seen: string[] = [];
-  const Cart = component("Cart", { contractVersion: "1" })
+  const Cart = component("Cart")
     .state("items", () => ({ list: [] as string[] }))
     .render(({ state }) => {
       const items = state.items();
@@ -72,7 +72,7 @@ test("function initializers run per render and never share references", async ()
 });
 
 test("an override replacing an object state does not leak into later renders", async () => {
-  const Cart = component("Cart", { contractVersion: "1" })
+  const Cart = component("Cart")
     .state("items", () => ({ list: [] as string[] }))
     .render(({ state }) => html`<p>${state.items().list.join("|")}</p>`);
   expect(await renderToString(Cart, {}, { state: { items: { list: ["a", "b"] } } })).toBe(
@@ -83,7 +83,7 @@ test("an override replacing an object state does not leak into later renders", a
 
 test("an initializer exception leaves no render-local effects behind", async () => {
   let attempts = 0;
-  const Flaky = component("Flaky", { contractVersion: "1" })
+  const Flaky = component("Flaky")
     .state("value", () => {
       attempts += 1;
       if (attempts === 1) {
@@ -101,7 +101,7 @@ test("an initializer exception leaves no render-local effects behind", async () 
 });
 
 test("declared initial values must be JSON-safe too", async () => {
-  const Bad = component("Bad", { contractVersion: "1" })
+  const Bad = component("Bad")
     .state("at", () => new Date(0))
     .render(() => html`<p>x</p>`);
   await expect(renderToString(Bad, {})).rejects.toThrow(/state\.at: .*Date/);

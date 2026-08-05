@@ -34,5 +34,5 @@ jobs:
         uses: CodSpeedHQ/action@f22792bfac16f3e14eb9fbea76f4a48e9cc22b93 # v4.19.1
         with:
           mode: simulation
-          working-directory: packages/ui
+          working-directory: benchmarks
           run: node bench/index.mjs

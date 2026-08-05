@@ -185,12 +185,10 @@ async function activateOnly(host: HTMLElement, definition: ComponentDefinition):
 
   host.replaceChildren(template.content);
   try {
-    attachComponent(
-      host,
-      definition,
-      { props: payload.props as never, state: payload.state as never },
-      { skipVersionCheck: true },
-    );
+    attachComponent(host, definition, {
+      props: payload.props as never,
+      state: payload.state as never,
+    });
   } catch (error) {
     throw new HydrationAlreadyDispatched(error);
   }

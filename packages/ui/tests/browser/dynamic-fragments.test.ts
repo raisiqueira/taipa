@@ -21,12 +21,12 @@ function payload(value: number): string {
 
 function island(value: number): HTMLElement {
   const template = document.createElement("template");
-  template.innerHTML = `<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1"><output data-taipa-ref="label"></output>${payload(value)}</taipa-island>`;
+  template.innerHTML = `<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load"><output data-taipa-ref="label"></output>${payload(value)}</taipa-island>`;
   return template.content.firstElementChild as HTMLElement;
 }
 
 function counter() {
-  return component<{ value: number }>("Counter", { contractVersion: "1" })
+  return component<{ value: number }>("Counter")
     .bind("label", ({ props, element }) => {
       element.textContent = String(props.value);
     })
@@ -56,7 +56,7 @@ describe("dynamic fragment discovery", () => {
     const handle = track(bootstrap({ root, registry: { Counter: load }, observe: true }));
 
     const template = document.createElement("template");
-    template.innerHTML = `<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1"><output data-taipa-ref="label"></output>${payload(1)}<div><taipa-island data-taipa-component="Counter" data-taipa-hydrate="load" data-taipa-version="1"><output data-taipa-ref="label"></output>${payload(2)}</taipa-island></div></taipa-island>`;
+    template.innerHTML = `<taipa-island data-taipa-component="Counter" data-taipa-hydrate="load"><output data-taipa-ref="label"></output>${payload(1)}<div><taipa-island data-taipa-component="Counter" data-taipa-hydrate="load"><output data-taipa-ref="label"></output>${payload(2)}</taipa-island></div></taipa-island>`;
     root.append(template.content);
 
     // Explicit rescan of the same root must not duplicate the pending work.

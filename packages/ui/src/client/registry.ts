@@ -147,9 +147,6 @@ function normalizeJsonRegistryEntry(name: string, entry: unknown): JsonRegistryE
   if (record.export !== undefined && typeof record.export !== "string") {
     throw new TypeError(`registry entry for component "${name}" has an invalid export name`);
   }
-  if (record.contractVersion !== undefined && typeof record.contractVersion !== "string") {
-    throw new TypeError(`registry entry for component "${name}" has an invalid contractVersion`);
-  }
   assertApprovedSpecifier(record.src);
   return {
     src: record.src,

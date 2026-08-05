@@ -1,5 +1,5 @@
 /**
- * The `html` tagged template: context scanning, escaping, and SafeHtml nesting.
+ * Taipa UI's `html` tagged template: context scanning, escaping, and SafeHtml nesting.
  *
  * Every server render funnels through this module, so it is the hottest code in
  * the package. The tasks below separate the fixed scanning cost (static markup)

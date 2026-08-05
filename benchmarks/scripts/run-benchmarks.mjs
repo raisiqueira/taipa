@@ -2,6 +2,7 @@ import { chromium } from "playwright";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { writeFile } from "node:fs/promises";
+import { cpus, totalmem } from "node:os";
 
 const frameworks = ["taipa", "ilha", "vanillajs", "lit-html", "react", "vue"];
 const warmupCount = 5;
@@ -79,10 +80,15 @@ try {
 
   const timestamp = new Date().toISOString();
   const gitHash = await currentGitHash();
+  const processors = cpus();
   const environment = {
     chromium: browser.version(),
     node: process.version,
     platform: process.platform,
+    architecture: process.arch,
+    processor: processors[0]?.model ?? "unknown",
+    logicalCores: processors.length,
+    hostMemoryBytes: totalmem(),
   };
   await browser.close();
   const report = formatReport(results, timestamp, gitHash, environment);
@@ -116,6 +122,8 @@ function formatReport(results, timestamp, gitHash, environment) {
     `- Git hash: ${gitHash}`,
     `- Chromium: ${environment.chromium}`,
     `- Node: ${environment.node} on ${environment.platform}`,
+    `- Processor: ${environment.processor} (${environment.logicalCores} logical cores, ${environment.architecture})`,
+    `- Host memory: ${formatHostMemory(environment.hostMemoryBytes)}`,
     `- Warmups: ${warmupCount}`,
     "",
     operations.map((operation) => formatOperationResults(operation, results)).join("\n\n"),
@@ -178,6 +186,10 @@ function formatValue(value, unit) {
   if (!Number.isFinite(value)) return "n/a";
   if (unit === "ms") return `${value.toFixed(1)} ms`;
   return `${value.toLocaleString("en-US")} bytes`;
+}
+
+function formatHostMemory(bytes) {
+  return `${(bytes / 1024 ** 3).toFixed(1)} GiB`;
 }
 
 function formatRelative(value, bestValue) {

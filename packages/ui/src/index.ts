@@ -25,9 +25,8 @@ export type {
 } from "./types";
 
 export { component } from "./component";
-export type { ComponentOptions } from "./component";
 
-export { html, raw } from "./template/html";
+export { html, raw, repeat } from "./template/html";
 export { safeUrl } from "./template/safe-url";
 export type { SafeUrlOptions } from "./template/safe-url";
 

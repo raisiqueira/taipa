@@ -1,10 +1,14 @@
 {
-  "timestamp": "2026-07-28T21:08:04.799Z",
-  "gitHash": "8a96d131f218d22ab65139a46c771eae6d7627b5",
+  "timestamp": "2026-08-04T19:31:47.765Z",
+  "gitHash": "764d86ba1e4fe0164f7faa169a46a0821d025338",
   "environment": {
     "chromium": "149.0.7827.55",
     "node": "v24.18.0",
     "platform": "darwin",
+    "architecture": "arm64",
+    "processor": "Apple M4 Pro",
+    "logicalCores": 12,
+    "hostMemoryBytes": 25769803776,
     "warmups": 5
   },
   "frameworks": ["taipa", "ilha", "vanillajs", "lit-html", "react", "vue"],
@@ -16,27 +20,27 @@
       "results": [
         {
           "framework": "ilha",
-          "value": 60.2
+          "value": 60
         },
         {
           "framework": "taipa",
-          "value": 60.7
+          "value": 62.2
         },
         {
           "framework": "vanillajs",
-          "value": 63.9
+          "value": 63.1
         },
         {
           "framework": "vue",
-          "value": 69.2
+          "value": 68.6
         },
         {
           "framework": "react",
-          "value": 143.9
+          "value": 96.7
         },
         {
           "framework": "lit-html",
-          "value": 379.2
+          "value": 380.6
         }
       ]
     },
@@ -46,28 +50,28 @@
       "unit": "ms",
       "results": [
         {
-          "framework": "taipa",
-          "value": 92.2
+          "framework": "vue",
+          "value": 91.2
         },
         {
-          "framework": "vue",
-          "value": 92.6
+          "framework": "taipa",
+          "value": 94
         },
         {
           "framework": "vanillajs",
-          "value": 96
+          "value": 96.5
         },
         {
           "framework": "ilha",
-          "value": 116.6
+          "value": 114.4
         },
         {
           "framework": "react",
-          "value": 130.5
+          "value": 228.8
         },
         {
           "framework": "lit-html",
-          "value": 2367.1
+          "value": 2594.6
         }
       ]
     },
@@ -78,27 +82,27 @@
       "results": [
         {
           "framework": "vue",
-          "value": 77.7
+          "value": 81
         },
         {
           "framework": "vanillajs",
-          "value": 96.9
+          "value": 95.2
         },
         {
           "framework": "taipa",
-          "value": 97
+          "value": 96.3
         },
         {
           "framework": "ilha",
-          "value": 100.6
+          "value": 99.7
         },
         {
           "framework": "react",
-          "value": 168
+          "value": 134.2
         },
         {
           "framework": "lit-html",
-          "value": 2050.8
+          "value": 1907.8
         }
       ]
     },
@@ -109,27 +113,27 @@
       "results": [
         {
           "framework": "vanillajs",
-          "value": 2467492
+          "value": 2379796
         },
         {
           "framework": "taipa",
-          "value": 2858536
+          "value": 2855240
         },
         {
           "framework": "ilha",
-          "value": 3266388
+          "value": 3298812
         },
         {
           "framework": "lit-html",
-          "value": 3816268
+          "value": 3724288
         },
         {
           "framework": "vue",
-          "value": 5811416
+          "value": 5810188
         },
         {
           "framework": "react",
-          "value": 11324848
+          "value": 10019480
         }
       ]
     },
@@ -140,27 +144,27 @@
       "results": [
         {
           "framework": "vanillajs",
-          "value": 2398048
+          "value": 2517540
         },
         {
           "framework": "taipa",
-          "value": 2772972
+          "value": 2771440
         },
         {
           "framework": "lit-html",
-          "value": 4042556
+          "value": 3873492
         },
         {
           "framework": "ilha",
-          "value": 4172868
+          "value": 4171192
         },
         {
           "framework": "vue",
-          "value": 5959696
+          "value": 5960636
         },
         {
           "framework": "react",
-          "value": 10728072
+          "value": 17162512
         }
       ]
     }

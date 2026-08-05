@@ -19,7 +19,7 @@
   import { component, html } from "../../../packages/ui/src/index";
   import { mount } from "../../../packages/ui/src/client/index";
 
-  const Counter = component("DocsCounter", { contractVersion: "1" })
+  const Counter = component("DocsCounter")
     .state("count", 0)
     .bind("count", ({ element, state }) => {
       element.textContent = String(state.count());
