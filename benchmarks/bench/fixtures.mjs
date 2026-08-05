@@ -1,5 +1,5 @@
 /**
- * Shared benchmark fixtures.
+ * Shared Taipa UI benchmark fixtures.
  *
  * Everything here is built once, at module load, so the measured task bodies
  * only contain the work under test. The data shapes mirror the server-rendering

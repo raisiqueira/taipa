@@ -1,12 +1,12 @@
 /**
- * CodSpeed benchmark entry point for `@taipa/ui`.
+ * CodSpeed benchmark entry point for the Taipa benchmarks package.
  *
  * The suites below run against the packed ESM artifacts in `dist/`, so the
  * numbers describe what consumers actually import. Run `vp run build` (or
  * `pnpm --filter @taipa/ui build`) before benchmarking.
  *
- * Local run:      pnpm --filter @taipa/ui bench
- * Instrumented:   codspeed run --mode simulation -- pnpm --filter @taipa/ui bench
+ * Local run:      pnpm --filter @taipa/benchmarks bench:ui
+ * Instrumented:   codspeed run --mode simulation -- pnpm --filter @taipa/benchmarks bench:ui
  */
 import { withCodSpeed } from "@codspeed/tinybench-plugin";
 import { Bench } from "tinybench";

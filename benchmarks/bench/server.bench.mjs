@@ -1,5 +1,5 @@
 /**
- * Server rendering: `renderToString` and `renderIsland`.
+ * Taipa UI server rendering: `renderToString` and `renderIsland`.
  *
  * These are the entry points a JavaScript server calls per request, so they
  * carry the whole cost of prop validation, per-render signal instantiation,

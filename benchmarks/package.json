@@ -8,6 +8,8 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "bench": "node scripts/run-benchmarks.mjs",
+    "bench:repeat": "node bench/run-repeat-browser.mjs",
+    "bench:ui": "node bench/index.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -20,6 +22,7 @@
     "vue": "catalog:"
   },
   "devDependencies": {
+    "@codspeed/tinybench-plugin": "catalog:",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
@@ -27,6 +30,7 @@
     "@vitejs/plugin-vue": "catalog:",
     "playwright": "catalog:",
     "tailwindcss": "^4.3.3",
+    "tinybench": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-cli": "catalog:",

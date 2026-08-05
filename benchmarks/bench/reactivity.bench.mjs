@@ -1,5 +1,5 @@
 /**
- * Reactivity and component definition.
+ * Taipa UI reactivity and component definition.
  *
  * Taipa re-exports alien-signals verbatim and only wraps batching, so these
  * tasks track the reactive graph cost that hydrated islands pay on every state

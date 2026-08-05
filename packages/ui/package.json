@@ -23,7 +23,6 @@
     "access": "public"
   },
   "scripts": {
-    "bench": "node bench/index.mjs",
     "build": "vp pack",
     "dev": "vp pack --watch",
     "test": "vp test",
@@ -34,11 +33,9 @@
     "alien-signals": "catalog:"
   },
   "devDependencies": {
-    "@codspeed/tinybench-plugin": "catalog:",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "playwright": "catalog:",
-    "tinybench": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
