@@ -49,3 +49,22 @@ The runner performs five warmup executions before the measured pass for each fra
 - `benchmarks/BENCHMARK_RESULTS.md` — the same numbers as Markdown tables.
 
 CPU timings are ranked by lower milliseconds. Memory readings are ranked by lower Chromium `JSHeapUsedSize` bytes. The `vs best` column shows the percentage slower or heavier than the top-ranked result for that operation. Treat these as local development signals, not official js-framework-benchmark results.
+
+## Running the Taipa UI microbenchmarks
+
+Build the packaged UI entry points, then run the Tinybench/CodSpeed suite:
+
+```sh
+pnpm --filter @taipa/ui build
+pnpm --filter @taipa/benchmarks bench:ui
+```
+
+Run the production-browser comparison between Taipa's `repeat()` helper and Lit's keyed
+`repeat` directive with:
+
+```sh
+pnpm --filter @taipa/benchmarks bench:repeat
+```
+
+The repeat runner rebuilds `@taipa/ui`, bundles both libraries in Vite production mode, validates
+equivalent output and DOM identity, and prints a Markdown-ready report from headless Chromium.

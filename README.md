@@ -97,9 +97,11 @@ createForm(document.querySelector("form")!, {
 - `pnpm docs:check` validates the Astro documentation site.
 - `pnpm --filter @taipa/playground dev` starts the local playground.
 - `pnpm benchmark` runs the local benchmark subset and records its environment.
-- `pnpm --filter @taipa/ui bench` runs the CodSpeed benchmarks for the packed
+- `pnpm --filter @taipa/benchmarks bench:ui` runs the CodSpeed benchmarks for the packed
   `@taipa/ui` artifacts (build first). CI runs the same suite under CodSpeed's
   CPU simulation instrument on every push and pull request.
+- `pnpm --filter @taipa/benchmarks bench:repeat` compares the production bundles
+  of Taipa's `repeat()` helper and Lit's `repeat` directive in Chromium.
 
 ## Public Subpaths
 
