@@ -292,6 +292,16 @@ catalogs:
     vue:
       specifier: ^3.5.40
       version: 3.5.40
+  examples:
+    '@hono/node-server':
+      specifier: 2.0.12
+      version: 2.0.12
+    hono:
+      specifier: ^4.13.0
+      version: 4.13.0
+    vite-cli:
+      specifier: npm:vite@^8.1.5
+      version: 8.1.5
 
 overrides:
   vite: npm:@voidzero-dev/vite-plus-core@0.2.5
@@ -431,9 +441,22 @@ importers:
 
   examples/node-ssr:
     dependencies:
+      '@hono/node-server':
+        specifier: catalog:examples
+        version: 2.0.12(hono@4.13.0)
       '@taipa/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      hono:
+        specifier: catalog:examples
+        version: 4.13.0
+    devDependencies:
+      playwright:
+        specifier: 'catalog:'
+        version: 1.61.1
+      vite-cli:
+        specifier: catalog:examples
+        version: vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
 
   packages/conformance:
     devDependencies:
@@ -926,6 +949,12 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@hono/node-server@2.0.12':
+    resolution: {integrity: sha512-eWpQYr67tqJLeaSUl0Q+TquuYfUdTibpOJlUMV2FfUP7+KqCC5TufnwnlXL6mobZBJbGAYRd7ZvEBDCbLInjhg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      hono: ^4
 
   '@iconify-json/ph@1.2.2':
     resolution: {integrity: sha512-PgkEZNtqa8hBGjHXQa4pMwZa93hmfu8FUSjs/nv4oUU6yLsgv+gh9nu28Kqi8Fz9CCVu4hj1MZs9/60J57IzFw==}
@@ -2822,6 +2851,10 @@ packages:
   hastscript@9.0.1:
     resolution: {integrity: sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w==}
 
+  hono@4.13.0:
+    resolution: {integrity: sha512-jhunvfHWxd7J5EFfSgH4xsYJzSe/lfqbUCxiyyeaQasUsXeEHXtzVid+7EOGByc5JnFa23SSFL3Y2RV/z1T+eQ==}
+    engines: {node: '>=16.9.0'}
+
   html-escaper@3.0.3:
     resolution: {integrity: sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ==}
 
@@ -4588,6 +4621,10 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.1':
     optional: true
+
+  '@hono/node-server@2.0.12(hono@4.13.0)':
+    dependencies:
+      hono: 4.13.0
 
   '@iconify-json/ph@1.2.2':
     dependencies:
@@ -6366,6 +6403,8 @@ snapshots:
       hast-util-parse-selector: 4.0.0
       property-information: 7.2.0
       space-separated-tokens: 2.0.2
+
+  hono@4.13.0: {}
 
   html-escaper@3.0.3: {}
 

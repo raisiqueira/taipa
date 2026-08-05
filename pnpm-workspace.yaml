@@ -45,6 +45,12 @@ catalog:
   "@tailwindcss/vite": ^4.3.3
   tailwindcss: ^4.3.3
   pagefind: ^1.5.2
+
+catalogs:
+  examples:
+    "@hono/node-server": 2.0.12
+    hono: ^4.13.0
+    vite-cli: npm:vite@^8.1.5
 overrides:
   vite: "catalog:"
 peerDependencyRules:

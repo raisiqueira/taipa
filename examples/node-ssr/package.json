@@ -1,10 +1,19 @@
 {
+  "name": "@taipa/example-node-ssr",
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.mjs"
+    "build": "vite build",
+    "start": "pnpm run build && node server.mjs",
+    "test": "pnpm run build && node --test test.mjs"
   },
   "dependencies": {
-    "@taipa/ui": "workspace:*"
+    "@hono/node-server": "catalog:examples",
+    "@taipa/ui": "workspace:*",
+    "hono": "catalog:examples"
+  },
+  "devDependencies": {
+    "playwright": "catalog:",
+    "vite-cli": "catalog:examples"
   }
 }
