@@ -13,7 +13,11 @@
  */
 import { effect, effectScope } from "alien-signals";
 import type { ComponentDefinition } from "../component";
-import { ATTR_PROPS_SCRIPT, ATTR_STATE_SCRIPT } from "../server/attributes";
+import {
+  ATTR_PROPS_SCRIPT,
+  ATTR_STATE_SCRIPT,
+  MAX_ISLAND_PAYLOAD_CHARS,
+} from "../server/attributes";
 import {
   asComponentDefinition,
   prepareContext,
@@ -39,7 +43,6 @@ import {
 } from "./refs";
 import { claimRuntimeOwner } from "./runtime-owner";
 
-const MAX_PAYLOAD_BYTES = 64 * 1024;
 const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 
 export function hydrate<P, S, D>(
@@ -224,7 +227,7 @@ function readPayload(
     );
   }
   const text = scripts[0]?.textContent ?? "";
-  if (text.length > MAX_PAYLOAD_BYTES) {
+  if (text.length > MAX_ISLAND_PAYLOAD_CHARS) {
     throw new Error(
       `${label} payload for component "${definition.name}" exceeds the 64 KiB island payload limit`,
     );

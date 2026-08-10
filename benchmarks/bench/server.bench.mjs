@@ -7,7 +7,17 @@
  * JSON serialization of props and state overrides.
  */
 import { renderIsland, renderToString } from "@taipa/ui/server";
-import { Counter, Dashboard, largeProps, rows, Table } from "./fixtures.mjs";
+import {
+  Counter,
+  Dashboard,
+  hostileText,
+  largeProps,
+  nearLimitProps,
+  Payload,
+  rows,
+  Table,
+  unicodeText,
+} from "./fixtures.mjs";
 
 export function register(bench) {
   bench
@@ -44,6 +54,23 @@ export function register(bench) {
     })
     .add("renderIsland: serialize a large props payload", async () => {
       return await renderIsland(Dashboard, largeProps, { hydrate: "idle", idleTimeout: 500 });
+    })
+    .add("renderIsland: serialize clean Unicode props", async () => {
+      return await renderIsland(
+        Dashboard,
+        { title: unicodeText, query: unicodeText },
+        { hydrate: "load" },
+      );
+    })
+    .add("renderIsland: serialize escape-heavy props", async () => {
+      return await renderIsland(
+        Dashboard,
+        { title: hostileText, query: hostileText },
+        { hydrate: "load" },
+      );
+    })
+    .add("renderIsland: serialize near-limit props", async () => {
+      return await renderIsland(Payload, nearLimitProps, { hydrate: "load" });
     })
     .add(`renderIsland: table of ${rows.length} rows, hydrate on load`, async () => {
       return await renderIsland(Table, { rows }, { hydrate: "load" });

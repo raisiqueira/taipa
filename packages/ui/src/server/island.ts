@@ -21,6 +21,7 @@ import {
   ATTR_VISIBLE_ROOT_MARGIN,
   FALLBACK_MARKER,
   ISLAND_TAG,
+  MAX_ISLAND_PAYLOAD_CHARS,
   jsonScript,
   serializeAttributes,
   type Attribute,
@@ -48,6 +49,7 @@ export interface IslandRenderOptions<S> extends RenderOptions<S> {
 }
 
 const HYDRATION_POLICIES: ReadonlySet<string> = new Set(["load", "idle", "visible", "only"]);
+const PAYLOAD_WARNING_THRESHOLD = MAX_ISLAND_PAYLOAD_CHARS * 0.75;
 
 function resolveHydrationPolicy(input: unknown): HydrationPolicy {
   if (input === undefined || input === false) {
@@ -104,6 +106,31 @@ function validateIslandOptions<S>(
   }
 }
 
+function serializePayload(
+  componentName: string,
+  label: "props" | "state",
+  markerAttribute: string,
+  value: JsonObject,
+): string {
+  const payload = toInertJson(value);
+  if (payload.length > MAX_ISLAND_PAYLOAD_CHARS) {
+    throw new Error(
+      `${label} payload for component "${componentName}" exceeds the 64 KiB island payload limit`,
+    );
+  }
+  if (
+    typeof process !== "undefined" &&
+    process.env.NODE_ENV === "development" &&
+    payload.length >= PAYLOAD_WARNING_THRESHOLD
+  ) {
+    const bytes = new TextEncoder().encode(payload).byteLength;
+    console.warn(
+      `Taipa ${label} payload for component "${componentName}" is ${payload.length} characters (${bytes} UTF-8 bytes), approaching the 64 KiB island payload limit`,
+    );
+  }
+  return jsonScript(markerAttribute, payload);
+}
+
 export async function renderIsland<P extends JsonObject, S, D>(
   component: Component<P, S, D>,
   props: P,
@@ -114,6 +141,18 @@ export async function renderIsland<P extends JsonObject, S, D>(
   validateIslandOptions(definition.name, hydrate, options);
   validateProps(definition, props);
   validateStateOverrides(definition, options.state);
+
+  const scripts: string[] = [];
+  if (hydrate !== false) {
+    if (Object.keys(props).length > 0) {
+      scripts.push(serializePayload(definition.name, "props", ATTR_PROPS_SCRIPT, props));
+    }
+    if (options.state !== undefined && Object.keys(options.state).length > 0) {
+      scripts.push(
+        serializePayload(definition.name, "state", ATTR_STATE_SCRIPT, options.state as JsonObject),
+      );
+    }
+  }
 
   let inner: string;
   if (hydrate === "only") {
@@ -143,16 +182,6 @@ export async function renderIsland<P extends JsonObject, S, D>(
     }
     if (options.idleTimeout !== undefined) {
       attributes.push([ATTR_IDLE_TIMEOUT, String(options.idleTimeout)]);
-    }
-  }
-
-  const scripts: string[] = [];
-  if (hydrate !== false) {
-    if (Object.keys(props).length > 0) {
-      scripts.push(jsonScript(ATTR_PROPS_SCRIPT, toInertJson(props)));
-    }
-    if (options.state !== undefined && Object.keys(options.state).length > 0) {
-      scripts.push(jsonScript(ATTR_STATE_SCRIPT, toInertJson(options.state as JsonObject)));
     }
   }
 

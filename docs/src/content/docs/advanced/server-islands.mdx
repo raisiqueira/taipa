@@ -33,6 +33,16 @@ loads the approved component module and attaches bindings and events to those ex
 The island string contains its host, hydration policy, module metadata, and inert state payload. Write
 it into an ordinary HTML response from the runtime you already use.
 
+## Keep payloads bounded
+
+Each props or state script is limited to 64 KiB, measured as post-escape JSON characters. `renderIsland()`
+rejects an oversized payload before it returns markup, matching the browser's preflight limit. In development,
+payloads at 75% of that limit emit a warning with the component name, payload kind, character count, and UTF-8
+byte count. The warning never includes serialized data.
+
+Keep props and state focused on the data an island needs to attach. Island payloads are visible in the page source
+and should never contain credentials or other secrets.
+
 ## Return the page from your runtime
 
 The component and island renderer are runtime-neutral ESM. Only the few lines that create the HTTP

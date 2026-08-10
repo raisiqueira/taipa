@@ -10,7 +10,8 @@
     "bench": "node scripts/run-benchmarks.mjs",
     "bench:repeat": "node bench/run-repeat-browser.mjs",
     "bench:ui": "node bench/index.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "bench:serialization": "node bench/run-serialization-browser.mjs"
   },
   "dependencies": {
     "@taipa/ui": "workspace:*",

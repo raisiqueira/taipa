@@ -59,6 +59,10 @@ pnpm --filter @taipa/ui build
 pnpm --filter @taipa/benchmarks bench:ui
 ```
 
+The server-island tasks include small stateful islands plus large, Unicode, escape-heavy, near-limit, and tabular
+payloads. They measure the public packaged render path, including validation, inert JSON serialization, and view
+rendering. Compare runs on the same machine; these numbers are local regression signals rather than universal claims.
+
 Run the production-browser comparison between Taipa's `repeat()` helper and Lit's keyed
 `repeat` directive with:
 
@@ -68,3 +72,13 @@ pnpm --filter @taipa/benchmarks bench:repeat
 
 The repeat runner rebuilds `@taipa/ui`, bundles both libraries in Vite production mode, validates
 equivalent output and DOM identity, and prints a Markdown-ready report from headless Chromium.
+
+Run the production-browser serialization benchmark with:
+
+```sh
+pnpm --filter @taipa/benchmarks bench:serialization
+```
+
+It rebuilds the package, bundles a production Vite fixture, validates the hydrated DOM and sanitized
+payload before timing, then reports direct `hydrate()` payload parsing/sanitization separately from
+`bootstrap()` DOM JSON-registry and JavaScript-registry resolution paths.

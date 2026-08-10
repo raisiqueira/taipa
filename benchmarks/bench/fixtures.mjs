@@ -21,6 +21,12 @@ export const rows = Array.from({ length: ROW_COUNT }, (_, index) => ({
 /** Untrusted input that exercises every branch of the escaping tables. */
 export const hostileText = `<script>alert("x")</script> & 'friends' <b>&amp;</b> ${"a".repeat(64)}`;
 
+export const unicodeText = "Ol\u00e1 \ud83c\udf0d \ud83e\udde9 \ud83d\ude80".repeat(64);
+
+// Kept below the per-script character cap after JSON framing, so this measures
+// the production hot path rather than the server's rejection path.
+export const nearLimitProps = { payload: "x".repeat(64 * 1024 - 32) };
+
 export const inertAttributeValue = `say "hi" & <bye> ${"z".repeat(32)}`;
 
 export const trustedMarkup = `<span class="badge">pre-sanitized</span>`;
@@ -73,6 +79,9 @@ export const Dashboard = component("Dashboard")
       </section>
     `,
   );
+
+/** A render-light component for measuring payload work without template cost. */
+export const Payload = component("Payload").render(() => html``);
 
 /** The table scenario: one nested SafeHtml fragment per row. */
 export const Table = component("Table")
