@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { expect, test } from "vite-plus/test";
+import { expect, test, vi } from "vite-plus/test";
 import { component } from "../../src/component";
 import { renderIsland, type IslandRenderOptions } from "../../src/server/island";
 import { html, raw } from "../../src/template/html";
@@ -17,6 +17,10 @@ const PriceChart = component<{ symbol: string }>("PriceChart").render(
 const Badge = component<{ label: string }>("Badge").render(
   ({ props }) => html`<span>${props.label}</span>`,
 );
+
+const PayloadState = component("PayloadState")
+  .state("payload", "")
+  .render(() => html``);
 
 // ---------------------------------------------------------------------------
 // Attributes and scripts for every hydration policy.
@@ -124,6 +128,68 @@ test("line separators and non-ASCII survive the props script round-trip", async 
   expect(payload).not.toContain("\u2028");
   expect(payload).not.toContain("\u2029");
   expect(JSON.parse(payload)).toEqual(value);
+});
+
+test("server payload limits match client character-count semantics", async () => {
+  const limit = 64 * 1024;
+  const emptyPayloadLength = JSON.stringify({ label: "" }).length;
+  const atLimit = "x".repeat(limit - emptyPayloadLength);
+
+  await expect(renderIsland(Badge, { label: atLimit }, { hydrate: "load" })).resolves.toContain(
+    `"label":"${atLimit}`,
+  );
+  await expect(renderIsland(Badge, { label: `${atLimit}x` }, { hydrate: "load" })).rejects.toThrow(
+    /props payload.*64\s*KiB/i,
+  );
+
+  const emptyStateLength = JSON.stringify({ payload: "" }).length;
+  const stateAtLimit = "x".repeat(limit - emptyStateLength);
+  await expect(
+    renderIsland(PayloadState, {}, { hydrate: "load", state: { payload: stateAtLimit } }),
+  ).resolves.toContain(`"payload":"${stateAtLimit}`);
+  await expect(
+    renderIsland(PayloadState, {}, { hydrate: "load", state: { payload: `${stateAtLimit}x` } }),
+  ).rejects.toThrow(/state payload.*64\s*KiB/i);
+});
+
+test("development warnings report payload metadata without payload contents", async () => {
+  const originalEnvironment = process.env.NODE_ENV;
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+  process.env.NODE_ENV = "development";
+  const label = "x".repeat(64 * 1024 * 0.75);
+
+  try {
+    await renderIsland(Badge, { label }, { hydrate: "load" });
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(/Badge.*characters.*UTF-8 bytes.*64 KiB/i),
+    );
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining(label));
+
+    warn.mockClear();
+    process.env.NODE_ENV = "production";
+    await renderIsland(Badge, { label }, { hydrate: "load" });
+    expect(warn).not.toHaveBeenCalled();
+
+    process.env.NODE_ENV = "development";
+    await renderIsland(PayloadState, {}, { hydrate: "load", state: { payload: label } });
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(/state payload.*PayloadState.*UTF-8 bytes/i),
+    );
+  } finally {
+    process.env.NODE_ENV = originalEnvironment;
+    warn.mockRestore();
+  }
+});
+
+test("payload serialization supports runtimes without Node process", async () => {
+  vi.stubGlobal("process", undefined);
+  try {
+    await expect(
+      renderIsland(Badge, { label: "runtime neutral" }, { hydrate: "load" }),
+    ).resolves.toContain('data-taipa-props>{"label":"runtime neutral"}</script>');
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });
 
 // ---------------------------------------------------------------------------

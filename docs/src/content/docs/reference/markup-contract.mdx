@@ -24,6 +24,10 @@ The server emits the island host, inert data, and fallback content. The client r
 
 Before attaching effects or listeners, hydration validates payload shapes and every singular ref declared through `bind()` and `on()`. Missing or duplicated singular refs leave the island inert and report one error.
 
+Props and state use separate `application/json` scripts. Each script is capped at 64 KiB by its post-escape JSON
+character count; this is a character compatibility limit, not a UTF-8 byte limit. The server rejects payloads that
+exceed it, and the browser applies the same limit before attachment.
+
 <Aside type="caution" title="Deploy matching server and browser assets">
   Taipa 0.1 removed the per-island version handshake. Deploy the server output and browser modules
   together, and invalidate cached browser assets when releasing a new version.

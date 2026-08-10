@@ -18,6 +18,9 @@ export const ATTR_VISIBLE_ROOT_MARGIN = "data-taipa-visible-root-margin";
 export const ATTR_PROPS_SCRIPT = "data-taipa-props";
 export const ATTR_STATE_SCRIPT = "data-taipa-state";
 export const FALLBACK_MARKER = "data-taipa-fallback";
+// Payload scripts are capped independently so props and state can be read and
+// rejected independently during client preflight.
+export const MAX_ISLAND_PAYLOAD_CHARS = 64 * 1024;
 
 export type Attribute = readonly [name: string, value: string];
 
