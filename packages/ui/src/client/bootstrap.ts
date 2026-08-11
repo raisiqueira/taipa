@@ -14,7 +14,6 @@ import { resolvePolicy, schedulePolicy } from "./scheduler";
 
 interface BootstrapRecord {
   readonly options: BootstrapOptions;
-  readonly roots: Set<ParentNode>;
   readonly claimedHosts: Set<HTMLElement>;
   readonly observers: MutationObserver[];
   destroyed: boolean;
@@ -30,7 +29,6 @@ export function bootstrap(options: BootstrapOptions = {}): BootstrapHandle {
 
   const record: BootstrapRecord = {
     options,
-    roots: new Set(),
     claimedHosts: new Set(),
     observers: [],
     destroyed: false,
@@ -54,7 +52,6 @@ export function bootstrap(options: BootstrapOptions = {}): BootstrapHandle {
       for (const host of record.claimedHosts) {
         releaseHost(record, owner, host);
       }
-      record.roots.clear();
     },
   };
 
@@ -70,7 +67,6 @@ function scanRoot(
   owner: ReturnType<typeof claimRuntimeOwner>,
   root: ParentNode,
 ): void {
-  record.roots.add(root);
   for (const host of discoverIslands(root)) {
     claimAndSchedule(record, owner, host);
   }

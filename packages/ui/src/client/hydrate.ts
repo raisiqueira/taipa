@@ -111,8 +111,9 @@ export function attachComponent<P, S, D>(
       try {
         for (const binding of definition.bindingRegistrations) {
           const element = elementForRef(collected, binding.refName);
+          const bindingContext = { ...clientContext, element };
           effect(() => {
-            const cleanup = binding.update({ ...clientContext, element });
+            const cleanup = binding.update(bindingContext);
             return typeof cleanup === "function" ? cleanup : undefined;
           });
         }

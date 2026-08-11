@@ -93,6 +93,37 @@ describe("success path", () => {
     expect([...host.querySelectorAll("*")]).toEqual(before);
   });
 
+  test("each binding reuses its own ref-specific context across reruns", () => {
+    const firstContexts: { readonly element: Element }[] = [];
+    const secondContexts: { readonly element: Element }[] = [];
+    const pair = component("pair")
+      .state("count", 0)
+      .bind("first", (context) => {
+        firstContexts.push(context);
+        context.state.count();
+      })
+      .bind("second", (context) => {
+        secondContexts.push(context);
+        context.state.count();
+      })
+      .render(() => html`<span></span>`);
+    const host = island(
+      `<output data-taipa-ref="first"></output><output data-taipa-ref="second"></output>`,
+    );
+
+    const instance = hydrate(host, pair);
+    instance.state.count(7);
+
+    const [first, second] = [...host.querySelectorAll("output")];
+    expect(firstContexts).toHaveLength(2);
+    expect(secondContexts).toHaveLength(2);
+    expect(firstContexts[0]?.element).toBe(first);
+    expect(secondContexts[0]?.element).toBe(second);
+    expect(firstContexts[1]).toBe(firstContexts[0]);
+    expect(secondContexts[1]).toBe(secondContexts[0]);
+    expect(firstContexts[0]).not.toBe(secondContexts[0]);
+  });
+
   test("events attach to refs and to the host per spec, with event and target", () => {
     const seen: { event: Event; target: Element }[] = [];
     const recorder = component("recorder")
