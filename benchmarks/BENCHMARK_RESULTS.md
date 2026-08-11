@@ -1,100 +1,99 @@
 # Benchmark Results
 
-- Timestamp: 2026-08-04T19:31:47.765Z
-- Git hash: 764d86ba1e4fe0164f7faa169a46a0821d025338
+- Timestamp: 2026-08-11T14:14:39.675Z
+- Git hash: 620b474b4aaaf13b1c530c5e1f3c0b76f810848c (dirty working tree)
 - Chromium: 149.0.7827.55
 - Node: v24.18.0 on darwin
 - Processor: Apple M4 Pro (12 logical cores, arm64)
 - Host memory: 24.0 GiB
 - Warmups: 5
+- CPU samples: 10
+- Randomization seed: 1952541040
 
 ## create rows
 
-| rank | framework |     time | vs best |
-| ---: | --------- | -------: | ------: |
-|    1 | ilha      |  60.0 ms |    best |
-|    2 | taipa     |  62.2 ms |   +3.7% |
-|    3 | vanillajs |  63.1 ms |   +5.2% |
-|    4 | vue       |  68.6 ms |  +14.3% |
-|    5 | react     |  96.7 ms |  +61.2% |
-|    6 | lit-html  | 380.6 ms | +534.3% |
+| rank | framework |     time |         95% CI | samples | vs best |
+| ---: | --------- | -------: | -------------: | ------: | ------: |
+|    1 | vanillajs |  48.2 ms |   46.4-49.9 ms |      10 |    best |
+|    2 | taipa     |  49.6 ms |   48.2-51.0 ms |      10 |   +2.9% |
+|    3 | ilha      |  53.2 ms |   50.9-55.5 ms |      10 |  +10.4% |
+|    4 | vue       |  54.1 ms |   51.5-56.8 ms |      10 |  +12.3% |
+|    5 | lit-html  |  54.6 ms |   48.6-60.7 ms |      10 |  +13.4% |
+|    6 | react     | 125.8 ms | 123.1-128.4 ms |      10 | +161.0% |
+
+## create 10,000 rows
+
+| rank | framework |     time |         95% CI | samples | vs best |
+| ---: | --------- | -------: | -------------: | ------: | ------: |
+|    1 | vanillajs | 221.1 ms | 213.2-229.0 ms |      10 |    best |
+|    2 | taipa     | 221.8 ms | 216.9-226.6 ms |      10 |   +0.3% |
+|    3 | vue       | 262.9 ms | 260.8-265.1 ms |      10 |  +18.9% |
+|    4 | ilha      | 274.8 ms | 268.0-281.6 ms |      10 |  +24.3% |
+|    5 | lit-html  | 275.2 ms | 263.4-287.1 ms |      10 |  +24.5% |
+|    6 | react     | 571.7 ms | 566.1-577.2 ms |      10 | +158.5% |
 
 ## replace all rows
 
-| rank | framework |      time |  vs best |
-| ---: | --------- | --------: | -------: |
-|    1 | vue       |   91.2 ms |     best |
-|    2 | taipa     |   94.0 ms |    +3.1% |
-|    3 | vanillajs |   96.5 ms |    +5.8% |
-|    4 | ilha      |  114.4 ms |   +25.4% |
-|    5 | react     |  228.8 ms |  +150.9% |
-|    6 | lit-html  | 2594.6 ms | +2745.0% |
+| rank | framework |    time |       95% CI | samples | vs best |
+| ---: | --------- | ------: | -----------: | ------: | ------: |
+|    1 | vanillajs | 22.3 ms | 21.0-23.6 ms |      10 |    best |
+|    2 | taipa     | 23.4 ms | 21.8-25.0 ms |      10 |   +5.1% |
+|    3 | vue       | 25.8 ms | 25.0-26.6 ms |      10 |  +15.7% |
+|    4 | ilha      | 34.3 ms | 33.6-35.0 ms |      10 |  +53.9% |
+|    5 | lit-html  | 37.5 ms | 37.0-38.0 ms |      10 |  +68.4% |
+|    6 | react     | 46.1 ms | 45.4-46.7 ms |      10 | +106.7% |
+
+## append 1,000 rows
+
+| rank | framework |    time |       95% CI | samples | vs best |
+| ---: | --------- | ------: | -----------: | ------: | ------: |
+|    1 | lit-html  | 27.2 ms | 26.4-28.0 ms |      10 |    best |
+|    2 | vue       | 28.3 ms | 27.3-29.4 ms |      10 |   +4.0% |
+|    3 | vanillajs | 38.0 ms | 36.2-39.7 ms |      10 |  +39.4% |
+|    4 | taipa     | 38.3 ms | 36.7-39.9 ms |      10 |  +40.6% |
+|    5 | react     | 44.7 ms | 44.0-45.4 ms |      10 |  +64.2% |
+|    6 | ilha      | 51.8 ms | 50.0-53.6 ms |      10 |  +90.3% |
 
 ## partial update
 
-| rank | framework |      time |  vs best |
-| ---: | --------- | --------: | -------: |
-|    1 | vue       |   81.0 ms |     best |
-|    2 | vanillajs |   95.2 ms |   +17.5% |
-|    3 | taipa     |   96.3 ms |   +18.9% |
-|    4 | ilha      |   99.7 ms |   +23.1% |
-|    5 | react     |  134.2 ms |   +65.7% |
-|    6 | lit-html  | 1907.8 ms | +2255.3% |
+| rank | framework |    time |       95% CI | samples | vs best |
+| ---: | --------- | ------: | -----------: | ------: | ------: |
+|    1 | vue       |  9.9 ms |  6.4-13.5 ms |      10 |    best |
+|    2 | lit-html  | 11.2 ms |  8.2-14.2 ms |      10 |  +12.5% |
+|    3 | react     | 12.6 ms | 11.8-13.4 ms |      10 |  +26.4% |
+|    4 | taipa     | 20.8 ms | 19.2-22.4 ms |      10 | +108.8% |
+|    5 | vanillajs | 20.9 ms | 18.9-22.9 ms |      10 | +110.1% |
+|    6 | ilha      | 27.9 ms | 26.5-29.4 ms |      10 | +180.5% |
+
+## swap rows
+
+| rank | framework |    time |       95% CI | samples | vs best |
+| ---: | --------- | ------: | -----------: | ------: | ------: |
+|    1 | vue       | 10.7 ms |  7.7-13.7 ms |      10 |    best |
+|    2 | lit-html  | 12.0 ms |  9.4-14.7 ms |      10 |  +12.4% |
+|    3 | vanillajs | 19.3 ms | 17.9-20.7 ms |      10 |  +80.4% |
+|    4 | taipa     | 21.4 ms | 19.6-23.1 ms |      10 |  +99.9% |
+|    5 | react     | 26.0 ms | 25.2-26.9 ms |      10 | +143.3% |
+|    6 | ilha      | 27.0 ms | 25.6-28.3 ms |      10 | +152.4% |
 
 ## run memory
 
 | rank | framework |           memory | vs best |
 | ---: | --------- | ---------------: | ------: |
-|    1 | vanillajs |  2,379,796 bytes |    best |
-|    2 | taipa     |  2,855,240 bytes |  +20.0% |
-|    3 | ilha      |  3,298,812 bytes |  +38.6% |
-|    4 | lit-html  |  3,724,288 bytes |  +56.5% |
-|    5 | vue       |  5,810,188 bytes | +144.1% |
-|    6 | react     | 10,019,480 bytes | +321.0% |
+|    1 | vanillajs |  2,306,868 bytes |    best |
+|    2 | taipa     |  2,676,528 bytes |  +16.0% |
+|    3 | ilha      |  2,926,360 bytes |  +26.9% |
+|    4 | lit-html  |  3,234,484 bytes |  +40.2% |
+|    5 | vue       |  5,421,076 bytes | +135.0% |
+|    6 | react     | 15,058,868 bytes | +552.8% |
 
 ## update memory
 
 | rank | framework |           memory | vs best |
 | ---: | --------- | ---------------: | ------: |
-|    1 | vanillajs |  2,517,540 bytes |    best |
-|    2 | taipa     |  2,771,440 bytes |  +10.1% |
-|    3 | lit-html  |  3,873,492 bytes |  +53.9% |
-|    4 | ilha      |  4,171,192 bytes |  +65.7% |
-|    5 | vue       |  5,960,636 bytes | +136.8% |
-|    6 | react     | 17,162,512 bytes | +581.7% |
-
-## `repeat()` helper vs Lit `repeat`
-
-- Timestamp: 2026-08-05T00:56:50.768Z
-- Git hash: 58b71e2cf29276967656638e394bd0fa4ae5a25e
-- Chromium: 149.0.7827.55
-- Node: v24.18.0 on darwin arm64
-- Bundle: minified Vite production build using Taipa's built package entry and Lit's production export
-- Workload: 500 rows, 600 ms per task after a 200 ms warmup, minimum 20 iterations
-- Output validation: PASS (8 output/DOM-identity checks across both row orders; equivalent
-  15,293-character markup after removing Lit marker comments)
-
-Taipa and Lit perform different native work here: Taipa produces a server-safe HTML string, while
-Lit commits or updates DOM. Absolute times across the two libraries are therefore not an
-end-to-end rendering comparison. The meaningful comparison is each `repeat` implementation
-against its own `Array.map` baseline for the same workload. Negative percentages mean lower
-latency than that baseline.
-
-| task                                                  |  ops/s | mean (ms) |   RME | samples | vs `Array.map` |
-| ----------------------------------------------------- | -----: | --------: | ----: | ------: | -------------: |
-| Taipa `repeat`: first render                          |  4,424 |    0.2435 | 1.02% |   2,464 |          -3.9% |
-| Taipa `Array.map`: first render                       |  4,225 |    0.2534 | 0.98% |   2,368 |       baseline |
-| Taipa `repeat`: reversed re-render, no reconciliation |  4,481 |    0.2406 | 0.98% |   2,494 |          -4.1% |
-| Taipa `Array.map`: reversed re-render                 |  4,235 |    0.2508 | 0.93% |   2,393 |       baseline |
-| Lit `repeat`: first render, keyed                     |  2,510 |    0.4719 | 6.99% |   1,272 |          -1.2% |
-| Lit `Array.map`: first render                         |  2,517 |    0.4776 | 7.51% |   1,257 |       baseline |
-| Lit `repeat`: reversed keyed update                   |  8,571 |    0.1157 | 2.14% |   5,186 |         +51.2% |
-| Lit `Array.map`: reversed positional update           | 10,561 |    0.0765 | 1.70% |   7,839 |       baseline |
-
-The Taipa helper was 3.9-4.1% lower-latency than Taipa's `Array.map` composition across the two
-row orders in this run. Lit's first-render result was effectively even with its baseline because
-the 1.2% delta is much smaller than the measurement error. On reversal, Lit's keyed directive was
-51.2% higher-latency than positional `Array.map`; the validation confirms that `repeat` preserved
-row identity and moved keyed DOM ranges, while `Array.map` reused positions and changed their
-values. This supports Taipa's `repeat()` as a low-overhead, output-equivalent helper for static
-server markup; it does not imply client-side keyed reconciliation equivalent to Lit's directive.
+|    1 | vanillajs |  2,571,600 bytes |    best |
+|    2 | taipa     |  2,993,852 bytes |  +16.4% |
+|    3 | ilha      |  3,327,228 bytes |  +29.4% |
+|    4 | lit-html  |  3,534,672 bytes |  +37.5% |
+|    5 | vue       |  5,900,976 bytes | +129.5% |
+|    6 | react     | 16,749,224 bytes | +551.3% |

@@ -11,7 +11,8 @@
     "bench:repeat": "node bench/run-repeat-browser.mjs",
     "bench:ui": "node bench/index.mjs",
     "preview": "vite preview",
-    "bench:serialization": "node bench/run-serialization-browser.mjs"
+    "bench:serialization": "node bench/run-serialization-browser.mjs",
+    "bench:client-lifecycle": "node bench/run-client-lifecycle-browser.mjs"
   },
   "dependencies": {
     "@taipa/ui": "workspace:*",
