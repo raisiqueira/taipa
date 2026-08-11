@@ -4,6 +4,10 @@ All notable changes to `@taipa/ui` are documented here.
 
 ## Unreleased
 
+## 0.2.0
+
+- When a `batch()` callback and its closing effect flush both throw, `batch()` now preserves the callback error as the primary failure.
+- Reduced client runtime overhead by reusing binding contexts and no longer retaining transient roots scanned by long-lived bootstrap handles.
 - `renderIsland()` now rejects props or state payload scripts above the existing 64 KiB client character limit and
   emits development-only size warnings before that limit.
 - Added a complete documentation site for server rendering, hydration, forms, no-build delivery, public APIs, security boundaries, and benchmark evidence.
