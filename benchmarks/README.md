@@ -14,8 +14,11 @@ This first slice compares:
 Implemented operations:
 
 - `create rows` (`#run`, 1,000 rows)
+- `create 10,000 rows` (`#runlots`)
 - `replace all rows` (`#run` over an existing 1,000-row table)
+- `append 1,000 rows` (`#add` over an existing 1,000-row table)
 - `partial update` (`#update`, every 10th row)
+- `swap rows` (`#swaprows`, rows 2 and 999)
 - `run memory` (JS heap after `#run`)
 - `update memory` (local extension: JS heap after `#run` + `#update`)
 
@@ -23,7 +26,7 @@ Implemented operations:
 
 ![Taipa UI Benchmarks dashboard](./docs/dashboard.png)
 
-Start the dev server to view the results dashboard — a single page that renders the latest run from `src/results.json` with an overall standing (geometric mean vs the best framework per operation) and a ranked bar chart per operation:
+Start the dev server to view the results dashboard — a single page that renders the latest run from `src/results.json` with a ranked bar chart per operation:
 
 ```sh
 pnpm --filter @taipa/benchmarks dev
@@ -43,12 +46,16 @@ Run the automated local pass:
 pnpm --filter @taipa/benchmarks bench
 ```
 
-The runner performs five warmup executions before the measured pass for each framework/operation. It drives the per-framework harness (`harness.html`), prints one table per operation sorted from best to worst, and records the timestamp, git hash, browser/runtime, host processor, logical core count, architecture, and physical memory in two artifacts:
+The runner performs five warmup executions and ten measured samples for each framework/CPU operation. Framework and operation positions rotate through deterministically randomized base orders, and every execution gets a fresh page. Setup runs outside the timed interval, and every sample validates the complete final row data and expected DOM identity behavior. The timed browser-local interval starts immediately before the button action and includes two animation frames for DOM settlement. Reports show the sample mean and Student-t 95% confidence interval. Override the sample count with `TAIPA_BENCH_SAMPLES` (2-30), warmups with `TAIPA_BENCH_WARMUPS`, the selected comma-separated adapters with `TAIPA_BENCH_FRAMEWORKS`, the deterministic seed with `TAIPA_BENCH_SEED`, and the slow-operation timeout with `TAIPA_BENCH_ACTION_TIMEOUT`. Memory warmups use a disposable page; each memory operation is then a single validated reading from its own fresh page.
+
+It drives the per-framework harness (`harness.html`), prints one table per operation sorted by point estimate, and records the timestamp, git hash and dirty-worktree state, browser/runtime, host processor, logical core count, architecture, and physical memory in two artifacts:
 
 - `benchmarks/src/results.json` — structured data consumed by the dashboard.
 - `benchmarks/BENCHMARK_RESULTS.md` — the same numbers as Markdown tables.
 
-CPU timings are ranked by lower milliseconds. Memory readings are ranked by lower Chromium `JSHeapUsedSize` bytes. The `vs best` column shows the percentage slower or heavier than the top-ranked result for that operation. Treat these as local development signals, not official js-framework-benchmark results.
+CPU timings are ranked by lower mean milliseconds, with uncertainty shown separately rather than used to assert a definitive ordering. Memory readings are ranked by lower Chromium `JSHeapUsedSize` bytes. The `vs best` column shows the point-estimate percentage slower or heavier than the top-ranked result for that operation. Treat these as local development signals, not official js-framework-benchmark results.
+
+The adapters intentionally exercise their existing DOM strategies: Taipa and VanillaJS replace rows, Ilha reuses positions, and lit-html, React, and Vue preserve keyed nodes. Per-operation charts therefore compare complete adapter behavior, including different identity guarantees. They are not combined into an overall framework score.
 
 ## Running the Taipa UI microbenchmarks
 
@@ -82,3 +89,18 @@ pnpm --filter @taipa/benchmarks bench:serialization
 It rebuilds the package, bundles a production Vite fixture, validates the hydrated DOM and sanitized
 payload before timing, then reports direct `hydrate()` payload parsing/sanitization separately from
 `bootstrap()` DOM JSON-registry and JavaScript-registry resolution paths.
+
+Run the production-browser client lifecycle controls with:
+
+```sh
+pnpm --filter @taipa/benchmarks bench:client-lifecycle
+```
+
+This benchmark runs four paired comparisons: direct hydration versus mount startup, unrelated and
+descendant mutation-heavy workloads with and without a live instance, and dynamic insertion with
+`bootstrap({ observe: false })` versus `observe: true`. It consumes packaged public APIs from a
+minified production bundle, performs eight warmup and forty measured rounds in deterministic balanced
+AB/BA order, validates lifecycle and discovery behavior outside timing, and reports condition and
+paired-difference Student-t 95% confidence intervals. The startup paths perform intentionally different
+work; each mutation row reports amortized latency in milliseconds per mutation for one batch of 10,000 `textContent`
+replacements and one observer delivery.

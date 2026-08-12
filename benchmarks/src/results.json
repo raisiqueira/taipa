@@ -1,6 +1,7 @@
 {
-  "timestamp": "2026-08-04T19:31:47.765Z",
-  "gitHash": "764d86ba1e4fe0164f7faa169a46a0821d025338",
+  "timestamp": "2026-08-11T14:43:31.860Z",
+  "gitHash": "e4ad65ae960dbc3f2bc50dbfac7282d0956b7d53",
+  "gitDirty": false,
   "environment": {
     "chromium": "149.0.7827.55",
     "node": "v24.18.0",
@@ -9,7 +10,9 @@
     "processor": "Apple M4 Pro",
     "logicalCores": 12,
     "hostMemoryBytes": 25769803776,
-    "warmups": 5
+    "warmups": 5,
+    "cpuSamples": 10,
+    "randomizationSeed": 1952541040
   },
   "frameworks": ["taipa", "ilha", "vanillajs", "lit-html", "react", "vue"],
   "operations": [
@@ -19,28 +22,95 @@
       "unit": "ms",
       "results": [
         {
-          "framework": "ilha",
-          "value": 60
-        },
-        {
           "framework": "taipa",
-          "value": 62.2
+          "value": 45.96,
+          "confidenceLow": 43.887,
+          "confidenceHigh": 48.033,
+          "samples": 10
         },
         {
           "framework": "vanillajs",
-          "value": 63.1
-        },
-        {
-          "framework": "vue",
-          "value": 68.6
-        },
-        {
-          "framework": "react",
-          "value": 96.7
+          "value": 46.16,
+          "confidenceLow": 43.868,
+          "confidenceHigh": 48.452,
+          "samples": 10
         },
         {
           "framework": "lit-html",
-          "value": 380.6
+          "value": 51.4,
+          "confidenceLow": 49.851,
+          "confidenceHigh": 52.949,
+          "samples": 10
+        },
+        {
+          "framework": "ilha",
+          "value": 51.99,
+          "confidenceLow": 50.593,
+          "confidenceHigh": 53.387,
+          "samples": 10
+        },
+        {
+          "framework": "vue",
+          "value": 52.48,
+          "confidenceLow": 48.387,
+          "confidenceHigh": 56.573,
+          "samples": 10
+        },
+        {
+          "framework": "react",
+          "value": 121.3,
+          "confidenceLow": 118.671,
+          "confidenceHigh": 123.929,
+          "samples": 10
+        }
+      ]
+    },
+    {
+      "name": "create 10,000 rows",
+      "metric": "milliseconds",
+      "unit": "ms",
+      "results": [
+        {
+          "framework": "vanillajs",
+          "value": 210.04,
+          "confidenceLow": 205.541,
+          "confidenceHigh": 214.539,
+          "samples": 10
+        },
+        {
+          "framework": "taipa",
+          "value": 212.17,
+          "confidenceLow": 208.743,
+          "confidenceHigh": 215.597,
+          "samples": 10
+        },
+        {
+          "framework": "vue",
+          "value": 254.24,
+          "confidenceLow": 249.508,
+          "confidenceHigh": 258.972,
+          "samples": 10
+        },
+        {
+          "framework": "lit-html",
+          "value": 260.91,
+          "confidenceLow": 254.96,
+          "confidenceHigh": 266.86,
+          "samples": 10
+        },
+        {
+          "framework": "ilha",
+          "value": 274.82,
+          "confidenceLow": 253.378,
+          "confidenceHigh": 296.262,
+          "samples": 10
+        },
+        {
+          "framework": "react",
+          "value": 548.65,
+          "confidenceLow": 543.862,
+          "confidenceHigh": 553.438,
+          "samples": 10
         }
       ]
     },
@@ -50,28 +120,95 @@
       "unit": "ms",
       "results": [
         {
-          "framework": "vue",
-          "value": 91.2
-        },
-        {
           "framework": "taipa",
-          "value": 94
+          "value": 20.59,
+          "confidenceLow": 19.283,
+          "confidenceHigh": 21.897,
+          "samples": 10
         },
         {
           "framework": "vanillajs",
-          "value": 96.5
+          "value": 21.17,
+          "confidenceLow": 19.66,
+          "confidenceHigh": 22.68,
+          "samples": 10
+        },
+        {
+          "framework": "vue",
+          "value": 24.43,
+          "confidenceLow": 23.946,
+          "confidenceHigh": 24.914,
+          "samples": 10
         },
         {
           "framework": "ilha",
-          "value": 114.4
-        },
-        {
-          "framework": "react",
-          "value": 228.8
+          "value": 33.63,
+          "confidenceLow": 32.901,
+          "confidenceHigh": 34.359,
+          "samples": 10
         },
         {
           "framework": "lit-html",
-          "value": 2594.6
+          "value": 37.02,
+          "confidenceLow": 36.668,
+          "confidenceHigh": 37.372,
+          "samples": 10
+        },
+        {
+          "framework": "react",
+          "value": 45.06,
+          "confidenceLow": 44.11,
+          "confidenceHigh": 46.01,
+          "samples": 10
+        }
+      ]
+    },
+    {
+      "name": "append 1,000 rows",
+      "metric": "milliseconds",
+      "unit": "ms",
+      "results": [
+        {
+          "framework": "lit-html",
+          "value": 27.18,
+          "confidenceLow": 26.129,
+          "confidenceHigh": 28.231,
+          "samples": 10
+        },
+        {
+          "framework": "vue",
+          "value": 27.63,
+          "confidenceLow": 26.929,
+          "confidenceHigh": 28.331,
+          "samples": 10
+        },
+        {
+          "framework": "vanillajs",
+          "value": 37.31,
+          "confidenceLow": 35.744,
+          "confidenceHigh": 38.876,
+          "samples": 10
+        },
+        {
+          "framework": "taipa",
+          "value": 37.77,
+          "confidenceLow": 36.459,
+          "confidenceHigh": 39.081,
+          "samples": 10
+        },
+        {
+          "framework": "react",
+          "value": 43.48,
+          "confidenceLow": 42.748,
+          "confidenceHigh": 44.212,
+          "samples": 10
+        },
+        {
+          "framework": "ilha",
+          "value": 50.24,
+          "confidenceLow": 47.656,
+          "confidenceHigh": 52.824,
+          "samples": 10
         }
       ]
     },
@@ -81,28 +218,95 @@
       "unit": "ms",
       "results": [
         {
+          "framework": "lit-html",
+          "value": 10.46,
+          "confidenceLow": 6.602,
+          "confidenceHigh": 14.318,
+          "samples": 10
+        },
+        {
           "framework": "vue",
-          "value": 81
-        },
-        {
-          "framework": "vanillajs",
-          "value": 95.2
-        },
-        {
-          "framework": "taipa",
-          "value": 96.3
-        },
-        {
-          "framework": "ilha",
-          "value": 99.7
+          "value": 10.85,
+          "confidenceLow": 7.395,
+          "confidenceHigh": 14.305,
+          "samples": 10
         },
         {
           "framework": "react",
-          "value": 134.2
+          "value": 12.9,
+          "confidenceLow": 11.625,
+          "confidenceHigh": 14.175,
+          "samples": 10
+        },
+        {
+          "framework": "vanillajs",
+          "value": 20.08,
+          "confidenceLow": 18.49,
+          "confidenceHigh": 21.67,
+          "samples": 10
+        },
+        {
+          "framework": "taipa",
+          "value": 20.69,
+          "confidenceLow": 18.876,
+          "confidenceHigh": 22.504,
+          "samples": 10
+        },
+        {
+          "framework": "ilha",
+          "value": 26.42,
+          "confidenceLow": 25.93,
+          "confidenceHigh": 26.91,
+          "samples": 10
+        }
+      ]
+    },
+    {
+      "name": "swap rows",
+      "metric": "milliseconds",
+      "unit": "ms",
+      "results": [
+        {
+          "framework": "vue",
+          "value": 12.26,
+          "confidenceLow": 9.129,
+          "confidenceHigh": 15.391,
+          "samples": 10
         },
         {
           "framework": "lit-html",
-          "value": 1907.8
+          "value": 13.01,
+          "confidenceLow": 9.854,
+          "confidenceHigh": 16.166,
+          "samples": 10
+        },
+        {
+          "framework": "vanillajs",
+          "value": 19.1,
+          "confidenceLow": 17.734,
+          "confidenceHigh": 20.466,
+          "samples": 10
+        },
+        {
+          "framework": "taipa",
+          "value": 19.62,
+          "confidenceLow": 18.831,
+          "confidenceHigh": 20.409,
+          "samples": 10
+        },
+        {
+          "framework": "react",
+          "value": 25.37,
+          "confidenceLow": 24.68,
+          "confidenceHigh": 26.06,
+          "samples": 10
+        },
+        {
+          "framework": "ilha",
+          "value": 25.71,
+          "confidenceLow": 25.384,
+          "confidenceHigh": 26.036,
+          "samples": 10
         }
       ]
     },
@@ -113,27 +317,27 @@
       "results": [
         {
           "framework": "vanillajs",
-          "value": 2379796
+          "value": 2307492
         },
         {
           "framework": "taipa",
-          "value": 2855240
+          "value": 2676832
         },
         {
           "framework": "ilha",
-          "value": 3298812
+          "value": 2926284
         },
         {
           "framework": "lit-html",
-          "value": 3724288
+          "value": 3233840
         },
         {
           "framework": "vue",
-          "value": 5810188
+          "value": 5420968
         },
         {
           "framework": "react",
-          "value": 10019480
+          "value": 15058652
         }
       ]
     },
@@ -144,27 +348,27 @@
       "results": [
         {
           "framework": "vanillajs",
-          "value": 2517540
+          "value": 2571412
         },
         {
           "framework": "taipa",
-          "value": 2771440
-        },
-        {
-          "framework": "lit-html",
-          "value": 3873492
+          "value": 2994360
         },
         {
           "framework": "ilha",
-          "value": 4171192
+          "value": 3327880
+        },
+        {
+          "framework": "lit-html",
+          "value": 3533856
         },
         {
           "framework": "vue",
-          "value": 5960636
+          "value": 5729032
         },
         {
           "framework": "react",
-          "value": 17162512
+          "value": 16749460
         }
       ]
     }

@@ -113,7 +113,7 @@ test("batch returns the callback result", () => {
   expect(batch(() => 42)).toBe(42);
 });
 
-test("an exception inside batch still balances batching (try/finally)", () => {
+test("an exception inside batch still balances batching", () => {
   const a = signal(0);
   let runs = 0;
   effect(() => {
@@ -138,4 +138,44 @@ test("an exception inside batch still balances batching (try/finally)", () => {
     a(3);
   });
   expect(runs).toBe(4);
+});
+
+test("a callback error takes precedence over an effect error while closing the batch", () => {
+  const callbackFailure = new Error("callback failed");
+  const effectFailure = new Error("effect failed");
+  const value = signal(0);
+  const seen: number[] = [];
+  effect(() => {
+    const current = value();
+    if (current === 1) {
+      throw effectFailure;
+    }
+    seen.push(current);
+  });
+
+  expect(() =>
+    batch(() => {
+      value(1);
+      throw callbackFailure;
+    }),
+  ).toThrow(callbackFailure);
+
+  value(2);
+  expect(seen).toEqual([0, 2]);
+});
+
+test("an effect error while closing propagates when the callback succeeds", () => {
+  const effectFailure = new Error("effect failed");
+  const value = signal(0);
+  effect(() => {
+    if (value() === 1) {
+      throw effectFailure;
+    }
+  });
+
+  expect(() =>
+    batch(() => {
+      value(1);
+    }),
+  ).toThrow(effectFailure);
 });

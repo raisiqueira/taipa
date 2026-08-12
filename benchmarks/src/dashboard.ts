@@ -4,6 +4,9 @@ import report from "./results.json";
 interface OperationResult {
   readonly framework: string;
   readonly value: number;
+  readonly confidenceLow?: number;
+  readonly confidenceHigh?: number;
+  readonly samples?: number;
 }
 
 interface Operation {
@@ -16,6 +19,7 @@ interface Operation {
 interface BenchmarkReport {
   readonly timestamp: string;
   readonly gitHash: string;
+  readonly gitDirty: boolean;
   readonly frameworks: readonly string[];
   readonly operations: readonly Operation[];
 }
@@ -64,6 +68,14 @@ function formatValue(value: number, unit: Operation["unit"]): string {
   return `${(value / 1024 / 1024).toFixed(2)} MB`;
 }
 
+function formatResultValue(result: OperationResult, unit: Operation["unit"]): string {
+  const value = formatValue(result.value, unit);
+  if (unit !== "ms" || result.confidenceLow === undefined || result.confidenceHigh === undefined) {
+    return value;
+  }
+  return `${value} (${result.confidenceLow.toFixed(1)}-${result.confidenceHigh.toFixed(1)})`;
+}
+
 function relativePercent(value: number, best: number): number {
   if (best === 0) return 0;
   return ((value - best) / best) * 100;
@@ -81,70 +93,6 @@ function relativeBadgeClasses(value: number, best: number): string {
   if (delta <= 25) return "bg-slate-100 text-slate-700";
   if (delta <= 100) return "bg-amber-100 text-amber-800";
   return "bg-rose-100 text-rose-800";
-}
-
-// Geometric mean of each framework's per-operation ratio to that operation's best.
-// 1.00 = would be the fastest/lightest everywhere; higher is worse.
-function overallScores(): Array<{ framework: string; score: number; wins: number }> {
-  return data.frameworks
-    .map((framework) => {
-      let product = 1;
-      let wins = 0;
-      for (const operation of data.operations) {
-        const best = bestValue(operation);
-        const entry = operation.results.find((result) => result.framework === framework);
-        if (entry === undefined) continue;
-        product *= entry.value / best;
-        if (entry.value === best) wins += 1;
-      }
-      const score = product ** (1 / data.operations.length);
-      return { framework, score, wins };
-    })
-    .sort((left, right) => left.score - right.score);
-}
-
-function overviewSection(): string {
-  const rows = overallScores()
-    .map((entry, index) => {
-      const highlighted = entry.framework === HIGHLIGHT;
-      const rowClass = highlighted ? "bg-indigo-50" : index % 2 === 1 ? "bg-slate-50/60" : "";
-      const nameClass = highlighted
-        ? "font-semibold text-indigo-700"
-        : "font-medium text-slate-800";
-      const badge = highlighted
-        ? `<span class="ml-2 rounded-full bg-indigo-600 px-2 py-0.5 text-[11px] font-medium text-white">this repo</span>`
-        : "";
-      return `
-        <tr class="${rowClass}">
-          <td class="px-4 py-3 text-slate-400 tabular-nums">${index + 1}</td>
-          <td class="px-4 py-3 ${nameClass}">${escapeHtml(displayName(entry.framework))}${badge}</td>
-          <td class="px-4 py-3 text-right font-mono tabular-nums text-slate-800">${entry.score.toFixed(2)}×</td>
-          <td class="px-4 py-3 text-right tabular-nums text-slate-500">${entry.wins}</td>
-        </tr>`;
-    })
-    .join("");
-
-  return `
-    <section class="mt-10">
-      <h2 class="text-lg font-semibold text-slate-900">Overall standing</h2>
-      <p class="mt-1 text-sm text-slate-500">
-        Geometric mean of each framework's ratio to the best result across all five operations.
-        <span class="font-mono">1.00×</span> would mean fastest and lightest everywhere &mdash; lower is better.
-      </p>
-      <div class="mt-4 overflow-hidden rounded-lg border border-slate-200">
-        <table class="w-full border-collapse text-sm">
-          <thead>
-            <tr class="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
-              <th class="px-4 py-2 font-medium">#</th>
-              <th class="px-4 py-2 font-medium">Framework</th>
-              <th class="px-4 py-2 text-right font-medium">Overall</th>
-              <th class="px-4 py-2 text-right font-medium">Best-in-op</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">${rows}</tbody>
-        </table>
-      </div>
-    </section>`;
 }
 
 function operationSection(operation: Operation): string {
@@ -169,7 +117,7 @@ function operationSection(operation: Operation): string {
             <span class="block h-2.5 rounded-full ${barClass}" style="width: ${width.toFixed(2)}%"></span>
           </span>
           <span class="flex items-center justify-end gap-2 whitespace-nowrap">
-            <span class="font-mono text-sm tabular-nums text-slate-800">${formatValue(result.value, operation.unit)}</span>
+            <span class="font-mono text-sm tabular-nums text-slate-800">${formatResultValue(result, operation.unit)}</span>
             <span class="rounded-full px-2 py-0.5 text-xs font-medium tabular-nums ${badgeClass}">${relativeLabel(result.value, best)}</span>
           </span>
         </li>`;
@@ -210,8 +158,8 @@ function header(): string {
           <dd class="mt-0.5 font-mono text-slate-700">${escapeHtml(formattedTimestamp)}</dd>
         </div>
         <div>
-          <dt class="text-xs uppercase tracking-wide text-slate-400">Commit</dt>
-          <dd class="mt-0.5 font-mono text-slate-700">${escapeHtml(shortHash)}</dd>
+          <dt class="text-xs uppercase tracking-wide text-slate-400">Source</dt>
+          <dd class="mt-0.5 font-mono text-slate-700">${escapeHtml(shortHash)}${data.gitDirty ? " (dirty)" : ""}</dd>
         </div>
         <div>
           <dt class="text-xs uppercase tracking-wide text-slate-400">Frameworks</dt>
@@ -242,9 +190,11 @@ function render(): string {
   return `
     <main class="mx-auto max-w-4xl px-6 py-12">
       ${header()}
-      ${overviewSection()}
-      <section class="mt-12">
+      <section class="mt-10">
         <h2 class="text-lg font-semibold text-slate-900">Per-operation results</h2>
+        <p class="mt-1 text-sm text-slate-500">
+          Adapters retain their native row-identity strategies, so these point estimates are not combined into an overall score.
+        </p>
         ${legend()}
         <div class="mt-5 grid gap-5">
           ${data.operations.map(operationSection).join("")}

@@ -67,6 +67,9 @@ export function buildData(count = 1000): RowData[] {
     };
     nextId += 1;
   }
+  (
+    globalThis as typeof globalThis & { __taipaBenchmarkLatestRows?: readonly RowData[] }
+  ).__taipaBenchmarkLatestRows = data;
   return data;
 }
 

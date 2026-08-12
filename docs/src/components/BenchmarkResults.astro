@@ -10,6 +10,10 @@ const format = (value: number, unit: string) =>
   unit === "bytes" ? `${(value / 1_000_000).toFixed(2)} MB` : `${value.toFixed(1)} ms`;
 const metricLabel = (unit: string) => (unit === "bytes" ? "Heap used" : "Time");
 const hostMemory = `${(results.environment.hostMemoryBytes / 1024 ** 3).toFixed(1)} GiB`;
+const cpuSamples = "cpuSamples" in results.environment ? results.environment.cpuSamples : 1;
+const sourceRevision = results.gitDirty
+  ? `a dirty working tree based on ${results.gitHash.slice(0, 8)}`
+  : `commit ${results.gitHash.slice(0, 8)}`;
 const comparison = (value: number, best: number, unit: string, index: number) => {
   if (index === 0) return "Reference";
 
@@ -21,7 +25,7 @@ const comparison = (value: number, best: number, unit: string, index: number) =>
 <aside class="benchmark-provenance">
   <strong>How to read this snapshot</strong>
   <p>
-    Recorded {timestamp} UTC at commit <code>{results.gitHash.slice(0, 8)}</code> with {results.environment.chromium}, {results.environment.node} on {results.environment.platform}, {results.environment.processor} ({results.environment.logicalCores} logical cores, {results.environment.architecture}), and {hostMemory} host memory. Each operation has {results.environment.warmups} warmups before one measured run.
+    Recorded {timestamp} UTC from {sourceRevision} with {results.environment.chromium}, {results.environment.node} on {results.environment.platform}, {results.environment.processor} ({results.environment.logicalCores} logical cores, {results.environment.architecture}), and {hostMemory} host memory. CPU operations use {results.environment.warmups} warmups and {cpuSamples} measured samples; each memory row is a single validated reading from its own fresh page.
   </p>
 </aside>
 
@@ -37,7 +41,12 @@ const comparison = (value: number, best: number, unit: string, index: number) =>
           {operation.results.map((result, index) => (
             <tr>
               <td><strong>{result.framework}</strong></td>
-              <td>{format(result.value, operation.unit)}</td>
+              <td>
+                {format(result.value, operation.unit)}
+                {operation.unit === "ms" && "confidenceLow" in result && "confidenceHigh" in result
+                  ? ` (${result.confidenceLow.toFixed(1)}-${result.confidenceHigh.toFixed(1)} 95% CI)`
+                  : null}
+              </td>
               <td>{comparison(result.value, best, operation.unit, index)}</td>
             </tr>
           ))}
