@@ -4,8 +4,14 @@
  * island interiors. Nested islands own their refs independently, so the
  * parent must not see them (and vice versa).
  */
-import { describe, expect, test } from "vite-plus/test";
-import { assertRequiredRefs, collectRefs, createRefMap } from "../../src/client/refs";
+import { afterEach, describe, expect, test, vi } from "vite-plus/test";
+import {
+  assertRequiredRefs,
+  collectRefs,
+  createRefMap,
+  lookedUpRefNames,
+  warnUnusedRef,
+} from "../../src/client/refs";
 
 function hostFrom(markup: string): HTMLElement {
   const template = document.createElement("template");
@@ -115,5 +121,35 @@ describe("createRefMap", () => {
   test("all() returns every match in document order and an empty array for unknown names", () => {
     expect(refs.all("dot").map((element) => element.textContent)).toEqual(["1", "2", "3"]);
     expect(refs.all("unknown")).toEqual([]);
+  });
+
+  test("records every lookup argument, including misses and throws", () => {
+    const recorded = createRefMap(collectRefs(host));
+    expect(recorded.one("save").textContent).toBe("s");
+    expect(recorded.optional("missing")).toBeNull();
+    expect(recorded.all("unknown")).toEqual([]);
+    expect(() => recorded.one("absent")).toThrowError(/"absent"/);
+    expect([...lookedUpRefNames(recorded)]).toEqual(["save", "missing", "unknown", "absent"]);
+  });
+});
+
+describe("warnUnusedRef", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("warns once per component, kind, and leftover name", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    warnUnusedRef("WarnOnceAlpha", "dead");
+    warnUnusedRef("WarnOnceAlpha", "dead");
+    warnUnusedRef("WarnOnceAlpha", "other");
+    expect(warn.mock.calls).toEqual([
+      [
+        '[Taipa] component "WarnOnceAlpha" has unused data-taipa-ref="dead"; check the island markup',
+      ],
+      [
+        '[Taipa] component "WarnOnceAlpha" has unused data-taipa-ref="other"; check the island markup',
+      ],
+    ]);
   });
 });
