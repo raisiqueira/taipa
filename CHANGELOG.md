@@ -4,6 +4,8 @@ All notable changes to `@taipa/ui` are documented here.
 
 ## Unreleased
 
+- After a successful hydrate, unused `data-taipa-ref` names warn once in the console so a leftover or mistyped markup hook is visible as an app mistake.
+
 ## 0.2.0
 
 - When a `batch()` callback and its closing effect flush both throw, `batch()` now preserves the callback error as the primary failure.

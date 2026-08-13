@@ -148,3 +148,26 @@ export function warnUnusedRef(componentName: string, refName: string): void {
     `[Taipa] component "${componentName}" has unused data-taipa-ref="${refName}"; check the island markup`,
   );
 }
+
+/**
+ * After a successful attach, warn for collected names that were neither
+ * required nor looked up. A throwing `console.warn` never escapes.
+ */
+export function warnUnusedCollectedRefs(
+  collected: CollectedRefs,
+  requiredRefs: readonly string[],
+  lookedUp: readonly string[],
+  componentName: string,
+): void {
+  const known = new Set<string>([...requiredRefs, ...lookedUp]);
+  for (const name of collected.byName.keys()) {
+    if (known.has(name)) {
+      continue;
+    }
+    try {
+      warnUnusedRef(componentName, name);
+    } catch {
+      // Warn-only must not change attach control flow.
+    }
+  }
+}

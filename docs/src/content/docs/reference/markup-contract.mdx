@@ -24,6 +24,8 @@ The server emits the island host, inert data, and fallback content. The client r
 
 Before attaching effects or listeners, hydration validates payload shapes and every singular ref declared through `bind()` and `on()`. Missing or duplicated singular refs leave the island inert and report one error.
 
+After a successful attach, leftover `data-taipa-ref` names that were never required and never passed to `refs.one`, `refs.optional`, or `refs.all` during that attach produce one console warning. A missing `optional` or `all` lookup stays silent. If you resolve a name later (click handler, later effect tick, or after `await` in `.connected()`), touch it once during attach — for example `void refs.optional("dialog")` in `.connected()` — so it is not treated as leftover.
+
 Props and state use separate `application/json` scripts. Each script is capped at 64 KiB by its post-escape JSON
 character count; this is a character compatibility limit, not a UTF-8 byte limit. The server rejects payloads that
 exceed it, and the browser applies the same limit before attachment.

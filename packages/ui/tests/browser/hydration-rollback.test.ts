@@ -28,6 +28,7 @@ function watchErrors(host: HTMLElement): CustomEvent[] {
 }
 
 afterEach(() => {
+  vi.restoreAllMocks();
   for (const host of created.splice(0)) {
     host.remove();
   }
@@ -63,7 +64,10 @@ test("a binding fault disposes everything, marks the host, and emits one error",
       };
     })
     .render(() => html`<output data-taipa-ref="out"></output>`);
-  const host = island(`<output data-taipa-ref="out"></output>`);
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  const host = island(
+    `<output data-taipa-ref="out"></output><i data-taipa-ref="rollback-orphan"></i>`,
+  );
   const errors = watchErrors(host);
   const markupBefore = host.innerHTML;
 
@@ -73,6 +77,7 @@ test("a binding fault disposes everything, marks the host, and emits one error",
   } catch (error) {
     thrown = error;
   }
+  expect(warn).not.toHaveBeenCalled();
 
   expect((thrown as Error).message).toBe("bind boom");
   expect(errors).toHaveLength(1);

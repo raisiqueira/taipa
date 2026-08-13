@@ -3,7 +3,12 @@
  * Browser coverage for the same helpers lives in tests/browser/refs.test.ts.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { createRefMap, lookedUpRefNames, warnUnusedRef } from "../../src/client/refs";
+import {
+  createRefMap,
+  lookedUpRefNames,
+  warnUnusedCollectedRefs,
+  warnUnusedRef,
+} from "../../src/client/refs";
 
 function emptyRefs() {
   return createRefMap({ byName: new Map() });
@@ -37,5 +42,43 @@ describe("warnUnusedRef", () => {
         '[Taipa] component "WarnOnceNodeAlpha" has unused data-taipa-ref="other"; check the island markup',
       ],
     ]);
+  });
+});
+
+describe("warnUnusedCollectedRefs", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function collected(...names: string[]) {
+    const byName = new Map<string, readonly Element[]>();
+    for (const name of names) {
+      byName.set(name, [{} as Element]);
+    }
+    return { byName };
+  }
+
+  test("warns leftover names and stays silent for required or looked-up names", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    warnUnusedCollectedRefs(
+      collected("save", "form", "from"),
+      ["save"],
+      ["form"],
+      "WarnOnceNodeBeta",
+    );
+    expect(warn.mock.calls).toEqual([
+      [
+        '[Taipa] component "WarnOnceNodeBeta" has unused data-taipa-ref="from"; check the island markup',
+      ],
+    ]);
+  });
+
+  test("swallows a throwing console.warn", () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {
+      throw new Error("warn boom");
+    });
+    expect(() =>
+      warnUnusedCollectedRefs(collected("orphan-throw"), [], [], "WarnOnceNodeGamma"),
+    ).not.toThrow();
   });
 });
