@@ -42,6 +42,8 @@ describe("warnUnusedRef", () => {
         '[Taipa] component "WarnOnceNodeAlpha" has unused data-taipa-ref="other"; check the island markup',
       ],
     ]);
+    warnUnusedRef("WarnOnceNodeOmega", "dead");
+    expect(warn).toHaveBeenCalledTimes(3);
   });
 });
 

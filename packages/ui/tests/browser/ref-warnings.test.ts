@@ -96,12 +96,27 @@ test("a second leftover name on the same island warns separately", () => {
 
 test("nested child leftover names do not warn on the parent", () => {
   const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-  const widget = component("WarnOnceBrowserZeta").render(
-    () => html`<span data-taipa-ref="outer"></span>`,
-  );
+  const widget = component("WarnOnceBrowserZeta")
+    .connected(({ refs }) => {
+      refs.optional("outer");
+    })
+    .render(() => html`<span data-taipa-ref="outer"></span>`);
   const parent = island(
     `<span data-taipa-ref="outer"></span><taipa-island><i data-taipa-ref="inner"></i></taipa-island>`,
   );
   hydrate(parent, widget);
   expect(warn).not.toHaveBeenCalled();
+});
+
+test("the same leftover name still warns on a different component", () => {
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  const first = component("WarnOnceBrowserEta").render(
+    () => html`<i data-taipa-ref="shared-dead"></i>`,
+  );
+  const second = component("WarnOnceBrowserTheta").render(
+    () => html`<i data-taipa-ref="shared-dead"></i>`,
+  );
+  hydrate(island(`<i data-taipa-ref="shared-dead"></i>`), first);
+  hydrate(island(`<i data-taipa-ref="shared-dead"></i>`), second);
+  expect(warn).toHaveBeenCalledTimes(2);
 });
