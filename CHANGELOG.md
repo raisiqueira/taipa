@@ -5,6 +5,7 @@ All notable changes to `@taipa/ui` are documented here.
 ## Unreleased
 
 - After a successful hydrate, unused `data-taipa-ref` names warn once in the console so a leftover or mistyped markup hook is visible as an app mistake.
+- Expanded `examples/` into a kitchensink: no-build `mount()`, then Node SSR routes for every hydration policy and a native progressive form.
 
 ## 0.2.0
 

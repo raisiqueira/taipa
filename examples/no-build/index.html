@@ -2,19 +2,83 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Taipa UI no-build example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Taipa UI no-build counter</title>
     <script type="importmap">
       {
         "imports": {
-          "alien-signals": "https://esm.sh/alien-signals@3.2.1",
-          "@taipa/ui": "https://esm.sh/@taipa/ui@0.1.0",
-          "@taipa/ui/client": "https://esm.sh/@taipa/ui@0.1.0/client"
+          "@taipa/ui": "https://esm.sh/@taipa/ui@0.2.0?external=alien-signals",
+          "@taipa/ui/client": "https://esm.sh/@taipa/ui@0.2.0/client?external=alien-signals",
+          "alien-signals": "https://esm.sh/alien-signals@3.2.1"
         }
       }
     </script>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", serif;
+        line-height: 1.5;
+        color: #142029;
+        background: #eef1ec;
+      }
+      body {
+        margin: 0;
+      }
+      main {
+        margin: 0 auto;
+        max-width: 36rem;
+        padding: 2.5rem 1.25rem;
+      }
+      h1,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: 2rem;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+      p {
+        margin-top: 0.65rem;
+      }
+      .counter {
+        align-items: center;
+        display: flex;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+      }
+      button {
+        appearance: none;
+        background: #142029;
+        border: 0;
+        color: #f8faf6;
+        cursor: pointer;
+        font: inherit;
+        min-height: 2.75rem;
+        min-width: 2.75rem;
+      }
+      button:focus-visible {
+        outline: 2px solid #0b4f8a;
+        outline-offset: 2px;
+      }
+      output {
+        font-size: 1.5rem;
+        font-variant-numeric: tabular-nums;
+        min-width: 3ch;
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
-    <div id="counter"></div>
+    <main>
+      <h1>Mount a counter</h1>
+      <p>
+        No bundler. The import map pins <code>@taipa/ui</code> and a single
+        <code>alien-signals</code> graph, then <code>mount()</code> renders once into an empty host.
+      </p>
+      <div id="counter"></div>
+    </main>
     <script type="module">
       import { component, html } from "@taipa/ui";
       import { mount } from "@taipa/ui/client";
@@ -24,17 +88,30 @@
         .bind("count", ({ element, state }) => {
           element.textContent = String(state.count());
         })
+        .on("decrement@click", ({ state }) => {
+          state.count(state.count() - 1);
+        })
         .on("increment@click", ({ state }) => {
           state.count(state.count() + 1);
         })
         .render(
           ({ state }) => html`
-            <button data-taipa-ref="increment">Increment</button>
-            <output data-taipa-ref="count">${state.count()}</output>
+            <div class="counter">
+              <button type="button" data-taipa-ref="decrement" aria-label="Decrease count">
+                -
+              </button>
+              <output data-taipa-ref="count" aria-live="polite">${state.count()}</output>
+              <button type="button" data-taipa-ref="increment" aria-label="Increase count">
+                +
+              </button>
+            </div>
           `,
         );
 
-      await mount(document.querySelector("#counter"), Counter, { replace: true });
+      const host = document.querySelector("#counter");
+      if (host instanceof HTMLElement) {
+        await mount(host, Counter, { replace: true });
+      }
     </script>
   </body>
 </html>

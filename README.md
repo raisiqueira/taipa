@@ -249,6 +249,21 @@ state, and imperative helpers. If your validator implements Standard Schema V1, 
 
 All entrypoints are ESM and side-effect free until you call an explicit runtime API.
 
+## Examples
+
+`examples/` is a small kitchensink:
+
+- `examples/no-build` mounts the counter in the browser with an import map and no bundler.
+- `examples/node-ssr` renders the same component on a Hono server, then walks every hydration
+  policy (`false`, `load`, `idle`, `visible`, `only`) plus a native form that still POSTs without
+  JavaScript.
+
+```sh
+pnpm --filter @taipa/example-node-ssr start
+```
+
+See [`examples/README.md`](./examples/README.md) for the route map.
+
 ## Workspace commands
 
 - `pnpm ready` runs the main check, test, and build lanes.
