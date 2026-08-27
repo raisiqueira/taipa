@@ -52,6 +52,7 @@ function counter() {
 }
 
 afterEach(() => {
+  vi.restoreAllMocks();
   for (const handle of handles.splice(0)) {
     handle.destroy();
   }
@@ -121,6 +122,7 @@ describe("client-only islands", () => {
   });
 
   test("off-DOM ref preflight failures keep fallback untouched", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const island = host(`${fallback("Loading")}${payload(1)}`);
     const missingRef = component<{ start: number }>("Counter")
       .bind("label", ({ element }) => {
@@ -134,6 +136,7 @@ describe("client-only islands", () => {
 
     expect(island.querySelector("[data-taipa-fallback]")?.textContent).toBe("Loading");
     expect(island.querySelector("span")).toBeNull();
+    expect(warn).not.toHaveBeenCalled();
     expect(unmount(island)).toBe(false);
   });
 });

@@ -50,6 +50,7 @@ function watchErrors(host: HTMLElement): CustomEvent[] {
 }
 
 afterEach(() => {
+  vi.restoreAllMocks();
   for (const host of created.splice(0)) {
     host.remove();
   }
@@ -166,10 +167,14 @@ describe("atomic preflight", () => {
   });
 
   test("missing required ref fails atomically with nothing attached", () => {
-    const host = island(`<output data-taipa-ref="label"></output>`);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const host = island(
+      `<output data-taipa-ref="label"></output><i data-taipa-ref="hydrate-preflight-orphan"></i>`,
+    );
     const errors = watchErrors(host);
     expect(() => hydrate(host, counter(), { props: { start: 0 } })).toThrowError(/"increment"/);
     expect(errors).toHaveLength(1);
+    expect(warn).not.toHaveBeenCalled();
     host.click();
     expect(host.querySelector("output")?.textContent).toBe("");
   });

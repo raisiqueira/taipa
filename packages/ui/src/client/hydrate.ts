@@ -10,6 +10,9 @@
  * runtime resource created so far is disposed in reverse order and the host
  * is marked with `data-taipa-error`; DOM writes already applied by user code
  * are not reversible and are left alone.
+ *
+ * Unused collected `data-taipa-ref` names warn only after a successful
+ * commit and `taipa:hydrated`. The warning never changes attach success.
  */
 import { effect, effectScope } from "alien-signals";
 import type { ComponentDefinition } from "../component";
@@ -39,6 +42,8 @@ import {
   collectRefs,
   createRefMap,
   elementForRef,
+  lookedUpRefNames,
+  warnUnusedCollectedRefs,
   type CollectedRefs,
 } from "./refs";
 import { claimRuntimeOwner } from "./runtime-owner";
@@ -164,6 +169,12 @@ export function attachComponent<P, S, D>(
   // A live instance means a previously failed attach has been superseded.
   host.removeAttribute("data-taipa-error");
   dispatchIslandEvent(host, "taipa:hydrated", { component: definition.name, host });
+  warnUnusedCollectedRefs(
+    collected,
+    definition.requiredRefs,
+    lookedUpRefNames(clientContext.refs),
+    definition.name,
+  );
   return instance;
 }
 
