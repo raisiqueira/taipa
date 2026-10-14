@@ -13,6 +13,7 @@ export default defineConfig({
     },
     dts: {
       tsgo: true,
+      tsconfig: "tsconfig.build.json",
     },
     exports: true,
   },
