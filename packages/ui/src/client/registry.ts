@@ -131,12 +131,16 @@ function parseJsonRegistry(document: Document): Map<string, JsonRegistryEntry> {
     if (DANGEROUS_KEYS.has(name)) {
       throw new TypeError(`registry contains dangerous key "${name}"`);
     }
-    map.set(name, normalizeJsonRegistryEntry(name, entry));
+    map.set(name, normalizeJsonRegistryEntry(name, entry, document));
   }
   return map;
 }
 
-function normalizeJsonRegistryEntry(name: string, entry: unknown): JsonRegistryEntry {
+function normalizeJsonRegistryEntry(
+  name: string,
+  entry: unknown,
+  document: Document,
+): JsonRegistryEntry {
   if (typeof entry !== "object" || entry === null || Array.isArray(entry)) {
     throw new TypeError(`registry entry for component "${name}" must be an object`);
   }
@@ -147,19 +151,78 @@ function normalizeJsonRegistryEntry(name: string, entry: unknown): JsonRegistryE
   if (record.export !== undefined && typeof record.export !== "string") {
     throw new TypeError(`registry entry for component "${name}" has an invalid export name`);
   }
-  assertApprovedSpecifier(record.src);
+  assertApprovedSpecifier(record.src, import.meta.url, document);
   return {
     src: record.src,
     ...(typeof record.export === "string" ? { exportName: record.export } : {}),
   };
 }
 
-export function assertApprovedSpecifier(specifier: string): void {
-  const scheme = specifier.match(/^([a-z][a-z0-9+.-]*):/i)?.[1]?.toLowerCase();
-  if (scheme === undefined || scheme === "https") {
+/**
+ * Page-authored registry srcs may only select http(s) modules on the consuming
+ * page's own origin. Resolve the specifier exactly the way import() does
+ * (bare-vs-URL classification, then URL resolution — against the importing
+ * module's URL only for path-like specifiers) and enforce the policy on the
+ * RESOLVED URL. Raw-string scheme matching cannot see protocol-relative
+ * ("//evil.example"), backslash ("/\evil.example", "//evil.example\x.js" — the
+ * URL parser normalizes backslashes after a special scheme), root-relative,
+ * traversal, or any-host https forms, all of which resolve away from the page
+ * origin; it also cannot see control-character scheme smuggling (the URL
+ * parser strips tab and newline anywhere), which is rejected outright.
+ * Applications that want module sources on other origins should use the
+ * trusted JavaScript registry or approve the exact specifier through
+ * resolveDomModule instead.
+ */
+export function assertApprovedSpecifier(
+  specifier: string,
+  baseURL: string = import.meta.url,
+  document: Document = globalThis.document,
+): void {
+  // oxlint-disable-next-line no-control-regex -- rejecting control characters is the point
+  if (/[\x00-\x20\x7f]/.test(specifier)) {
+    throw new Error(`unapproved control or whitespace character in registry source "${specifier}"`);
+  }
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(specifier);
+  const isPathLike =
+    specifier === "." ||
+    specifier === ".." ||
+    specifier.startsWith("/") ||
+    specifier.startsWith("\\") ||
+    specifier.startsWith("./") ||
+    specifier.startsWith("../") ||
+    specifier.startsWith(".\\") ||
+    specifier.startsWith("..\\");
+  if (!hasScheme && !isPathLike) {
+    // Bare specifiers resolve through the application's import map, which is
+    // trusted application code.
     return;
   }
-  throw new Error(`unapproved registry source scheme "${scheme}:" for "${specifier}"`);
+  const documentOrigin = document?.location?.origin;
+  if (documentOrigin === undefined) {
+    // A document without a browsing context cannot establish the page origin.
+    throw new Error(`unapproved registry source "${specifier}": page origin is unavailable`);
+  }
+  let resolved: URL;
+  try {
+    // import() parses a specifier with a scheme on its own: against a
+    // same-scheme base, "https:evil.example/x.js" would read as a same-origin
+    // path, but the loader fetches it from the host evil.example.
+    resolved = hasScheme ? new URL(specifier) : new URL(specifier, baseURL);
+  } catch {
+    throw new Error(`unapproved registry source "${specifier}": not a resolvable module specifier`);
+  }
+  if (resolved.protocol !== "https:" && resolved.protocol !== "http:") {
+    // data:, javascript:, and about: URLs have opaque origins that serialize
+    // as "null" — the same string srcdoc and about:blank documents report.
+    throw new Error(
+      `unapproved registry source "${specifier}": scheme "${resolved.protocol}" is not allowed`,
+    );
+  }
+  if (resolved.origin !== documentOrigin) {
+    throw new Error(
+      `unapproved registry source "${specifier}": resolves to origin "${resolved.origin}", expected "${documentOrigin}"`,
+    );
+  }
 }
 
 function assertSafeRegistryValue(value: unknown, path: string): void {

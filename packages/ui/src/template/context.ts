@@ -70,9 +70,46 @@ export function classifyAttribute(name: string): AttributeClass {
 
 type Mode = "text" | "tag" | "attrDq" | "attrSq" | "attrUq" | "comment";
 
+/**
+ * WHATWG script-data states (HTML Standard §13.2.5.14–.29). Inside `<script>`,
+ * the tokenizer reacts to `<!--` (escape start), `-->` (escape end), and
+ * `<script`/`</script` + delimiter transitions; a `</script>` end tag is only
+ * emitted outside the double-escaped states. The dash sub-states distinguish a
+ * `-->` that ends an established escape from one that only commits the
+ * escape-start dash run.
+ */
+type ScriptDataState =
+  | "data"
+  | "escapeStart"
+  | "escapeStartDash"
+  | "escaped"
+  | "escapedDash"
+  | "escapedDashDash"
+  | "double"
+  | "doubleDash"
+  | "doubleDashDash";
+
+/** `</script` + ASCII delimiter: script close in the data/escaped states,
+ *  escape end in the double-escaped states. */
+const SCRIPT_CLOSE = /<\/script[\t\n\f\r />]$/;
+/** `<script` + ASCII delimiter: double-escape start from the escaped states. */
+const SCRIPT_REOPEN = /<script[\t\n\f\r />]$/;
+/** `<!` opens a script-data escape from the data state. */
+const SCRIPT_ESCAPE_OPEN = /<!$/;
+/** `<!-` extends the escape start into its dash state. */
+const SCRIPT_ESCAPE_DASH = /<!-$/;
+
 const ASCII_LETTER = /[a-zA-Z]/;
 const TAG_NAME_CHAR = /[a-zA-Z0-9-]/;
-const WHITESPACE = /\s/;
+// WHATWG HTML tokenizer whitespace is exactly TAB/LF/FF/CR/SPACE (spec 13.2.5).
+// JavaScript's `\s` also matches VT, NBSP, U+1680, U+2000–U+200A, U+2028/9,
+// U+202F, U+205F, U+3000 and U+FEFF — characters every spec-conformant browser
+// parses as ordinary tag characters. Treating those as whitespace here
+// misclassifies the interpolation that follows them (a static `title=\u00A0"`
+// reads as a quoted attribute to this scanner but is an unquoted value to a
+// browser), letting escaped values inject new attributes. The class must match
+// the tokenizer's exactly, so a differential fails closed rather than open.
+const HTML_WHITESPACE = /[\t\n\f\r ]/;
 
 /**
  * A small state machine over the static parts of one template literal. The
@@ -94,9 +131,14 @@ export function createTemplateScanner(): {
   let attrName = "";
   /** Whether `=` followed the current attribute name (unquoted detection). */
   let attrAfterEquals = false;
+  /** Script-data escape state while rawtextTag === "script". */
+  let scriptData: ScriptDataState = "data";
+  /** Tail of script raw text carried across static segments so `<!--`,
+   *  `-->`, `<script`, and `</script` split across segments still match. */
+  let scriptTail = "";
 
   function isTagNameDelimiter(char: string | undefined): boolean {
-    return char === undefined || WHITESPACE.test(char) || char === "/" || char === ">";
+    return char === undefined || HTML_WHITESPACE.test(char) || char === "/" || char === ">";
   }
 
   function advance(segment: string): void {
@@ -106,6 +148,82 @@ export function createTemplateScanner(): {
     while (i < length) {
       if (mode === "text") {
         if (rawtextTag !== null) {
+          if (rawtextTag === "script") {
+            // Script raw text follows the WHATWG script-data states: `<!--`
+            // enters the escaped family, `<script` + delimiter enters the
+            // double-escaped family, and `</script>` only closes the element
+            // outside the double-escaped family. Modeling only the plain
+            // raw-text close let the scanner exit at a `</script>` the
+            // tokenizer treats as character data, so later interpolations
+            // were escaped as text while the browser parsed them as script.
+            const buffer = scriptTail + segment.slice(i);
+            let closedAt = -1;
+            for (let k = scriptTail.length; k < buffer.length; k += 1) {
+              const char = buffer[k] ?? "";
+              // Nine characters cover `</script` plus its delimiter.
+              const lookback = buffer.slice(Math.max(0, k - 8), k + 1).toLowerCase();
+              if (SCRIPT_CLOSE.test(lookback)) {
+                if (scriptData.startsWith("double")) {
+                  // Double-escape end: `</script>` is character data here.
+                  scriptData = "escaped";
+                } else {
+                  // Real end tag: character data may follow on the same line.
+                  closedAt = k;
+                  break;
+                }
+                continue;
+              }
+              if (SCRIPT_REOPEN.test(lookback) && scriptData.startsWith("escaped")) {
+                scriptData = "double";
+                continue;
+              }
+              if (SCRIPT_ESCAPE_OPEN.test(lookback) && scriptData === "data") {
+                scriptData = "escapeStart";
+                continue;
+              }
+              if (SCRIPT_ESCAPE_DASH.test(lookback) && scriptData === "escapeStart") {
+                scriptData = "escapeStartDash";
+                continue;
+              }
+              if (scriptData === "escapeStart" && char !== "-") {
+                scriptData = "data";
+              } else if (scriptData === "escapeStartDash" && char !== "-") {
+                scriptData = "escaped";
+              } else if (scriptData === "escaped" && char === "-") {
+                scriptData = "escapedDash";
+              } else if (scriptData === "escapedDash") {
+                scriptData = char === "-" ? "escapedDashDash" : "escaped";
+              } else if (scriptData === "escapedDashDash") {
+                if (char === ">") {
+                  scriptData = "data";
+                } else if (char !== "-") {
+                  scriptData = "escaped";
+                }
+              } else if (scriptData === "double" && char === "-") {
+                scriptData = "doubleDash";
+              } else if (scriptData === "doubleDash") {
+                scriptData = char === "-" ? "doubleDashDash" : "double";
+              } else if (scriptData === "doubleDashDash") {
+                if (char === ">") {
+                  scriptData = "data";
+                } else if (char !== "-") {
+                  scriptData = "double";
+                }
+              }
+            }
+            if (closedAt >= 0) {
+              const delimiterIndex = closedAt - scriptTail.length + i;
+              rawtextTag = null;
+              scriptData = "data";
+              scriptTail = "";
+              mode = "tag";
+              i = delimiterIndex;
+            } else {
+              scriptTail = buffer.slice(-9);
+              return;
+            }
+            continue;
+          }
           // Raw text ends only at a matching closing tag; everything else is
           // opaque character data, including `<` not followed by `/name`.
           const close = segment.indexOf("</", i);
@@ -194,7 +312,7 @@ export function createTemplateScanner(): {
 
       if (mode === "tag") {
         const char = segment[i];
-        if (WHITESPACE.test(char ?? "")) {
+        if (HTML_WHITESPACE.test(char ?? "")) {
           i += 1;
           continue;
         }
@@ -205,6 +323,8 @@ export function createTemplateScanner(): {
           if (pendingRawtext !== null) {
             rawtextTag = pendingRawtext;
             pendingRawtext = null;
+            scriptData = "data";
+            scriptTail = "";
           }
           i += 1;
           continue;
@@ -218,7 +338,7 @@ export function createTemplateScanner(): {
         let j = i;
         while (
           j < length &&
-          !WHITESPACE.test(segment[j] ?? "") &&
+          !HTML_WHITESPACE.test(segment[j] ?? "") &&
           segment[j] !== "=" &&
           segment[j] !== "/" &&
           segment[j] !== ">"
@@ -230,13 +350,13 @@ export function createTemplateScanner(): {
         i = j;
         // Look ahead past whitespace for `=`.
         let k = i;
-        while (k < length && WHITESPACE.test(segment[k] ?? "")) {
+        while (k < length && HTML_WHITESPACE.test(segment[k] ?? "")) {
           k += 1;
         }
         if (segment[k] === "=") {
           attrAfterEquals = true;
           k += 1;
-          while (k < length && WHITESPACE.test(segment[k] ?? "")) {
+          while (k < length && HTML_WHITESPACE.test(segment[k] ?? "")) {
             k += 1;
           }
           const quote = segment[k];
@@ -279,7 +399,7 @@ export function createTemplateScanner(): {
 
       // mode === "attrUq"
       let j = i;
-      while (j < length && !WHITESPACE.test(segment[j] ?? "") && segment[j] !== ">") {
+      while (j < length && !HTML_WHITESPACE.test(segment[j] ?? "") && segment[j] !== ">") {
         j += 1;
       }
       if (j === length) {
@@ -292,6 +412,8 @@ export function createTemplateScanner(): {
         if (pendingRawtext !== null) {
           rawtextTag = pendingRawtext;
           pendingRawtext = null;
+          scriptData = "data";
+          scriptTail = "";
         }
       } else {
         mode = "tag";
