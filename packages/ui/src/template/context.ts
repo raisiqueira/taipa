@@ -101,7 +101,15 @@ const SCRIPT_ESCAPE_DASH = /<!-$/;
 
 const ASCII_LETTER = /[a-zA-Z]/;
 const TAG_NAME_CHAR = /[a-zA-Z0-9-]/;
-const WHITESPACE = /\s/;
+// WHATWG HTML tokenizer whitespace is exactly TAB/LF/FF/CR/SPACE (spec 13.2.5).
+// JavaScript's `\s` also matches VT, NBSP, U+1680, U+2000–U+200A, U+2028/9,
+// U+202F, U+205F, U+3000 and U+FEFF — characters every spec-conformant browser
+// parses as ordinary tag characters. Treating those as whitespace here
+// misclassifies the interpolation that follows them (a static `title=\u00A0"`
+// reads as a quoted attribute to this scanner but is an unquoted value to a
+// browser), letting escaped values inject new attributes. The class must match
+// the tokenizer's exactly, so a differential fails closed rather than open.
+const HTML_WHITESPACE = /[\t\n\f\r ]/;
 
 /**
  * A small state machine over the static parts of one template literal. The
@@ -130,7 +138,7 @@ export function createTemplateScanner(): {
   let scriptTail = "";
 
   function isTagNameDelimiter(char: string | undefined): boolean {
-    return char === undefined || WHITESPACE.test(char) || char === "/" || char === ">";
+    return char === undefined || HTML_WHITESPACE.test(char) || char === "/" || char === ">";
   }
 
   function advance(segment: string): void {
@@ -304,7 +312,7 @@ export function createTemplateScanner(): {
 
       if (mode === "tag") {
         const char = segment[i];
-        if (WHITESPACE.test(char ?? "")) {
+        if (HTML_WHITESPACE.test(char ?? "")) {
           i += 1;
           continue;
         }
@@ -330,7 +338,7 @@ export function createTemplateScanner(): {
         let j = i;
         while (
           j < length &&
-          !WHITESPACE.test(segment[j] ?? "") &&
+          !HTML_WHITESPACE.test(segment[j] ?? "") &&
           segment[j] !== "=" &&
           segment[j] !== "/" &&
           segment[j] !== ">"
@@ -342,13 +350,13 @@ export function createTemplateScanner(): {
         i = j;
         // Look ahead past whitespace for `=`.
         let k = i;
-        while (k < length && WHITESPACE.test(segment[k] ?? "")) {
+        while (k < length && HTML_WHITESPACE.test(segment[k] ?? "")) {
           k += 1;
         }
         if (segment[k] === "=") {
           attrAfterEquals = true;
           k += 1;
-          while (k < length && WHITESPACE.test(segment[k] ?? "")) {
+          while (k < length && HTML_WHITESPACE.test(segment[k] ?? "")) {
             k += 1;
           }
           const quote = segment[k];
@@ -391,7 +399,7 @@ export function createTemplateScanner(): {
 
       // mode === "attrUq"
       let j = i;
-      while (j < length && !WHITESPACE.test(segment[j] ?? "") && segment[j] !== ">") {
+      while (j < length && !HTML_WHITESPACE.test(segment[j] ?? "") && segment[j] !== ">") {
         j += 1;
       }
       if (j === length) {

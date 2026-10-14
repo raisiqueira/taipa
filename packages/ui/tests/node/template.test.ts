@@ -114,6 +114,35 @@ test("unquoted attribute interpolation throws", () => {
   expect(() => html`<div class=${"x"}>y</div>`).toThrow(/unquoted attribute/);
 });
 
+test("non-ascii whitespace in statics no longer reads as quoted-attribute whitespace", () => {
+  // The WHATWG tokenizer treats only TAB/LF/FF/CR/SPACE as tag whitespace.
+  // NBSP (pasted from word processors, rendered &nbsp; text, CJK IME input,
+  // U+2028/9, U+FEFF, ...) next to an attribute is an ordinary tag character
+  // to a browser. When the scanner treated it as whitespace, these statics
+  // classified the interpolation as the quoted inert attribute `title` while
+  // the browser parsed it inside an unquoted value or a renamed element —
+  // letting an escaped value append new attributes (onmouseover=...) to the
+  // element. The scanner now agrees with the tokenizer's whitespace class and
+  // fails closed for all three trigger shapes.
+  // oxfmt reflows whitespace and quote adjacency in template literals, so
+  // build the templates at runtime with characters from explicit char codes.
+  const nbsp = String.fromCharCode(0x00a0);
+  const quote = String.fromCharCode(0x0022);
+  const runtime = (parts: string[]) => Object.assign(parts, { raw: parts }) as TemplateStringsArray;
+
+  expect(() =>
+    html(runtime(["<p title=" + nbsp + quote, quote + ">y</p>"]), "x onmouseover=alert(1) x"),
+  ).toThrow(/unquoted/);
+  expect(() =>
+    html(runtime(["<div" + nbsp + "title=" + quote, quote + ">y</div>"]), "x onfocus=alert(1) x"),
+  ).toThrow(/allowlisted interpolation context/);
+  expect(() =>
+    html(runtime(["<div data-x=foo" + nbsp + "title=" + quote, quote + ">y</div>"]), "x"),
+  ).toThrow(/unquoted/);
+  // Mixed ASCII whitespace still reads as the quoted attribute it looks like.
+  expect(html`<p title=" ${"ok"} ">x</p>`.value).toBe('<p title=" ok ">x</p>');
+});
+
 test("event handler attributes throw even when quoted", () => {
   expect(() => html`<div onclick="${"alert(1)"}">y</div>`).toThrow(/onclick/);
   expect(() => html`<div onmouseover="${"alert(1)"}">y</div>`).toThrow(/onmouseover/);
