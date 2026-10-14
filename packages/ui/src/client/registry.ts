@@ -155,6 +155,17 @@ function normalizeJsonRegistryEntry(name: string, entry: unknown): JsonRegistryE
 }
 
 export function assertApprovedSpecifier(specifier: string): void {
+  // ASCII control characters and whitespace are invisible to the scheme
+  // regex below, but the WHATWG URL parser that import() uses for module
+  // specifiers strips them: a JSON-escaped ("\t") tab in "da\tta:..." makes
+  // the character class stop at the tab, so no scheme is matched and the
+  // value passes as "relative" — then import() normalizes it to a
+  // `data:text/javascript,…` module the application never approved.
+  // safeUrl() enforces the same policy for URL attributes (template/safe-url.ts).
+  // oxlint-disable-next-line no-control-regex -- rejecting control characters is the point
+  if (/[\x00-\x20\x7f]/.test(specifier)) {
+    throw new Error(`unapproved control or whitespace character in registry source "${specifier}"`);
+  }
   const scheme = specifier.match(/^([a-z][a-z0-9+.-]*):/i)?.[1]?.toLowerCase();
   if (scheme === undefined || scheme === "https") {
     return;

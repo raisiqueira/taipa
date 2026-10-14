@@ -203,6 +203,33 @@ describe("approved specifiers", () => {
       expect(() => assertApprovedSpecifier(specifier)).toThrowError(/unapproved|scheme/i);
     }
   });
+
+  test("rejects control characters that smuggle schemes past the prefix check", () => {
+    // The WHATWG URL parser (import()'s resolver) strips tab/LF/CR anywhere and
+    // leading/trailing C0 controls and space before parsing the scheme, so each
+    // of these raw strings normalizes to "data:text/javascript,…" at the sink
+    // while the scheme regex above sees no scheme. (JSON.parse decodes \t, \n,
+    // and \r escapes inside the #taipa-registry script's JSON into real
+    // control characters in src.)
+    const payload = "text/javascript,globalThis.PWNED=1";
+    for (const specifier of [
+      `da\tta:${payload}`,
+      `da\nta:${payload}`,
+      `da\rta:${payload}`,
+      `data\t:${payload}`,
+      ` data:${payload}`,
+      `\tdata:${payload}`,
+      `\ndata:${payload}`,
+      `\u000bdata:${payload}`,
+      `\u0000data:${payload}`,
+      `data:${payload} `,
+      `https://a\tb.example/x.js`,
+    ]) {
+      expect(() => assertApprovedSpecifier(specifier)).toThrowError(
+        /control or whitespace character/i,
+      );
+    }
+  });
 });
 
 describe("document-scope loader cache", () => {
