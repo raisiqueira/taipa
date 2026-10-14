@@ -11,7 +11,7 @@ Taipa's safety model protects template interpolation, inert payload data, approv
 
 - HTML interpolation is allowed only in safe text and inert-attribute contexts.
 - Hydration props and state are recursively JSON-safe, inert-script escaped, and size-bounded before attachment.
-- Registry sources reject dangerous keys, oversized payloads, and unapproved URL schemes before loading a module.
+- Registry sources reject dangerous keys, oversized payloads, and specifiers that would resolve outside the page origin before loading a module.
 - Form errors are written with text APIs, never as trusted HTML.
 
 ## What the application owns

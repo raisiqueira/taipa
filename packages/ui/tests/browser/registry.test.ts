@@ -3,9 +3,9 @@
  *
  * JavaScript registries are trusted application code and override page JSON.
  * The inert JSON registry is data: it is capped, duplicate-checked, sanitized
- * against prototype-pollution keys, and may only name approved specifier
- * schemes. `data-taipa-src` is inert unless the application explicitly
- * approves the exact specifier through resolveDomModule.
+ * against prototype-pollution keys, and its srcs must resolve to the page
+ * origin the way import() resolves them. `data-taipa-src` is inert unless the
+ * application explicitly approves the exact specifier through resolveDomModule.
  */
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import type { ComponentLoader } from "../../src/types";
@@ -180,37 +180,73 @@ describe("JSON registry safety", () => {
 });
 
 describe("approved specifiers", () => {
-  test("allows bare, relative, root-relative, and https specifiers without rewriting", () => {
+  test("resolves specifiers the way import() does and allows same-origin and import-map forms", () => {
     for (const specifier of [
       "counter",
       "@scope/counter",
       "./counter.js",
       "../counter.js",
       "/counter.js",
-      "https://cdn.example/counter.js",
+      `${location.origin}/counter.js`,
     ]) {
-      expect(() => assertApprovedSpecifier(specifier)).not.toThrow();
+      expect(() => assertApprovedSpecifier(specifier, import.meta.url, document)).not.toThrow();
     }
   });
 
-  test("rejects unapproved URL schemes", () => {
+  test("rejects specifiers that resolve away from the page origin", () => {
+    for (const specifier of [
+      "//evil.example/x.js",
+      "/\\evil.example/x.js",
+      "//evil.example\\x.js",
+      "\\\\evil.example\\x.js",
+    ]) {
+      expect(() => assertApprovedSpecifier(specifier, import.meta.url, document)).toThrowError(
+        /unapproved registry source/,
+      );
+    }
+  });
+
+  test("CDN-delivered bundles resolve relative specifiers against the bundle URL", () => {
+    const cdnBaseURL = "https://cdn.example/@taipa/ui/client.mjs";
+    // Import-map specifiers still go through the application's trusted map.
+    expect(() => assertApprovedSpecifier("counter", cdnBaseURL, document)).not.toThrow();
+    // Root-relative and traversal forms would resolve onto the CDN origin:
+    // no-build delivery serves this bundle from a CDN that also serves
+    // attacker-publishable npm packages, so they must not be approved from
+    // page JSON alone.
+    for (const specifier of ["/attacker-pkg@1.0.0/evil.mjs", "./evil.mjs", "../evil.mjs"]) {
+      expect(() => assertApprovedSpecifier(specifier, cdnBaseURL, document)).toThrowError(
+        /unapproved registry source/,
+      );
+    }
+    // While a bundle served from the page's own origin keeps relative loading.
+    expect(() =>
+      assertApprovedSpecifier("/counter.js", `${location.origin}/static/client.mjs`, document),
+    ).not.toThrow();
+  });
+
+  test("rejects unapproved URL schemes and cross-origin https sources", () => {
     for (const specifier of [
       "javascript:alert(1)",
       "data:text/javascript,export{}",
+      "blob:https://evil.example/x.js",
       "http://example.com/x.js",
+      "https://evil.example/x.js",
       "file:///tmp/x.js",
     ]) {
-      expect(() => assertApprovedSpecifier(specifier)).toThrowError(/unapproved|scheme/i);
+      expect(() => assertApprovedSpecifier(specifier, import.meta.url, document)).toThrowError(
+        /unapproved registry source/,
+      );
     }
   });
 
-  test("rejects control characters that smuggle schemes past the prefix check", () => {
+  test("rejects control characters that smuggle schemes past classification", () => {
     // The WHATWG URL parser (import()'s resolver) strips tab/LF/CR anywhere and
     // leading/trailing C0 controls and space before parsing the scheme, so each
-    // of these raw strings normalizes to "data:text/javascript,…" at the sink
-    // while the scheme regex above sees no scheme. (JSON.parse decodes \t, \n,
-    // and \r escapes inside the #taipa-registry script's JSON into real
-    // control characters in src.)
+    // of these raw strings would normalize to "data:text/javascript,…" at the
+    // sink. The gate rejects them outright so the raw string never reaches it.
+    // (JSON.parse decodes \t, \n, and \r escapes inside the #taipa-registry
+    // script's JSON into real control characters in src.)
     const payload = "text/javascript,globalThis.PWNED=1";
     for (const specifier of [
       `da\tta:${payload}`,
@@ -225,7 +261,7 @@ describe("approved specifiers", () => {
       `data:${payload} `,
       `https://a\tb.example/x.js`,
     ]) {
-      expect(() => assertApprovedSpecifier(specifier)).toThrowError(
+      expect(() => assertApprovedSpecifier(specifier, import.meta.url, document)).toThrowError(
         /control or whitespace character/i,
       );
     }
