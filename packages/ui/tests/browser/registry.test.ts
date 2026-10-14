@@ -206,6 +206,47 @@ describe("approved specifiers", () => {
     }
   });
 
+  test("parses specifiers that carry a scheme without the base URL, as import() does", () => {
+    // import() only resolves "/", "./", and "../" specifiers against the
+    // importing module's URL. With a same-scheme base, new URL() would read
+    // "https:evil.example/x.js" as a path on the page origin, while import()
+    // loads it from the host evil.example.
+    for (const specifier of [
+      `${location.protocol}evil.example/x.js`,
+      `${location.protocol}/evil.example/x.js`,
+      `${location.protocol}\\evil.example\\x.js`,
+      "https:evil.example/x.js",
+    ]) {
+      expect(() => assertApprovedSpecifier(specifier, import.meta.url, document)).toThrowError(
+        /unapproved registry source/,
+      );
+    }
+  });
+
+  test("rejects non-http(s) schemes in documents whose origin serializes as null", async () => {
+    // srcdoc and about:blank frames report location.origin as "null", which
+    // equals the opaque origin of every data:, javascript:, and about: URL.
+    const frame = document.createElement("iframe");
+    frame.srcdoc = "<!doctype html>";
+    const loaded = new Promise((resolve) =>
+      frame.addEventListener("load", resolve, { once: true }),
+    );
+    document.body.append(frame);
+    elements.push(frame);
+    await loaded;
+    const frameDocument = frame.contentDocument as Document;
+    expect(frameDocument.location.origin).toBe("null");
+    for (const specifier of [
+      "data:text/javascript,globalThis.PWNED=1;export{}",
+      "javascript:alert(1)",
+      "about:blank",
+    ]) {
+      expect(() => assertApprovedSpecifier(specifier, import.meta.url, frameDocument)).toThrowError(
+        /unapproved registry source/,
+      );
+    }
+  });
+
   test("CDN-delivered bundles resolve relative specifiers against the bundle URL", () => {
     const cdnBaseURL = "https://cdn.example/@taipa/ui/client.mjs";
     // Import-map specifiers still go through the application's trusted map.

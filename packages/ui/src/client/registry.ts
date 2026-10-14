@@ -159,18 +159,19 @@ function normalizeJsonRegistryEntry(
 }
 
 /**
- * Page-authored registry srcs may only select modules on the consuming page's
- * own origin. Resolve the specifier exactly the way import() does (WHATWG
- * normalization, bare-vs-URL classification, then URL resolution against the
- * importing module's URL) and enforce the policy on the RESOLVED URL.
- * Raw-string scheme matching cannot see protocol-relative ("//evil.example"),
- * backslash ("/\evil.example", "//evil.example\x.js" — the URL parser
- * normalizes backslashes after a special scheme), root-relative, traversal, or
- * any-host https forms, all of which resolve away from the page origin; it also
- * cannot see control-character scheme smuggling (the URL parser strips tab and
- * newline anywhere), which is rejected above. Applications that want module
- * sources on other origins should use the trusted JavaScript registry or
- * approve the exact specifier through resolveDomModule instead.
+ * Page-authored registry srcs may only select http(s) modules on the consuming
+ * page's own origin. Resolve the specifier exactly the way import() does
+ * (bare-vs-URL classification, then URL resolution — against the importing
+ * module's URL only for path-like specifiers) and enforce the policy on the
+ * RESOLVED URL. Raw-string scheme matching cannot see protocol-relative
+ * ("//evil.example"), backslash ("/\evil.example", "//evil.example\x.js" — the
+ * URL parser normalizes backslashes after a special scheme), root-relative,
+ * traversal, or any-host https forms, all of which resolve away from the page
+ * origin; it also cannot see control-character scheme smuggling (the URL
+ * parser strips tab and newline anywhere), which is rejected outright.
+ * Applications that want module sources on other origins should use the
+ * trusted JavaScript registry or approve the exact specifier through
+ * resolveDomModule instead.
  */
 export function assertApprovedSpecifier(
   specifier: string,
@@ -203,9 +204,19 @@ export function assertApprovedSpecifier(
   }
   let resolved: URL;
   try {
-    resolved = new URL(specifier, baseURL);
+    // import() parses a specifier with a scheme on its own: against a
+    // same-scheme base, "https:evil.example/x.js" would read as a same-origin
+    // path, but the loader fetches it from the host evil.example.
+    resolved = hasScheme ? new URL(specifier) : new URL(specifier, baseURL);
   } catch {
     throw new Error(`unapproved registry source "${specifier}": not a resolvable module specifier`);
+  }
+  if (resolved.protocol !== "https:" && resolved.protocol !== "http:") {
+    // data:, javascript:, and about: URLs have opaque origins that serialize
+    // as "null" — the same string srcdoc and about:blank documents report.
+    throw new Error(
+      `unapproved registry source "${specifier}": scheme "${resolved.protocol}" is not allowed`,
+    );
   }
   if (resolved.origin !== documentOrigin) {
     throw new Error(
