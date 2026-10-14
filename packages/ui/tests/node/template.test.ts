@@ -155,6 +155,86 @@ test("an unclosed raw-text element still forbids later interpolation", () => {
   expect(() => html`<script>const x = 1; ${"alert(1)"}`).toThrow(/raw-text/);
 });
 
+// ---------------------------------------------------------------------------
+// Script data escaped / double-escaped states (HTML Standard §13.2.5.14–.29).
+// Inside <script>, `<!--` plus `<script` + delimiter put the tokenizer into
+// the double-escaped states where `</script>` is character data — the script
+// stays open. Interpolations after such a phantom close must stay forbidden,
+// never degrade to escaped text concatenated into live script source.
+// ---------------------------------------------------------------------------
+
+test("a </script> inside double-escaped script data does not close the script", () => {
+  // Statics: `<script>` … `<!--` … `<script src=x>` … `</script>`. The HTML
+  // tokenizer is in the script-data-double-escaped state at the author's
+  // `</script>` (double escape end, only back to escaped), so the script
+  // element is still open when the interpolation lands. The scanner used to
+  // clear its raw-text tracking at that close, classifying the interpolation
+  // as ordinary text (escaping &, <, >, ", ' — a set JavaScript never needs)
+  // and emitting attacker-controlled JavaScript into live script source.
+  const attempt = () =>
+    html`<script> console.log("hi"); <!-- <script src=x> </script>
+      ${"alert(document.domain)"}; console.log("after"); </script>`;
+  expect(attempt).toThrow(/raw-text/);
+});
+
+test("script escape states close normally when --> precedes the end tag", () => {
+  // The legacy comment-hiding idiom: `<!--` opens the escaped family and
+  // `//-->` closes it, so the tokenizer is back in plain script data when
+  // `</script>` arrives. The scanner must agree with the tokenizer (close the
+  // raw-text tracking there) so interpolation after the script is plain text.
+  // oxfmt would reflow a raw template with this shape, so build it at runtime.
+  const strings = Object.assign(
+    [
+      "<script> var x = 1; <!-- hide from old parsers; var y = 2;\n      // --> </script><p>",
+      "</p>",
+    ],
+    {
+      raw: [
+        "<script> var x = 1; <!-- hide from old parsers; var y = 2;\n      // --> </script><p>",
+        "</p>",
+      ],
+    },
+  ) as TemplateStringsArray;
+  const rendered = html(strings, "<echo>");
+  // The interpolation after `</script>` is ordinary escaped text; the static
+  // segments, including the comment markers, pass through untouched.
+  expect(rendered.value).toContain("// --> </script><p>&lt;echo&gt;</p>");
+});
+
+test("a comment-hiding idiom without --> keeps the script open past its end tag", () => {
+  // `<!--` inside a script string literal with no `-->` before `</script>`:
+  // the browser never leaves the script-data-escaped family here, so the end
+  // tag is consumed as character data and the element stays open. The
+  // interpolation must be rejected (fail closed), not escaped as text.
+  expect(
+    () =>
+      html`<script>
+        var s = "<!--";
+        var more = 1;
+        ${"alert(1)"};
+      </script>`,
+  ).toThrow(/raw-text/);
+});
+
+test("<script with a delimiter inside script data only double-escapes after <!--", () => {
+  // Without `<!` the tokenizer stays in the plain script-data state:
+  // `<script src=x>` is character data and `</script>` closes for real.
+  const noEscape = html`<script>
+      var t = "<script src=x>";
+    </script>
+    <p>${"<echo>"}</p>`;
+  expect(noEscape.value).toContain("<script>");
+  expect(noEscape.value).toContain("<p>&lt;echo&gt;</p>");
+  // With `<!--` before it, the same string switches to double-escaped, the
+  // end tag becomes character data, and the script stays open.
+  const attempt = () =>
+    html`<script>
+      var t = "<!-- <script src=x>";
+      ${"alert(1)"};
+    </script>`;
+  expect(attempt).toThrow(/raw-text/);
+});
+
 test("interpolation inside HTML comments throws", () => {
   expect(() => html`<!-- ${"x"} -->`).toThrow(/comment/);
 });
